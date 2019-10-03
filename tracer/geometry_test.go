@@ -286,6 +286,14 @@ func TestVector_Sub(t *testing.T) {
 			},
 			want: NewVector(-2, -4, -6),
 		},
+		{
+			name: "vector - zero vector",
+			v:    NewVector(0, 0, 0),
+			args: args{
+				t: NewVector(1, -2, 3),
+			},
+			want: NewVector(-1, 2, -3),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -309,6 +317,25 @@ func TestVector_Sub(t *testing.T) {
 	for _, tt := range panicTests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Panics(t, func() { tt.v.Sub(tt.args.t) }, "should panic")
+		})
+	}
+}
+
+func TestVector_Negate(t *testing.T) {
+	tests := []struct {
+		name string
+		v    Vector
+		want Vector
+	}{
+		{
+			name: "negate",
+			v:    NewVector(1, -2, 3),
+			want: NewVector(-1, 2, -3),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.v.Negate(), tt.want, "should be equal")
 		})
 	}
 }

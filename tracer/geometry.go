@@ -130,3 +130,8 @@ func (v Vector) Sub(t Tuple) Tuple {
 	// t is a point, return a vector
 	return NewVector(v.X()-t.X(), v.Y()-t.Y(), v.Z()-t.Z())
 }
+
+// Negate negates the vector (subtracts it from the zero vector)
+func (v Vector) Negate() Vector {
+	return NewVector(0, 0, 0).Sub(v).(Vector)
+}
