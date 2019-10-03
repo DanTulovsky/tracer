@@ -135,3 +135,8 @@ func (v Vector) Sub(t Tuple) Tuple {
 func (v Vector) Negate() Vector {
 	return NewVector(0, 0, 0).Sub(v).(Vector)
 }
+
+// Scale scales the vector
+func (v Vector) Scale(s float64) Vector {
+	return NewVector(v.X()*s, v.Y()*s, v.Z()*s)
+}

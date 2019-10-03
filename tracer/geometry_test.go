@@ -339,3 +339,37 @@ func TestVector_Negate(t *testing.T) {
 		})
 	}
 }
+
+func TestVector_Scale(t *testing.T) {
+	type args struct {
+		s float64
+	}
+	tests := []struct {
+		name string
+		v    Vector
+		args args
+		want Vector
+	}{
+		{
+			name: "scale by > 0",
+			v:    NewVector(1, -2, 3),
+			args: args{
+				s: 3.5,
+			},
+			want: NewVector(3.5, -7, 10.5),
+		},
+		{
+			name: "scale by fraction",
+			v:    NewVector(1, -2, 3),
+			args: args{
+				s: 0.5,
+			},
+			want: NewVector(0.5, -1, 1.5),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.v.Scale(tt.args.s), tt.want, "should be equal")
+		})
+	}
+}
