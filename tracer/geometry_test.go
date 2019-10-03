@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -370,6 +371,45 @@ func TestVector_Scale(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.v.Scale(tt.args.s), tt.want, "should be equal")
+		})
+	}
+}
+
+func TestVector_Magnitude(t *testing.T) {
+	tests := []struct {
+		name string
+		v    Vector
+		want float64
+	}{
+		{
+			name: "test1",
+			v:    NewVector(1, 0, 0),
+			want: 1.0,
+		},
+		{
+			name: "test2",
+			v:    NewVector(0, 1, 0),
+			want: 1.0,
+		},
+		{
+			name: "test3",
+			v:    NewVector(0, 0, 1),
+			want: 1.0,
+		},
+		{
+			name: "test4",
+			v:    NewVector(1, 2, 3),
+			want: math.Sqrt(14),
+		},
+		{
+			name: "test5",
+			v:    NewVector(-1, -2, -3),
+			want: math.Sqrt(14),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.True(t, Equals(tt.v.Magnitude(), tt.want), "should be equal")
 		})
 	}
 }

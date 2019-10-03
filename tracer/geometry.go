@@ -1,5 +1,7 @@
 package tracer
 
+import "math"
+
 // Tuple is the base for Vector and Point
 type Tuple interface {
 	X() float64
@@ -139,4 +141,9 @@ func (v Vector) Negate() Vector {
 // Scale scales the vector
 func (v Vector) Scale(s float64) Vector {
 	return NewVector(v.X()*s, v.Y()*s, v.Z()*s)
+}
+
+// Magnitude computes the magnitude of the vector
+func (v Vector) Magnitude() float64 {
+	return math.Sqrt(math.Pow(v.X(), 2) + math.Pow(v.Y(), 2) + math.Pow(v.Z(), 2) + math.Pow(v.W(), 2))
 }
