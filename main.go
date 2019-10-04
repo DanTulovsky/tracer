@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/DanTulovsky/tracer/tracer"
 )
@@ -41,5 +43,16 @@ func main() {
 		ticks++
 	}
 	fmt.Printf("Total Ticks: %v\n", ticks)
+
+	// Canvas
+	c := tracer.NewCanvas(30, 20)
+	log.Println(c)
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	c.ExportToPNG(f)
 
 }
