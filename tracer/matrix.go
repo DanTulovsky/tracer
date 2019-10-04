@@ -22,6 +22,17 @@ func NewMatrixFromData(d [][]float64) Matrix {
 	return Matrix(d)
 }
 
+// IdentityMatrix returns a 4x4 identity Matrix
+func IdentityMatrix() Matrix {
+	return Matrix{
+		{1, 0, 0, 0},
+		{0, 1, 0, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 1},
+	}
+
+}
+
 // Dims returns the row, column dimensions of the matrix
 func (m Matrix) Dims() (r, c int) {
 	return len(m), len(m[0])
