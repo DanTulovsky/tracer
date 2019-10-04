@@ -31,7 +31,7 @@ func TestNewCanvas(t *testing.T) {
 			// assert all pixels are black
 			for w := 0; w < c.Width; w++ {
 				for h := 0; h < c.Height; h++ {
-					assert.Equal(t, c.Data[w][h], color.RGBA{0, 0, 0, 0xff})
+					assert.Equal(t, c.data[w][h], color.RGBA{0, 0, 0, 0xff})
 				}
 			}
 		})
@@ -88,7 +88,7 @@ func TestCanvas_Set(t *testing.T) {
 				assert.Error(t, tt.canvas.Set(tt.args.x, tt.args.y, tt.args.clr), "no error")
 			case false:
 				assert.NoError(t, tt.canvas.Set(tt.args.x, tt.args.y, tt.args.clr), "no error")
-				assert.Equal(t, tt.args.clr, tt.canvas.Data[tt.args.x][tt.args.y], "should be equal")
+				assert.Equal(t, tt.args.clr, tt.canvas.data[tt.args.x][tt.args.y], "should be equal")
 
 			}
 		})
