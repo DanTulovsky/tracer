@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	"golang.org/x/image/colornames"
+
 	"github.com/DanTulovsky/tracer/tracer"
 )
 
@@ -25,28 +27,42 @@ func tick(e environment, p projectile) projectile {
 	return projectile{Position: position, Velocity: velocity}
 }
 
+func addToCanvas(c *tracer.Canvas, p projectile) error {
+	pos := p.Position
+
+	x := int(pos.X())
+	y := c.Height - int(pos.Y())
+
+	c.Set(x, y, colornames.Red)
+
+	return nil
+}
+
 func main() {
 
+	// Canvas
+	c := tracer.NewCanvas(900, 550)
+
 	ticks := 0
-	vScale := 1.0
+	vScale := 11.25
+	startiPosition := tracer.NewPoint(0, 1, 0)
+	initialVelocity := tracer.NewVector(1, 1.8, 0).Normalize().Scale(vScale)
+	gravity := tracer.NewVector(0, -0.1, 0)
+	wind := tracer.NewVector(-0.01, 0, 0)
 
-	fmt.Println(tracer.NewVector(1, 1, 0).Normalize())
-	fmt.Println(tracer.NewVector(1, 1, 0).Magnitude())
-
-	p := projectile{Position: tracer.NewPoint(0, 1, 0), Velocity: tracer.NewVector(1, 0, 0).Normalize().Scale(vScale)}
-	e := environment{Gravity: tracer.NewVector(0, -0.1, 0), Wind: tracer.NewVector(-0.01, 0, 0)}
+	p := projectile{Position: startiPosition, Velocity: initialVelocity}
+	e := environment{Gravity: gravity, Wind: wind}
 
 	fmt.Printf("position: %2f\n", p.Position)
 	for p.Position.Y() > 0 {
 		p = tick(e, p)
 		fmt.Printf("position: %2f\n", p.Position)
 		ticks++
+		addToCanvas(c, p)
 	}
 	fmt.Printf("Total Ticks: %v\n", ticks)
 
-	// Canvas
-	c := tracer.NewCanvas(30, 20)
-	log.Println(c)
+	// Export
 	f, err := os.Create("image.png")
 	if err != nil {
 		log.Fatalln(err)
