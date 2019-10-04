@@ -42,33 +42,25 @@ func (v Vector) Equals(t Tuple) bool {
 	return false
 }
 
-// Add adds a point to a vector or a vector to a vector
-func (v Vector) Add(t Tuple) Tuple {
-	// t is a vector, return a vector
-	if t.W() == 0 {
-		return NewVector(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
-	}
-
-	// t is a point, return a point
-	return NewPoint(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
-
+// AddVector adds a vector  to a vector
+func (v Vector) AddVector(t Tuple) Vector {
+	return NewVector(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
 }
 
-// Sub subtracts vectors
-func (v Vector) Sub(t Tuple) Tuple {
+// AddPoint adds a point to a vector
+func (v Vector) AddPoint(t Tuple) Point {
+	return NewPoint(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
+}
 
-	// t is a point, this is an error
-	if t.W() == 1 {
-		panic("cannot subtract point from a vector")
-	}
+// SubVector subtracts vectors
+func (v Vector) SubVector(t Vector) Vector {
 
-	// t is a point, return a vector
 	return NewVector(v.X()-t.X(), v.Y()-t.Y(), v.Z()-t.Z())
 }
 
 // Negate negates the vector (subtracts it from the zero vector)
 func (v Vector) Negate() Vector {
-	return NewVector(0, 0, 0).Sub(v).(Vector)
+	return NewVector(0, 0, 0).SubVector(v)
 }
 
 // Scale scales the vector
