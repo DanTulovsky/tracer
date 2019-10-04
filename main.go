@@ -41,4 +41,5 @@ func main() {
 		ticks++
 	}
 	fmt.Printf("Total Ticks: %v\n", ticks)
+
 }
