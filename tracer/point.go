@@ -37,24 +37,18 @@ func (p Point) Equals(t Tuple) bool {
 	return false
 }
 
-// Add adds a point to a vector
-func (p Point) Add(t Tuple) Tuple {
-	// t is a point, this is an error
-	if t.W() == 1 {
-		panic("cannot add two points")
-	}
+// AddVector adds a point to a vector
+func (p Point) AddVector(t Vector) Point {
 	return NewPoint(p.X()+t.X(), p.Y()+t.Y(), p.Z()+t.Z())
 
 }
 
-// Sub subtracts points or vectors
-func (p Point) Sub(t Tuple) Tuple {
-
-	// t is a vector, return a point
-	if t.W() == 0 {
-		return NewPoint(p.X()-t.X(), p.Y()-t.Y(), p.Z()-t.Z())
-	}
-
-	// t is a point, return a vector
+// SubPoint subtracts points
+func (p Point) SubPoint(t Point) Vector {
 	return NewVector(p.X()-t.X(), p.Y()-t.Y(), p.Z()-t.Z())
+}
+
+// SubVector subtracts a vector
+func (p Point) SubVector(t Vector) Point {
+	return NewPoint(p.X()-t.X(), p.Y()-t.Y(), p.Z()-t.Z())
 }

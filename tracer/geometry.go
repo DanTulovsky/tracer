@@ -7,6 +7,4 @@ type Tuple interface {
 	Z() float64
 	W() float64
 	Equals(Tuple) bool
-	Add(Tuple) Tuple
-	Sub(Tuple) Tuple
 }

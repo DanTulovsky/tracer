@@ -83,7 +83,7 @@ func TestPoint_Equals(t *testing.T) {
 
 func TestPoint_Add(t *testing.T) {
 	type args struct {
-		t Tuple
+		t Vector
 	}
 	tests := []struct {
 		name string
@@ -102,39 +102,21 @@ func TestPoint_Add(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.p.Add(tt.args.t), tt.want, "should be equal")
+			assert.Equal(t, tt.p.AddVector(tt.args.t), tt.want, "should be equal")
 		})
 	}
 
-	panicTests := []struct {
-		name string
-		p    Point
-		args args
-	}{
-		{
-			name: "add point and point",
-			p:    NewPoint(1, 1, 1),
-			args: args{
-				t: NewPoint(2, 2, 2),
-			},
-		},
-	}
-	for _, tt := range panicTests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Panics(t, func() { tt.p.Add(tt.args.t) }, "should panic")
-		})
-	}
 }
 
-func TestPoint_Sub(t *testing.T) {
+func TestPoint_SubPoint(t *testing.T) {
 	type args struct {
-		t Tuple
+		t Point
 	}
 	tests := []struct {
 		name string
 		p    Point
 		args args
-		want Tuple
+		want Vector
 	}{
 		{
 			name: "point - point",
@@ -144,6 +126,24 @@ func TestPoint_Sub(t *testing.T) {
 			},
 			want: NewVector(-2, -4, -6),
 		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.p.SubPoint(tt.args.t), tt.want, "should be equal")
+		})
+	}
+}
+
+func TestPoint_SubVector(t *testing.T) {
+	type args struct {
+		t Vector
+	}
+	tests := []struct {
+		name string
+		p    Point
+		args args
+		want Point
+	}{
 		{
 			name: "point - vector",
 			p:    NewPoint(3, 2, 1),
@@ -155,7 +155,7 @@ func TestPoint_Sub(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.p.Sub(tt.args.t), tt.want, "should be equal")
+			assert.Equal(t, tt.p.SubVector(tt.args.t), tt.want, "should be equal")
 		})
 	}
 }
