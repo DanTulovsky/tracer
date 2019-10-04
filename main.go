@@ -26,9 +26,12 @@ func tick(e environment, p projectile) projectile {
 func main() {
 
 	ticks := 0
-	vScale := 2.0
+	vScale := 1.0
 
-	p := projectile{Position: tracer.NewPoint(0, 1, 0), Velocity: tracer.NewVector(1, 1, 0).Normalize().Scale(vScale)}
+	fmt.Println(tracer.NewVector(1, 1, 0).Normalize())
+	fmt.Println(tracer.NewVector(1, 1, 0).Magnitude())
+
+	p := projectile{Position: tracer.NewPoint(0, 1, 0), Velocity: tracer.NewVector(1, 0, 0).Normalize().Scale(vScale)}
 	e := environment{Gravity: tracer.NewVector(0, -0.1, 0), Wind: tracer.NewVector(-0.01, 0, 0)}
 
 	fmt.Printf("position: %2f\n", p.Position)
