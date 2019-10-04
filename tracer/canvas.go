@@ -11,7 +11,7 @@ import (
 // Canvas is the canvas for drawing on
 type Canvas struct {
 	Width, Height int
-	Data          map[int]map[int]color.Color
+	data          map[int]map[int]color.Color
 }
 
 // NewCanvas returns a pointer to a new canvas
@@ -24,7 +24,7 @@ func NewCanvas(w, h int) *Canvas {
 			data[x][y] = color.RGBA{0, 0, 0, 0xff}
 		}
 	}
-	return &Canvas{Width: w, Height: h, Data: data}
+	return &Canvas{Width: w, Height: h, data: data}
 }
 
 // Set sets the color of a pixel
@@ -33,7 +33,7 @@ func (c *Canvas) Set(x, y int, clr color.Color) error {
 		return fmt.Errorf("coordinates [%v, %v] are outside the canvas", x, y)
 	}
 
-	c.Data[x][y] = clr
+	c.data[x][y] = clr
 	return nil
 }
 
@@ -42,7 +42,7 @@ func (c *Canvas) Get(x, y int) (color.Color, error) {
 	if x >= c.Width || y >= c.Height {
 		return nil, fmt.Errorf("coordinates [%v, %v] are outside the canvas", x, y)
 	}
-	return c.Data[x][y], nil
+	return c.data[x][y], nil
 }
 
 // ExportToPNG exports the canvas to a png file
@@ -55,7 +55,7 @@ func (c *Canvas) ExportToPNG(w io.Writer) error {
 
 	for x := 0; x < c.Width; x++ {
 		for y := 0; y < c.Height; y++ {
-			img.Set(x, y, c.Data[x][y])
+			img.Set(x, y, c.data[x][y])
 		}
 	}
 
