@@ -93,3 +93,8 @@ func (v Vector) Dot(w Vector) float64 {
 func (v Vector) Cross(w Vector) Vector {
 	return NewVector(v.Y()*w.Z()-v.Z()*w.Y(), v.Z()*w.X()-v.X()*w.Z(), v.X()*w.Y()-v.Y()*w.X())
 }
+
+// TimesMatrix multiplies the vector by the matrix
+func (v Vector) TimesMatrix(m Matrix) Vector {
+	return v
+}

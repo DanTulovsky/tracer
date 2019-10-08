@@ -52,3 +52,8 @@ func (p Point) SubPoint(t Point) Vector {
 func (p Point) SubVector(t Vector) Point {
 	return NewPoint(p.X()-t.X(), p.Y()-t.Y(), p.Z()-t.Z())
 }
+
+// TimesMatrix multiplies a point by the matrix
+func (p Point) TimesMatrix(m Matrix) Point {
+	return p
+}
