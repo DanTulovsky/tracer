@@ -159,3 +159,29 @@ func TestPoint_SubVector(t *testing.T) {
 		})
 	}
 }
+
+func TestPoint_TimesMatrix(t *testing.T) {
+	type args struct {
+		m Matrix
+	}
+	tests := []struct {
+		name string
+		p    Point
+		args args
+		want Point
+	}{
+		{
+			name: "test1",
+			p:    NewPoint(0, 0, 0),
+			args: args{
+				m: NewMatrix(4, 4),
+			},
+			want: NewPoint(1, 1, 1),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.p.TimesMatrix(tt.args.m), tt.want, "should be equal")
+		})
+	}
+}

@@ -2,7 +2,6 @@ package tracer
 
 import (
 	"math"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -319,9 +318,7 @@ func TestVector_Dot(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.v.Dot(tt.args.w); got != tt.want {
-				t.Errorf("Vector.Dot() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.v.Dot(tt.args.w), tt.want, "should be equal")
 		})
 	}
 }
@@ -355,9 +352,33 @@ func TestVector_Cross(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.v.Cross(tt.args.w); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Vector.Cross() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.v.Cross(tt.args.w), tt.want, "should be equal")
+		})
+	}
+}
+
+func TestVector_TimesMatrix(t *testing.T) {
+	type args struct {
+		m Matrix
+	}
+	tests := []struct {
+		name string
+		v    Vector
+		args args
+		want Vector
+	}{
+		{
+			name: "test1",
+			v:    NewVector(1, 1, 1),
+			args: args{
+				m: NewMatrix(4, 4),
+			},
+			want: NewVector(2, 2, 2),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.v.TimesMatrix(tt.args.m), tt.want, "should be equal")
 		})
 	}
 }
