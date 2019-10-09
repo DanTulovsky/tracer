@@ -33,8 +33,8 @@ func TestNewVector(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			v := NewVector(tt.args.x, tt.args.y, tt.args.z)
 
-			assert.Equal(t, v, tt.want, "should be equal")
-			assert.Equal(t, v.W(), 0.0, "w should be 0")
+			assert.Equal(t, tt.want, v, "should be equal")
+			assert.Equal(t, 0.0, v.W(), "w should be 0")
 		})
 	}
 }
@@ -76,7 +76,7 @@ func TestVector_Equals(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.Equals(tt.args.t), tt.want, "should be equal")
+			assert.Equal(t, tt.want, tt.v.Equals(tt.args.t), "should be equal")
 		})
 	}
 }
@@ -101,7 +101,7 @@ func TestVector_AddVector(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.AddVector(tt.args.t), tt.want, "should be equal")
+			assert.Equal(t, tt.want, tt.v.AddVector(tt.args.t), "should be equal")
 		})
 	}
 }
@@ -127,7 +127,7 @@ func TestVector_AddPoint(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.AddPoint(tt.args.t), tt.want, "should be equal")
+			assert.Equal(t, tt.want, tt.v.AddPoint(tt.args.t), "should be equal")
 		})
 	}
 }
@@ -160,7 +160,7 @@ func TestVector_SubVector(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.SubVector(tt.args.t), tt.want, "should be equal")
+			assert.Equal(t, tt.want, tt.v.SubVector(tt.args.t), "should be equal")
 		})
 	}
 }
@@ -179,7 +179,7 @@ func TestVector_Negate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.Negate(), tt.want, "should be equal")
+			assert.Equal(t, tt.want, tt.v.Negate(), "should be equal")
 		})
 	}
 }
@@ -213,7 +213,7 @@ func TestVector_Scale(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.Scale(tt.args.s), tt.want, "should be equal")
+			assert.Equal(t, tt.want, tt.v.Scale(tt.args.s), "should be equal")
 		})
 	}
 }
@@ -276,8 +276,8 @@ func TestVector_Normalize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.Normalize(), tt.want, "should be equal")
-			assert.Equal(t, tt.v.Normalize().Magnitude(), 1.0, "should be equal")
+			assert.Equal(t, tt.want, tt.v.Normalize(), "should be equal")
+			assert.Equal(t, 1.0, tt.v.Normalize().Magnitude(), "should be equal")
 		})
 	}
 
@@ -318,7 +318,7 @@ func TestVector_Dot(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.Dot(tt.args.w), tt.want, "should be equal")
+			assert.Equal(t, tt.want, tt.v.Dot(tt.args.w), "should be equal")
 		})
 	}
 }
@@ -352,7 +352,7 @@ func TestVector_Cross(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.Cross(tt.args.w), tt.want, "should be equal")
+			assert.Equal(t, tt.want, tt.v.Cross(tt.args.w), "should be equal")
 		})
 	}
 }
@@ -369,16 +369,21 @@ func TestVector_TimesMatrix(t *testing.T) {
 	}{
 		{
 			name: "test1",
-			v:    NewVector(1, 1, 1),
+			v:    NewVector(1, 2, 3),
 			args: args{
-				m: NewMatrix(4, 4),
+				m: NewMatrixFromData([][]float64{
+					{1, 2, 3, 4},
+					{2, 4, 4, 2},
+					{8, 6, 4, 1},
+					{0, 0, 0, 1},
+				}),
 			},
-			want: NewVector(2, 2, 2),
+			want: NewVector(14, 22, 32),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.v.TimesMatrix(tt.args.m), tt.want, "should be equal")
+			assert.Equal(t, tt.want, tt.v.TimesMatrix(tt.args.m), "should be equal")
 		})
 	}
 }
