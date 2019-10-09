@@ -55,5 +55,8 @@ func (p Point) SubVector(t Vector) Point {
 
 // TimesMatrix multiplies a point by the matrix
 func (p Point) TimesMatrix(m Matrix) Point {
-	return p
+	return NewPoint(
+		m[0][0]*p.X()+m[0][1]*p.Y()+m[0][2]*p.Z()+m[0][3]*p.W(),
+		m[1][0]*p.X()+m[1][1]*p.Y()+m[1][2]*p.Z()+m[1][3]*p.W(),
+		m[2][0]*p.X()+m[2][1]*p.Y()+m[2][2]*p.Z()+m[2][3]*p.W())
 }

@@ -96,5 +96,8 @@ func (v Vector) Cross(w Vector) Vector {
 
 // TimesMatrix multiplies the vector by the matrix
 func (v Vector) TimesMatrix(m Matrix) Vector {
-	return v
+	return NewVector(
+		m[0][0]*v.X()+m[0][1]*v.Y()+m[0][2]*v.Z()+m[0][3]*v.W(),
+		m[1][0]*v.X()+m[1][1]*v.Y()+m[1][2]*v.Z()+m[1][3]*v.W(),
+		m[2][0]*v.X()+m[2][1]*v.Y()+m[2][2]*v.Z()+m[2][3]*v.W())
 }

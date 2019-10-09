@@ -30,7 +30,6 @@ func IdentityMatrix() Matrix {
 		{0, 0, 1, 0},
 		{0, 0, 0, 1},
 	}
-
 }
 
 // Dims returns the row, column dimensions of the matrix
@@ -76,18 +75,122 @@ func (m Matrix) TimesMatrix(m2 Matrix) Matrix {
 	return new
 }
 
-// TimesVector multiplies m by a vector and returns a new vector
-// func (m Matrix) TimesVector(v Vector) Vector {
-// 	mR, mC := m.Dims()
-// 	if mR != 4 || mC != 4 {
-// 		panic("can only handle 4x4 matricies")
-// 	}
+// Transpose transposes a YxY matrix
+func (m Matrix) Transpose() Matrix {
+	mR, mC := m.Dims()
+	if mR != mC {
+		panic("can only handle matrixies with same number of rows and columns")
+	}
 
-// 	new := NewVector(
-// 		m[0][0]*v.X()+m[0][1]*v.Y()+m[0][2]*v.Z()+m[0][3]*v.W(),
-// 		m[1][0]*v.X()+m[1][1]*v.Y()+m[1][2]*v.Z()+m[1][3]*v.W(),
-// 		m[2][0]*v.X()+m[2][1]*v.Y()+m[2][2]*v.Z()+m[2][3]*v.W())
-// 	// m[3][0]*v.X()+m[3][1]*v.Y()+m[3][2]*v.Z()+m[3][3]*v.W())
+	new := NewMatrix(mR, mC)
 
-// 	return new
-// }
+	for r := 0; r < mR; r++ {
+		for c := 0; c < mC; c++ {
+			new[r][c] = m[c][r]
+		}
+	}
+
+	return new
+}
+
+// Determinant returns the determinant of a 2x2 matrix
+func (m Matrix) Determinant() float64 {
+
+	mR, mC := m.Dims()
+	if mR != mC {
+		panic("can only handle matricies with same number of row and col")
+	}
+
+	if mR == 2 {
+		return m[0][0]*m[1][1] - m[0][1]*m[1][0]
+	}
+
+	// matricies larger than 2x2
+	result := 0.0
+
+	for c := 0; c < mC; c++ {
+		result = result + m[0][c]*m.Cofactor(0, c)
+	}
+	return result
+}
+
+// Submatrix returns a submatrix
+func (m Matrix) Submatrix(row, col int) Matrix {
+
+	mR, mC := m.Dims()
+	if mR != mC {
+		panic("can only handle matrixies with same number of rows and columns")
+	}
+
+	new := NewMatrix(mR-1, mC-1)
+
+	for r := 0; r < mR; r++ {
+		for c := 0; c < mC; c++ {
+			if r == row || c == col {
+				continue
+			}
+			rnew := r
+			if r > row {
+				rnew = r - 1
+			}
+			cnew := c
+			if c > col {
+				cnew = c - 1
+			}
+			new[rnew][cnew] = m[r][c]
+		}
+	}
+
+	return new
+}
+
+// Minor returns the minr of a matrix
+func (m Matrix) Minor(row, col int) float64 {
+	return m.Submatrix(row, col).Determinant()
+}
+
+// Cofactor returns the cofactor of a matrix at row, col
+func (m Matrix) Cofactor(row, col int) float64 {
+	minor := m.Minor(row, col)
+	if math.Mod(float64(row)+float64(col), 2) == 0 {
+		return minor
+	}
+	return -minor
+}
+
+// IsInvertible return true if the matrix is invertible
+func (m Matrix) IsInvertible() bool {
+	return m.Determinant() != 0
+}
+
+// Inverse returns the inverse of a matrix
+func (m Matrix) Inverse() Matrix {
+
+	mR, mC := m.Dims()
+	if mR != mC {
+		panic("can only handle matrixies with same number of rows and columns")
+	}
+
+	new := NewMatrix(mR, mC)
+
+	// ceate a matrix of cofactors of m
+	mc := NewMatrix(mR, mC)
+
+	for r := 0; r < mR; r++ {
+		for c := 0; c < mC; c++ {
+			mc[r][c] = m.Cofactor(r, c)
+		}
+	}
+
+	mt := mc.Transpose()
+
+	d := m.Determinant()
+
+	for r := 0; r < mR; r++ {
+		for c := 0; c < mC; c++ {
+			new[r][c] = mt[r][c] / d
+		}
+	}
+
+	return new
+}
