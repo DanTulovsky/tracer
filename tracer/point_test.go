@@ -20,12 +20,12 @@ func TestNewPoint(t *testing.T) {
 		{
 			name: "origin",
 			args: args{0, 0, 0},
-			want: Point{0, 0, 0, 1},
+			want: Point{Tuple{0, 0, 0, 1}},
 		},
 		{
 			name: "point1",
 			args: args{4.3, -4.2, 3.1},
-			want: Point{4.3, -4.2, 3.1, 1},
+			want: Point{Tuple{4.3, -4.2, 3.1, 1}},
 		},
 	}
 	for _, tt := range tests {
@@ -33,50 +33,8 @@ func TestNewPoint(t *testing.T) {
 			p := NewPoint(tt.args.x, tt.args.y, tt.args.z)
 			assert.Equal(t, p, tt.want, "should be equal")
 			assert.Equal(t, p.W(), 1.0, "w should be 1")
-			assert.Equal(t, p.X(), tt.want[0], "should be equal")
-			assert.Equal(t, p.Y(), tt.want[1], "should be equal")
-		})
-	}
-}
-
-func TestPoint_Equals(t *testing.T) {
-	type args struct {
-		t Tuple
-	}
-	tests := []struct {
-		name string
-		p    Point
-		args args
-		want bool
-	}{
-		{
-			name: "equals",
-			p:    NewPoint(1, 1, 1),
-			args: args{
-				t: NewPoint(1, 1, 1),
-			},
-			want: true,
-		},
-		{
-			name: "not equals: point",
-			p:    NewPoint(1, 1, 1),
-			args: args{
-				t: NewPoint(1, 2, 1),
-			},
-			want: false,
-		},
-		{
-			name: "not equals: vector",
-			p:    NewPoint(1, 1, 1),
-			args: args{
-				t: NewVector(1, 1, 1),
-			},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.p.Equals(tt.args.t), tt.want, "should be equal")
+			assert.Equal(t, p.X(), tt.want.x, "should be equal")
+			assert.Equal(t, p.Y(), tt.want.y, "should be equal")
 		})
 	}
 }
@@ -89,7 +47,7 @@ func TestPoint_Add(t *testing.T) {
 		name string
 		p    Point
 		args args
-		want Tuple
+		want Point
 	}{
 		{
 			name: "add point and vector",
@@ -182,6 +140,22 @@ func TestPoint_TimesMatrix(t *testing.T) {
 				}),
 			},
 			want: NewPoint(18, 24, 33),
+		},
+		{
+			name: "translation",
+			p:    NewPoint(-3, 4, 5),
+			args: args{
+				m: NewTranslation(5, -3, 2),
+			},
+			want: NewPoint(2, 1, 7),
+		},
+		{
+			name: "translation-inverse",
+			p:    NewPoint(-3, 4, 5),
+			args: args{
+				m: NewTranslation(5, -3, 2).Inverse(),
+			},
+			want: NewPoint(-8, 7, 3),
 		},
 	}
 	for _, tt := range tests {

@@ -21,12 +21,12 @@ func TestNewVector(t *testing.T) {
 		{
 			name: "origin",
 			args: args{0.0, 0.0, 0.0},
-			want: Vector{0.0, 0.0, 0.0, 0.0},
+			want: Vector{Tuple{0.0, 0.0, 0.0, 0.0}},
 		},
 		{
 			name: "vector1",
 			args: args{4.3, -4.2, 3.1},
-			want: Vector{4.3, -4.2, 3.1, 0},
+			want: Vector{Tuple{4.3, -4.2, 3.1, 0}},
 		},
 	}
 	for _, tt := range tests {
@@ -39,47 +39,6 @@ func TestNewVector(t *testing.T) {
 	}
 }
 
-func TestVector_Equals(t *testing.T) {
-	type args struct {
-		t Tuple
-	}
-	tests := []struct {
-		name string
-		v    Vector
-		args args
-		want bool
-	}{
-		{
-			name: "equals",
-			v:    NewVector(1, 1, 1),
-			args: args{
-				t: NewVector(1, 1, 1),
-			},
-			want: true,
-		},
-		{
-			name: "not equals: point",
-			v:    NewVector(1, 1, 1),
-			args: args{
-				t: NewPoint(1, 1, 1),
-			},
-			want: false,
-		},
-		{
-			name: "not equals: vector",
-			v:    NewVector(1, 1, 1),
-			args: args{
-				t: NewVector(1, 2, 1),
-			},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, tt.v.Equals(tt.args.t), "should be equal")
-		})
-	}
-}
 func TestVector_AddVector(t *testing.T) {
 	type args struct {
 		t Vector
@@ -379,6 +338,14 @@ func TestVector_TimesMatrix(t *testing.T) {
 				}),
 			},
 			want: NewVector(14, 22, 32),
+		},
+		{
+			name: "translation",
+			v:    NewVector(-3, 4, 5),
+			args: args{
+				m: NewTranslation(5, -3, 2),
+			},
+			want: NewVector(-3, 4, 5),
 		},
 	}
 	for _, tt := range tests {

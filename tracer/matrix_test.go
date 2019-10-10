@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -777,6 +778,198 @@ func TestMatrix_Inverse2(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := tt.a.TimesMatrix(tt.b)
 			assert.True(t, tt.a.Equals(c.TimesMatrix(tt.b.Inverse())), "should equal")
+		})
+	}
+}
+
+func TestNewTranslation(t *testing.T) {
+	type args struct {
+		x float64
+		y float64
+		z float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want Matrix
+	}{
+		{
+			name: "test1",
+			args: args{
+				x: 5,
+				y: -3,
+				z: 2,
+			},
+			want: NewMatrixFromData([][]float64{
+				{1, 0, 0, 5},
+				{0, 1, 0, -3},
+				{0, 0, 1, 2},
+				{0, 0, 0, 1},
+			}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, NewTranslation(tt.args.x, tt.args.y, tt.args.z), tt.want, "should equal")
+		})
+	}
+}
+
+func TestNewScaling(t *testing.T) {
+	type args struct {
+		x float64
+		y float64
+		z float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want Matrix
+	}{
+		{
+			name: "test1",
+			args: args{
+				x: 5,
+				y: -3,
+				z: 2,
+			},
+			want: NewMatrixFromData([][]float64{
+				{5, 0, 0, 0},
+				{0, -3, 0, 0},
+				{0, 0, 2, 0},
+				{0, 0, 0, 1},
+			}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, NewScaling(tt.args.x, tt.args.y, tt.args.z), tt.want, "should equal")
+		})
+	}
+}
+
+func TestNewRotationX(t *testing.T) {
+	type args struct {
+		r float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want Matrix
+	}{
+		{
+			name: "test1",
+			args: args{
+				r: math.Pi,
+			},
+			want: NewMatrixFromData([][]float64{
+				{1, 0, 0, 0},
+				{0, math.Cos(math.Pi), -math.Sin(math.Pi), 0},
+				{0, math.Sin(math.Pi), math.Cos(math.Pi), 0},
+				{0, 0, 0, 1},
+			}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, NewRotationX(math.Pi), tt.want, "should equal")
+		})
+	}
+}
+
+func TestNewRotationY(t *testing.T) {
+	type args struct {
+		r float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want Matrix
+	}{
+		{
+			name: "test1",
+			args: args{
+				r: math.Pi,
+			},
+			want: NewMatrixFromData([][]float64{
+				{math.Cos(math.Pi), 0, math.Sin(math.Pi), 0},
+				{0, 1, 0, 0},
+				{-math.Sin(math.Pi), 0, math.Cos(math.Pi), 0},
+				{0, 0, 0, 1},
+			}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, NewRotationY(math.Pi), tt.want, "should equal")
+		})
+	}
+}
+
+func TestNewRotationZ(t *testing.T) {
+	type args struct {
+		r float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want Matrix
+	}{
+		{
+			name: "test1",
+			args: args{
+				r: math.Pi,
+			},
+			want: NewMatrixFromData([][]float64{
+				{math.Cos(math.Pi), -math.Sin(math.Pi), 0, 0},
+				{math.Sin(math.Pi), math.Cos(math.Pi), 0, 0},
+				{0, 0, 1, 0},
+				{0, 0, 0, 1},
+			}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, NewRotationZ(math.Pi), tt.want, "should equal")
+		})
+	}
+}
+
+func TestNewShearing(t *testing.T) {
+	type args struct {
+		xy float64
+		xz float64
+		yx float64
+		yz float64
+		zx float64
+		zy float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want Matrix
+	}{
+		{
+			name: "test1",
+			args: args{
+				xy: 1,
+				xz: 2,
+				yx: 3,
+				yz: 4,
+				zx: 5,
+				zy: 6,
+			},
+			want: NewMatrixFromData([][]float64{
+				{1, 1, 2, 0},
+				{3, 1, 4, 0},
+				{5, 6, 1, 0},
+				{0, 0, 0, 1},
+			}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, NewShearing(tt.args.xy, tt.args.xz, tt.args.yx, tt.args.yz, tt.args.zx, tt.args.zy), tt.want, "should equal")
 		})
 	}
 }

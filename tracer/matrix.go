@@ -32,6 +32,66 @@ func IdentityMatrix() Matrix {
 	}
 }
 
+// NewTranslation returns a 4x4 translation Matrix
+func NewTranslation(x, y, z float64) Matrix {
+	return NewMatrixFromData([][]float64{
+		{1, 0, 0, x},
+		{0, 1, 0, y},
+		{0, 0, 1, z},
+		{0, 0, 0, 1},
+	})
+}
+
+// NewScaling returns a 4x4 scaling Matrix
+func NewScaling(x, y, z float64) Matrix {
+	return NewMatrixFromData([][]float64{
+		{x, 0, 0, 0},
+		{0, y, 0, 0},
+		{0, 0, z, 0},
+		{0, 0, 0, 1},
+	})
+}
+
+// NewRotationX returns a 4x4 rotation matrix around the X axis
+func NewRotationX(r float64) Matrix {
+	return NewMatrixFromData([][]float64{
+		{1, 0, 0, 0},
+		{0, math.Cos(r), -math.Sin(r), 0},
+		{0, math.Sin(r), math.Cos(r), 0},
+		{0, 0, 0, 1},
+	})
+}
+
+// NewRotationY returns a 4x4 rotation matrix around the Y axis
+func NewRotationY(r float64) Matrix {
+	return NewMatrixFromData([][]float64{
+		{math.Cos(r), 0, math.Sin(r), 0},
+		{0, 1, 0, 0},
+		{-math.Sin(r), 0, math.Cos(r), 0},
+		{0, 0, 0, 1},
+	})
+}
+
+// NewRotationZ returns a 4x4 rotation matrix around the Z axis
+func NewRotationZ(r float64) Matrix {
+	return NewMatrixFromData([][]float64{
+		{math.Cos(r), -math.Sin(r), 0, 0},
+		{math.Sin(r), math.Cos(r), 0, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 1},
+	})
+}
+
+// NewShearing returns a 4x4 shearing matrix
+func NewShearing(xy, xz, yx, yz, zx, zy float64) Matrix {
+	return NewMatrixFromData([][]float64{
+		{1, xy, xz, 0},
+		{yx, 1, yz, 0},
+		{zx, zy, 1, 0},
+		{0, 0, 0, 1},
+	})
+}
+
 // Dims returns the row, column dimensions of the matrix
 func (m Matrix) Dims() (r, c int) {
 	return len(m), len(m[0])
