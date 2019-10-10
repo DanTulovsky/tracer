@@ -3,7 +3,7 @@ package tracer
 import (
 	"testing"
 
-	"github.com/ToQoz/gopwt/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEquals(t *testing.T) {
@@ -37,7 +37,7 @@ func TestEquals(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := Equals(tt.args.a, tt.args.b)
 
-			assert.OK(t, result == tt.want, "float comparison")
+			assert.Equal(t, tt.want, result, "float comparison")
 		})
 	}
 }
