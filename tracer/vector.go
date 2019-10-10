@@ -6,49 +6,45 @@ import (
 )
 
 // Vector is a vector in 3D space. v[3] is always 0. Implements Tuple.
-type Vector [4]float64
+type Vector struct {
+	Tuple
+}
 
 // NewVector returns a new Vector
 func NewVector(x, y, z float64) Vector {
 
-	return Vector{x, y, z, 0.0}
+	return Vector{
+		Tuple{x, y, z, 0.0},
+	}
 }
 
 // X returns the vector's X coordinate
 func (v Vector) X() float64 {
-	return v[0]
+	return v.x
 }
 
 // Y returns the vector's y coordinate
 func (v Vector) Y() float64 {
-	return v[1]
+	return v.y
 }
 
 // Z returns the vector's Z coordinate
 func (v Vector) Z() float64 {
-	return v[2]
+	return v.z
 }
 
 // W returns the vector's W coordinate
 func (v Vector) W() float64 {
-	return 0
-}
-
-// Equals compares a vector with another tuple
-func (v Vector) Equals(t Tuple) bool {
-	if Equals(v.X(), t.X()) && Equals(v.Y(), t.Y()) && Equals(v.Z(), t.Y()) && Equals(v.W(), t.W()) {
-		return true
-	}
-	return false
+	return v.w
 }
 
 // AddVector adds a vector  to a vector
-func (v Vector) AddVector(t Tuple) Vector {
+func (v Vector) AddVector(t Vector) Vector {
 	return NewVector(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
 }
 
 // AddPoint adds a point to a vector
-func (v Vector) AddPoint(t Tuple) Point {
+func (v Vector) AddPoint(t Point) Point {
 	return NewPoint(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
 }
 

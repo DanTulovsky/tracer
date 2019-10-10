@@ -38,8 +38,7 @@ func addToCanvas(c *tracer.Canvas, p projectile) error {
 	return nil
 }
 
-func main() {
-
+func testCanvas() {
 	// Canvas
 	c := tracer.NewCanvas(900, 550)
 
@@ -70,5 +69,21 @@ func main() {
 
 	log.Printf("Exporting canvas to %v", f.Name())
 	c.ExportToPNG(f)
+}
+
+func test1() {
+
+	p := tracer.NewPoint(1, 1, 1)
+	p2 := tracer.NewPoint(2, 2, 2)
+	p3 := tracer.NewPoint(2, 2, 2)
+
+	log.Println(p.Equals(p2))
+	log.Println(p2.Equals(p3))
+}
+
+func main() {
+
+	// testCanvas()
+	test1()
 
 }
