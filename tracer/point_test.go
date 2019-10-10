@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -157,10 +158,138 @@ func TestPoint_TimesMatrix(t *testing.T) {
 			},
 			want: NewPoint(-8, 7, 3),
 		},
+		{
+			name: "scaling",
+			p:    NewPoint(-4, 6, 8),
+			args: args{
+				m: NewScaling(2, 3, 4),
+			},
+			want: NewPoint(-8, 18, 32),
+		},
+		{
+			name: "reflection",
+			p:    NewPoint(-1, 1, 1),
+			args: args{
+				m: NewScaling(2, 3, 4),
+			},
+			want: NewPoint(-2, 3, 4),
+		},
+		{
+			name: "rotateX",
+			p:    NewPoint(0, 1, 0),
+			args: args{
+				m: NewRotationX(math.Pi / 4),
+			},
+			want: NewPoint(0, math.Sqrt2/2, math.Sqrt2/2),
+		},
+		{
+			name: "rotateX.2",
+			p:    NewPoint(0, 1, 0),
+			args: args{
+				m: NewRotationX(math.Pi / 2),
+			},
+			want: NewPoint(0, 0, 1),
+		},
+		{
+			name: "rotateX inverse",
+			p:    NewPoint(0, 1, 0),
+			args: args{
+				m: NewRotationX(math.Pi / 4).Inverse(),
+			},
+			want: NewPoint(0, math.Sqrt2/2, -math.Sqrt2/2),
+		},
+		{
+			name: "rotateY",
+			p:    NewPoint(0, 0, 1),
+			args: args{
+				m: NewRotationY(math.Pi / 4),
+			},
+			want: NewPoint(math.Sqrt2/2, 0, math.Sqrt2/2),
+		},
+		{
+			name: "rotateY.2",
+			p:    NewPoint(0, 0, 1),
+			args: args{
+				m: NewRotationY(math.Pi / 2),
+			},
+			want: NewPoint(1, 0, 0),
+		},
+		{
+			name: "rotateZ",
+			p:    NewPoint(0, 1, 0),
+			args: args{
+				m: NewRotationZ(math.Pi / 4),
+			},
+			want: NewPoint(-math.Sqrt2/2, math.Sqrt2/2, 0),
+		},
+		{
+			name: "rotateZ.2",
+			p:    NewPoint(0, 1, 0),
+			args: args{
+				m: NewRotationZ(math.Pi / 2),
+			},
+			want: NewPoint(-1, 0, 0),
+		},
+		{
+			name: "shear",
+			p:    NewPoint(2, 3, 4),
+			args: args{
+				m: NewShearing(1, 0, 0, 0, 0, 0),
+			},
+			want: NewPoint(5, 3, 4),
+		},
+		{
+			name: "shear.2",
+			p:    NewPoint(2, 3, 4),
+			args: args{
+				m: NewShearing(0, 1, 0, 0, 0, 0),
+			},
+			want: NewPoint(6, 3, 4),
+		},
+		{
+			name: "shear.3",
+			p:    NewPoint(2, 3, 4),
+			args: args{
+				m: NewShearing(0, 0, 1, 0, 0, 0),
+			},
+			want: NewPoint(2, 5, 4),
+		},
+		{
+			name: "shear.4",
+			p:    NewPoint(2, 3, 4),
+			args: args{
+				m: NewShearing(0, 0, 0, 1, 0, 0),
+			},
+			want: NewPoint(2, 7, 4),
+		},
+		{
+			name: "shear.5",
+			p:    NewPoint(2, 3, 4),
+			args: args{
+				m: NewShearing(0, 0, 0, 0, 1, 0),
+			},
+			want: NewPoint(2, 3, 6),
+		},
+		{
+			name: "shear.6",
+			p:    NewPoint(2, 3, 4),
+			args: args{
+				m: NewShearing(0, 0, 0, 0, 0, 1),
+			},
+			want: NewPoint(2, 3, 7),
+		},
+		{
+			name: "sequence",
+			p:    NewPoint(1, 0, 1),
+			args: args{
+				m: IdentityMatrix().RotateX(math.Pi/2).Scale(5, 5, 5).Translate(10, 5, 7),
+			},
+			want: NewPoint(15, 0, 7),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.p.TimesMatrix(tt.args.m), tt.want, "should be equal")
+			assert.True(t, tt.want.Equals(tt.p.TimesMatrix(tt.args.m)), "should be true")
 		})
 	}
 }

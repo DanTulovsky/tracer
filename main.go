@@ -73,12 +73,12 @@ func testCanvas() {
 
 func test1() {
 
-	p := tracer.NewPoint(1, 1, 1)
-	p2 := tracer.NewPoint(2, 2, 2)
-	p3 := tracer.NewPoint(2, 2, 2)
+	p := tracer.NewPoint(1, 1.000000001, 1)
+	p2 := tracer.NewPoint(2, 4, 6)
+	p3 := tracer.NewPoint(2, 4, 6.000000001)
 
-	log.Println(p.Equals(p2))
-	log.Println(p2.Equals(p3))
+	log.Printf("%#v", p.Equals(p2))
+	log.Printf("%#v", p2.Equals(p3))
 }
 
 func main() {

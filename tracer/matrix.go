@@ -97,6 +97,36 @@ func (m Matrix) Dims() (r, c int) {
 	return len(m), len(m[0])
 }
 
+// RotateX rotates the matrix
+func (m Matrix) RotateX(r float64) Matrix {
+	return NewRotationX(r).TimesMatrix(m)
+}
+
+// RotateY rotates the matrix
+func (m Matrix) RotateY(r float64) Matrix {
+	return NewRotationY(r).TimesMatrix(m)
+}
+
+// RotateZ rotates the matrix
+func (m Matrix) RotateZ(r float64) Matrix {
+	return NewRotationZ(r).TimesMatrix(m)
+}
+
+// Scale scales the matrix
+func (m Matrix) Scale(x, y, z float64) Matrix {
+	return NewScaling(x, y, z).TimesMatrix(m)
+}
+
+// Translate translates the matrix
+func (m Matrix) Translate(x, y, z float64) Matrix {
+	return NewTranslation(x, y, z).TimesMatrix(m)
+}
+
+// Shear shears the matrix
+func (m Matrix) Shear(xy, xz, yx, yz, zx, zy float64) Matrix {
+	return NewShearing(xy, xz, yx, yz, zx, zy).TimesMatrix(m)
+}
+
 // Equals compares the matrix with another one within a margin of error for each value
 func (m Matrix) Equals(m2 Matrix) bool {
 	mR, mC := m.Dims()

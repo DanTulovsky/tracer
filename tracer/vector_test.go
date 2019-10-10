@@ -347,6 +347,22 @@ func TestVector_TimesMatrix(t *testing.T) {
 			},
 			want: NewVector(-3, 4, 5),
 		},
+		{
+			name: "scaling",
+			v:    NewVector(-4, 6, 8),
+			args: args{
+				m: NewScaling(2, 3, 4),
+			},
+			want: NewVector(-8, 18, 32),
+		},
+		{
+			name: "scaling inverse",
+			v:    NewVector(-4, 6, 8),
+			args: args{
+				m: NewScaling(2, 3, 4).Inverse(),
+			},
+			want: NewVector(-2, 2, 2),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
