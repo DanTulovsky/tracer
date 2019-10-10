@@ -173,22 +173,12 @@ func (m Matrix) Inverse() Matrix {
 
 	new := NewMatrix(mR, mC)
 
-	// ceate a matrix of cofactors of m
-	mc := NewMatrix(mR, mC)
-
-	for r := 0; r < mR; r++ {
-		for c := 0; c < mC; c++ {
-			mc[r][c] = m.Cofactor(r, c)
-		}
-	}
-
-	mt := mc.Transpose()
-
 	d := m.Determinant()
 
 	for r := 0; r < mR; r++ {
 		for c := 0; c < mC; c++ {
-			new[r][c] = mt[r][c] / d
+			cfactor := m.Cofactor(r, c)
+			new[c][r] = cfactor / d
 		}
 	}
 
