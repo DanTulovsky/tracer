@@ -42,7 +42,7 @@ func (t Tuple) W() float64 {
 
 // Equals compares tuples
 func (t Tuple) Equals(s Tupler) bool {
-	if Equals(t.X(), s.X()) && Equals(t.Y(), s.Y()) && Equals(t.Z(), s.Y()) && Equals(t.W(), s.W()) {
+	if Equals(t.X(), s.X()) && Equals(t.Y(), s.Y()) && Equals(t.Z(), s.Z()) && Equals(t.W(), s.W()) {
 		return true
 	}
 	return false
