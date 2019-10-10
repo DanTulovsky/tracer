@@ -18,30 +18,10 @@ func NewVector(x, y, z float64) Vector {
 	}
 }
 
-// X returns the vector's X coordinate
-func (v Vector) X() float64 {
-	return v.x
-}
-
-// Y returns the vector's y coordinate
-func (v Vector) Y() float64 {
-	return v.y
-}
-
-// Z returns the vector's Z coordinate
-func (v Vector) Z() float64 {
-	return v.z
-}
-
-// W returns the vector's W coordinate
-func (v Vector) W() float64 {
-	return v.w
-}
-
 // AddVector adds a vector  to a vector
-func (v Vector) AddVector(t Vector) Vector {
-	return NewVector(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
-}
+// func (v Vector) AddVector(t Vector) Vector {
+// 	return NewVector(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
+// }
 
 // AddPoint adds a point to a vector
 func (v Vector) AddPoint(t Point) Point {
