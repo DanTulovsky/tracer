@@ -7,15 +7,33 @@ import (
 
 // Vector is a vector in 3D space. v[3] is always 0. Implements Tuple.
 type Vector struct {
-	Tuple
+	x, y, z, w float64
 }
 
 // NewVector returns a new Vector
 func NewVector(x, y, z float64) Vector {
 
-	return Vector{
-		Tuple{x, y, z, 0.0},
-	}
+	return Vector{x, y, z, 0.0}
+}
+
+// X returns the point's X coordinate
+func (v Vector) X() float64 {
+	return v.x
+}
+
+// Y returns the point's y coordinate
+func (v Vector) Y() float64 {
+	return v.y
+}
+
+// Z returns the point's Z coordinate
+func (v Vector) Z() float64 {
+	return v.z
+}
+
+// W returns the point's W coordinate
+func (v Vector) W() float64 {
+	return v.w
 }
 
 // AddVector adds a vector  to a vector
@@ -76,4 +94,17 @@ func (v Vector) TimesMatrix(m Matrix) Vector {
 		m[0][0]*v.X()+m[0][1]*v.Y()+m[0][2]*v.Z()+m[0][3]*v.W(),
 		m[1][0]*v.X()+m[1][1]*v.Y()+m[1][2]*v.Z()+m[1][3]*v.W(),
 		m[2][0]*v.X()+m[2][1]*v.Y()+m[2][2]*v.Z()+m[2][3]*v.W())
+}
+
+// String returns ...
+func (v Vector) String() string {
+	return fmt.Sprintf("Vector(%.2f, %.2f, %.2f)", v.X(), v.Y(), v.Z())
+}
+
+// Equals compares vectors
+func (v Vector) Equals(s Vector) bool {
+	if Equals(v.X(), s.X()) && Equals(v.Y(), s.Y()) && Equals(v.Z(), s.Z()) && Equals(v.W(), s.W()) {
+		return true
+	}
+	return false
 }
