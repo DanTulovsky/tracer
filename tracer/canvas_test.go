@@ -23,6 +23,13 @@ func TestNewCanvas(t *testing.T) {
 				h: 30,
 			},
 		},
+		{
+			name: "canvas-rect",
+			args: args{
+				w: 10,
+				h: 30,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

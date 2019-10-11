@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"os"
 
 	"golang.org/x/image/colornames"
@@ -82,7 +83,30 @@ func test1() {
 }
 
 func clock() {
-	
+
+	c := tracer.NewCanvas(550, 600)
+
+	// center
+	center := tracer.NewVector(275, 0, 300)
+	c.SetFloat(center.X(), center.Z(), colornames.Yellow)
+
+	radius := 7.0 / 8.0 * center.X()
+	twelve := tracer.NewPoint(0, 0, 1)
+
+	for hour := 1.0; hour <= 12; hour++ {
+		m := tracer.IdentityMatrix().RotateY(hour*(math.Pi/6.0)).Scale(radius, 1, radius).Translate(center.X(), center.Y(), center.Z())
+		p := twelve.TimesMatrix(m)
+		c.SetFloat(p.X(), p.Z(), colornames.Red)
+	}
+
+	// Export
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	c.ExportToPNG(f)
 }
 
 func main() {
