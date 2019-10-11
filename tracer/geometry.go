@@ -9,10 +9,6 @@ type Tupler interface {
 	Y() float64
 	Z() float64
 	W() float64
-	SetX(float64)
-	SetY(float64)
-	SetZ(float64)
-	SetW(float64)
 }
 
 // Tuple is a base struct for Points and Vectors
@@ -44,26 +40,6 @@ func (t Tuple) Z() float64 {
 // W returns the point's W coordinate
 func (t Tuple) W() float64 {
 	return t.w
-}
-
-// SetX sets the value
-func (t Tuple) SetX(x float64) {
-	t.x = x
-}
-
-// SetY sets the value
-func (t Tuple) SetY(y float64) {
-	t.y = y
-}
-
-// SetZ sets the value
-func (t Tuple) SetZ(z float64) {
-	t.z = z
-}
-
-// SetW sets the value
-func (t Tuple) SetW(w float64) {
-	t.w = w
 }
 
 // Equals compares tuples
