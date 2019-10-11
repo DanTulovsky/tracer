@@ -102,6 +102,62 @@ func TestCanvas_Set(t *testing.T) {
 	}
 }
 
+func TestCanvas_SetFloat(t *testing.T) {
+	type args struct {
+		x   float64
+		y   float64
+		clr color.Color
+	}
+	tests := []struct {
+		name    string
+		canvas  *Canvas
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "set1",
+			canvas: NewCanvas(40, 20),
+			args: args{
+				x:   10.0,
+				y:   15.0,
+				clr: color.RGBA{10, 10, 10, 0xff},
+			},
+			wantErr: false,
+		},
+		{
+			name:   "invalid1",
+			canvas: NewCanvas(40, 20),
+			args: args{
+				x:   70.00001,
+				y:   15.00001,
+				clr: color.RGBA{10, 10, 10, 0xff},
+			},
+			wantErr: true,
+		},
+		{
+			name:   "invalid2",
+			canvas: NewCanvas(40, 20),
+			args: args{
+				x:   15.0,
+				y:   20.0,
+				clr: color.RGBA{10, 10, 10, 0xff},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			switch tt.wantErr {
+			case true:
+				assert.Error(t, tt.canvas.SetFloat(tt.args.x, tt.args.y, tt.args.clr), "no error")
+			case false:
+				assert.NoError(t, tt.canvas.SetFloat(tt.args.x, tt.args.y, tt.args.clr), "no error")
+				assert.Equal(t, tt.args.clr, tt.canvas.data[int(tt.args.x)][int(tt.args.y)], "should be equal")
+
+			}
+		})
+	}
+}
 func TestCanvas_Get(t *testing.T) {
 	type args struct {
 		x int
