@@ -81,9 +81,14 @@ func test1() {
 	log.Printf("%#v", p2.Equals(p3))
 }
 
+func clock() {
+	
+}
+
 func main() {
 
 	// testCanvas()
-	test1()
+	// test1()
+	clock()
 
 }
