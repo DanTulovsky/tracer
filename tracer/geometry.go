@@ -54,3 +54,8 @@ func (t Tuple) Equals(s Tupler) bool {
 func (t Tuple) String() string {
 	return fmt.Sprintf("(%.2f, %.2f, %.2f, %.0f)", t.X(), t.Y(), t.Z(), t.W())
 }
+
+// Object represents an physical object
+type Object interface {
+	IntersectWith(Ray) []float64
+}
