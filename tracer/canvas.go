@@ -17,19 +17,12 @@ type Canvas struct {
 // NewCanvas returns a pointer to a new canvas
 func NewCanvas(w, h int) *Canvas {
 	// Allocate the top-level slice, the same as before.
-	data := make([][]color.Color, h) // One row per unit of y.
-
-	// Allocate one large slice to hold all the pixels.
-	pixels := make([]color.Color, w*h)
-
-	// Loop over the rows, slicing each row from the front of the remaining pixels slice.
-	for i := range data {
-		data[i], pixels = pixels[:w], pixels[w:]
-	}
+	data := make([][]color.Color, w) // One row per unit of y.
 
 	for c := 0; c < w; c++ {
+		data[c] = make([]color.Color, h)
 		for r := 0; r < h; r++ {
-			data[r][c] = color.RGBA{0, 0, 0, 0xff}
+			data[c][r] = color.RGBA{0, 0, 0, 0xff}
 		}
 	}
 
@@ -43,6 +36,16 @@ func (c *Canvas) Set(x, y int, clr color.Color) error {
 	}
 
 	c.data[x][y] = clr
+	return nil
+}
+
+// SetFloat sets the color of a pixel
+func (c *Canvas) SetFloat(x, y float64, clr color.Color) error {
+	if int(x) >= c.Width || int(y) >= c.Height {
+		return fmt.Errorf("coordinates [%v, %v] are outside the canvas", x, y)
+	}
+
+	c.data[int(x)][int(y)] = clr
 	return nil
 }
 
@@ -62,9 +65,9 @@ func (c *Canvas) ExportToPNG(w io.Writer) error {
 
 	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
 
-	for x := 0; x < c.Width; x++ {
-		for y := 0; y < c.Height; y++ {
-			img.Set(x, y, c.data[x][y])
+	for col := 0; col < c.Width; col++ {
+		for row := 0; row < c.Height; row++ {
+			img.Set(col, row, c.data[col][row])
 		}
 	}
 

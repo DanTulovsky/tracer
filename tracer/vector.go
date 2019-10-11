@@ -19,9 +19,9 @@ func NewVector(x, y, z float64) Vector {
 }
 
 // AddVector adds a vector  to a vector
-// func (v Vector) AddVector(t Vector) Vector {
-// 	return NewVector(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
-// }
+func (v Vector) AddVector(t Vector) Vector {
+	return NewVector(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
+}
 
 // AddPoint adds a point to a vector
 func (v Vector) AddPoint(t Point) Point {
