@@ -11,19 +11,28 @@ import (
 // Canvas is the canvas for drawing on
 type Canvas struct {
 	Width, Height int
-	data          map[int]map[int]color.Color
+	data          [][]color.Color
 }
 
 // NewCanvas returns a pointer to a new canvas
 func NewCanvas(w, h int) *Canvas {
-	data := make(map[int]map[int]color.Color)
+	// Allocate the top-level slice, the same as before.
+	data := make([][]color.Color, h) // One row per unit of y.
 
-	for x := 0; x < w; x++ {
-		data[x] = make(map[int]color.Color)
-		for y := 0; y < h; y++ {
-			data[x][y] = color.RGBA{0, 0, 0, 0xff}
+	// Allocate one large slice to hold all the pixels.
+	pixels := make([]color.Color, w*h)
+
+	// Loop over the rows, slicing each row from the front of the remaining pixels slice.
+	for i := range data {
+		data[i], pixels = pixels[:w], pixels[w:]
+	}
+
+	for c := 0; c < w; c++ {
+		for r := 0; r < h; r++ {
+			data[r][c] = color.RGBA{0, 0, 0, 0xff}
 		}
 	}
+
 	return &Canvas{Width: w, Height: h, data: data}
 }
 
