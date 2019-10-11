@@ -1,15 +1,35 @@
 package tracer
 
+import "fmt"
+
 // Point is a single point in 3D space. p[3] is always 1. Implements Tupler.
 type Point struct {
-	Tuple
+	x, y, z, w float64
 }
 
 // NewPoint returns a new Point
 func NewPoint(x, y, z float64) Point {
-	return Point{
-		Tuple{x, y, z, 1.0},
-	}
+	return Point{x, y, z, 1.0}
+}
+
+// X returns the point's X coordinate
+func (p Point) X() float64 {
+	return p.x
+}
+
+// Y returns the point's y coordinate
+func (p Point) Y() float64 {
+	return p.y
+}
+
+// Z returns the point's Z coordinate
+func (p Point) Z() float64 {
+	return p.z
+}
+
+// W returns the point's W coordinate
+func (p Point) W() float64 {
+	return p.w
 }
 
 // AddVector adds a point to a vector
@@ -38,4 +58,17 @@ func (p Point) TimesMatrix(m Matrix) Point {
 		m[0][0]*p.X()+m[0][1]*p.Y()+m[0][2]*p.Z()+m[0][3]*p.W(),
 		m[1][0]*p.X()+m[1][1]*p.Y()+m[1][2]*p.Z()+m[1][3]*p.W(),
 		m[2][0]*p.X()+m[2][1]*p.Y()+m[2][2]*p.Z()+m[2][3]*p.W())
+}
+
+// String returns ...
+func (p Point) String() string {
+	return fmt.Sprintf("Point(%.2f, %.2f, %.2f)", p.X(), p.Y(), p.Z())
+}
+
+// Equals compares points
+func (p Point) Equals(s Point) bool {
+	if Equals(p.X(), s.X()) && Equals(p.Y(), s.Y()) && Equals(p.Z(), s.Z()) && Equals(p.W(), s.W()) {
+		return true
+	}
+	return false
 }

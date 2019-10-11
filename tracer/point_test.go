@@ -21,12 +21,12 @@ func TestNewPoint(t *testing.T) {
 		{
 			name: "origin",
 			args: args{0, 0, 0},
-			want: Point{Tuple{0, 0, 0, 1}},
+			want: Point{0, 0, 0, 1},
 		},
 		{
 			name: "point1",
 			args: args{4.3, -4.2, 3.1},
-			want: Point{Tuple{4.3, -4.2, 3.1, 1}},
+			want: Point{4.3, -4.2, 3.1, 1},
 		},
 	}
 	for _, tt := range tests {
@@ -40,6 +40,39 @@ func TestNewPoint(t *testing.T) {
 	}
 }
 
+func TestPoint_Equals(t *testing.T) {
+	type args struct {
+		p Point
+	}
+	tests := []struct {
+		name string
+		p    Point
+		args args
+		want bool
+	}{
+		{
+			name: "equals",
+			p:    NewPoint(1, 1, 1),
+			args: args{
+				p: NewPoint(1, 1, 1),
+			},
+			want: true,
+		},
+		{
+			name: "not equals",
+			p:    NewPoint(1, 1, 1),
+			args: args{
+				p: NewPoint(1, 2, 1),
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.p.Equals(tt.args.p), tt.want, "should be equal")
+		})
+	}
+}
 func TestPoint_Add(t *testing.T) {
 	type args struct {
 		t Vector

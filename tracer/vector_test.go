@@ -21,12 +21,12 @@ func TestNewVector(t *testing.T) {
 		{
 			name: "origin",
 			args: args{0.0, 0.0, 0.0},
-			want: Vector{Tuple{0.0, 0.0, 0.0, 0.0}},
+			want: Vector{0.0, 0.0, 0.0, 0.0},
 		},
 		{
 			name: "vector1",
 			args: args{4.3, -4.2, 3.1},
-			want: Vector{Tuple{4.3, -4.2, 3.1, 0}},
+			want: Vector{4.3, -4.2, 3.1, 0},
 		},
 	}
 	for _, tt := range tests {
