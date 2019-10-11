@@ -1,6 +1,6 @@
 package tracer
 
-// Point is a single point in 3D space. p[3] is always 1. Implements Tuple.
+// Point is a single point in 3D space. p[3] is always 1. Implements Tupler.
 type Point struct {
 	Tuple
 }
@@ -28,8 +28,8 @@ func (p Point) SubVector(t Vector) Point {
 }
 
 // Scale scales the point
-func (p Point) Scale(s float64) Vector {
-	return NewVector(p.X()*s, p.Y()*s, p.Z()*s)
+func (p Point) Scale(s float64) Point {
+	return NewPoint(p.X()*s, p.Y()*s, p.Z()*s)
 }
 
 // TimesMatrix multiplies a point by the matrix

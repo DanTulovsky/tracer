@@ -293,3 +293,37 @@ func TestPoint_TimesMatrix(t *testing.T) {
 		})
 	}
 }
+
+func TestPoint_Scale(t *testing.T) {
+	type args struct {
+		s float64
+	}
+	tests := []struct {
+		name string
+		p    Point
+		args args
+		want Point
+	}{
+		{
+			name: "scale by > 0",
+			p:    NewPoint(1, -2, 3),
+			args: args{
+				s: 3.5,
+			},
+			want: NewPoint(3.5, -7, 10.5),
+		},
+		{
+			name: "scale by fraction",
+			p:    NewPoint(1, -2, 3),
+			args: args{
+				s: 0.5,
+			},
+			want: NewPoint(0.5, -1, 1.5),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.p.Scale(tt.args.s), "should be equal")
+		})
+	}
+}
