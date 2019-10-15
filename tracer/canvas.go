@@ -65,6 +65,7 @@ func (c *Canvas) ExportToPNG(w io.Writer) error {
 
 	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
 
+	// TODO: Parallelize this
 	for col := 0; col < c.Width; col++ {
 		for row := 0; row < c.Height; row++ {
 			img.Set(col, row, c.data[col][row])
