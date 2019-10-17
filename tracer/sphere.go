@@ -7,22 +7,23 @@ import (
 
 // Sphere is a spherical object, implement Object
 type Sphere struct {
-	Center Point
-	Radius float64
+	Center    Point
+	Radius    float64
+	transform Matrix
 }
 
 // NewUnitSphere returns a new Sphere centered at the origin with r=1
-func NewUnitSphere() Sphere {
-	return Sphere{Center: NewPoint(0, 0, 0), Radius: 1}
+func NewUnitSphere() *Sphere {
+	return &Sphere{Center: NewPoint(0, 0, 0), Radius: 1, transform: IdentityMatrix()}
 }
 
 // NewSphere returns a new Sphere
-func NewSphere(c Point, r float64) Sphere {
-	return Sphere{Center: c, Radius: r}
+func NewSphere(c Point, r float64) *Sphere {
+	return &Sphere{Center: c, Radius: r, transform: IdentityMatrix()}
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the Sphere in sorted order
-func (s Sphere) IntersectWith(r Ray) Intersections {
+func (s *Sphere) IntersectWith(r Ray) Intersections {
 
 	t := Intersections{}
 
@@ -48,4 +49,14 @@ func (s Sphere) IntersectWith(r Ray) Intersections {
 	sort.Sort(byT(t))
 
 	return t
+}
+
+// Transform returns the transformation matrix of the Sphere
+func (s *Sphere) Transform() Matrix {
+	return s.transform
+}
+
+// SetTransform sets the transformation matrix of the Sphere
+func (s *Sphere) SetTransform(m Matrix) {
+	s.transform = m
 }
