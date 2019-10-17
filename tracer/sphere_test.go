@@ -40,7 +40,7 @@ func TestSphere_IntersectWith(t *testing.T) {
 		name   string
 		sphere Sphere
 		args   args
-		want   []float64
+		want   Intersections
 	}{
 		{
 			name:   "2 point intersect",
@@ -48,7 +48,10 @@ func TestSphere_IntersectWith(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
 			},
-			want: []float64{4.0, 6.0},
+			want: Intersections{
+				NewIntersection(NewUnitSphere(), 4.0),
+				NewIntersection(NewUnitSphere(), 6.0),
+			},
 		},
 		{
 			name:   "1 point intersect",
@@ -56,7 +59,10 @@ func TestSphere_IntersectWith(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 1, -5), NewVector(0, 0, 1)),
 			},
-			want: []float64{5.0, 5.0},
+			want: Intersections{
+				NewIntersection(NewUnitSphere(), 5.0),
+				NewIntersection(NewUnitSphere(), 5.0),
+			},
 		},
 		{
 			name:   "0 point intersect",
@@ -64,7 +70,7 @@ func TestSphere_IntersectWith(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 2, -5), NewVector(0, 0, 1)),
 			},
-			want: []float64{},
+			want: Intersections{},
 		},
 		{
 			name:   "ray inside sphere",
@@ -72,7 +78,10 @@ func TestSphere_IntersectWith(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, 0), NewVector(0, 0, 1)),
 			},
-			want: []float64{-1.0, 1.0},
+			want: Intersections{
+				NewIntersection(NewUnitSphere(), -1.0),
+				NewIntersection(NewUnitSphere(), 1.0),
+			},
 		},
 		{
 			name:   "sphere behind ray",
@@ -80,7 +89,10 @@ func TestSphere_IntersectWith(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, 5), NewVector(0, 0, 1)),
 			},
-			want: []float64{-6.0, -4.0},
+			want: Intersections{
+				NewIntersection(NewUnitSphere(), -6.0),
+				NewIntersection(NewUnitSphere(), -4.0),
+			},
 		},
 	}
 	for _, tt := range tests {
