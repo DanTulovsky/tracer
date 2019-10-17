@@ -4,5 +4,5 @@ package tracer
 
 // Object represents an physical object
 type Object interface {
-	IntersectWith(Ray) []float64
+	IntersectWith(Ray) Intersections
 }

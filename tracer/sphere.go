@@ -22,9 +22,9 @@ func NewSphere(c Point, r float64) Sphere {
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the Sphere in sorted order
-func (s Sphere) IntersectWith(r Ray) []float64 {
+func (s Sphere) IntersectWith(r Ray) Intersections {
 
-	t := []float64{}
+	t := Intersections{}
 
 	// vecto from sphere's center to ray origin
 	sphereToRay := r.Origin.SubPoint(s.Center)
@@ -36,17 +36,16 @@ func (s Sphere) IntersectWith(r Ray) []float64 {
 	// discriminant
 	d := math.Pow(b, 2) - 4*a*c
 
-	switch {
 	// no intersection
-	case d < 0:
+	if d < 0 {
 		return t
 	}
 
 	// one intersection means ray hits at tangent
-	t = append(t, (-b-math.Sqrt(d))/(2*a))
-	t = append(t, (-b+math.Sqrt(d))/(2*a))
+	t = append(t, NewIntersection(s, (-b-math.Sqrt(d))/(2*a)))
+	t = append(t, NewIntersection(s, (-b+math.Sqrt(d))/(2*a)))
 
-	sort.Float64s(t)
+	sort.Sort(byT(t))
 
 	return t
 }
