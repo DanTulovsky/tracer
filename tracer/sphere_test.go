@@ -31,3 +31,81 @@ func TestNewSphere(t *testing.T) {
 		})
 	}
 }
+
+func TestSphere_IntersectWith(t *testing.T) {
+	type args struct {
+		r Ray
+	}
+	tests := []struct {
+		name   string
+		sphere Sphere
+		args   args
+		want   []float64
+	}{
+		{
+			name:   "2 point intersect",
+			sphere: NewUnitSphere(),
+			args: args{
+				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
+			},
+			want: []float64{4.0, 6.0},
+		},
+		{
+			name:   "1 point intersect",
+			sphere: NewUnitSphere(),
+			args: args{
+				r: NewRay(NewPoint(0, 1, -5), NewVector(0, 0, 1)),
+			},
+			want: []float64{5.0, 5.0},
+		},
+		{
+			name:   "0 point intersect",
+			sphere: NewUnitSphere(),
+			args: args{
+				r: NewRay(NewPoint(0, 2, -5), NewVector(0, 0, 1)),
+			},
+			want: []float64{},
+		},
+		{
+			name:   "ray inside sphere",
+			sphere: NewUnitSphere(),
+			args: args{
+				r: NewRay(NewPoint(0, 0, 0), NewVector(0, 0, 1)),
+			},
+			want: []float64{-1.0, 1.0},
+		},
+		{
+			name:   "sphere behind ray",
+			sphere: NewUnitSphere(),
+			args: args{
+				r: NewRay(NewPoint(0, 0, 5), NewVector(0, 0, 1)),
+			},
+			want: []float64{-6.0, -4.0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.sphere.IntersectWith(tt.args.r))
+		})
+	}
+}
+
+func TestNewUnitSphere(t *testing.T) {
+	tests := []struct {
+		name string
+		want Sphere
+	}{
+		{
+			name: "test1",
+			want: Sphere{
+				Center: NewPoint(0, 0, 0),
+				Radius: 1,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, NewUnitSphere())
+		})
+	}
+}
