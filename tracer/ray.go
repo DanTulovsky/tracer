@@ -15,3 +15,8 @@ func NewRay(o Point, d Vector) Ray {
 func (r Ray) Position(t float64) Point {
 	return r.Origin.AddVector(r.Dir.Scale(t))
 }
+
+// Transform returns a new ray transformed by the matrix
+func (r Ray) Transform(m Matrix) Ray {
+	return Ray{Origin: r.Origin.TimesMatrix(m), Dir: r.Dir.TimesMatrix(m)}
+}

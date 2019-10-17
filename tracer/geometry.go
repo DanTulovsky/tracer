@@ -5,4 +5,7 @@ package tracer
 // Object represents an physical object
 type Object interface {
 	IntersectWith(Ray) Intersections
+
+	SetTransform(m Matrix)
+	Transform() Matrix
 }

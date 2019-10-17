@@ -81,3 +81,37 @@ func TestRay_Position(t *testing.T) {
 		})
 	}
 }
+
+func TestRay_Transform(t *testing.T) {
+	type args struct {
+		m Matrix
+	}
+	tests := []struct {
+		name string
+		ray  Ray
+		args args
+		want Ray
+	}{
+		{
+			name: "translate1",
+			ray:  NewRay(NewPoint(1, 2, 3), NewVector(0, 1, 0)),
+			args: args{
+				m: NewTranslation(3, 4, 5),
+			},
+			want: NewRay(NewPoint(4, 6, 8), NewVector(0, 1, 0)),
+		},
+		{
+			name: "scale1",
+			ray:  NewRay(NewPoint(1, 2, 3), NewVector(0, 1, 0)),
+			args: args{
+				m: NewScaling(2, 3, 4),
+			},
+			want: NewRay(NewPoint(2, 6, 12), NewVector(0, 3, 0)),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.ray.Transform(tt.args.m), "should be equal")
+		})
+	}
+}
