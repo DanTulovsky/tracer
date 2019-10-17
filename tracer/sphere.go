@@ -27,6 +27,12 @@ func (s *Sphere) IntersectWith(r Ray) Intersections {
 
 	t := Intersections{}
 
+	// transform the ray by the inverse of the sphere transfrom matrix
+	// instead of changing the sphere, we change the ray coming from the camera
+	// by the inverse, which achieves the same thing
+
+	r = r.Transform(s.transform.Inverse())
+
 	// vecto from sphere's center to ray origin
 	sphereToRay := r.Origin.SubPoint(s.Center)
 

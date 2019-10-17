@@ -37,67 +37,86 @@ func TestSphere_IntersectWith(t *testing.T) {
 		r Ray
 	}
 	tests := []struct {
-		name   string
-		sphere *Sphere
-		args   args
-		want   Intersections
+		name      string
+		sphere    *Sphere
+		args      args
+		transform Matrix
+		want      []float64
 	}{
 		{
-			name:   "2 point intersect",
-			sphere: NewUnitSphere(),
+			name:      "2 point intersect",
+			sphere:    NewUnitSphere(),
+			transform: IdentityMatrix(),
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
 			},
-			want: Intersections{
-				NewIntersection(NewUnitSphere(), 4.0),
-				NewIntersection(NewUnitSphere(), 6.0),
-			},
+			want: []float64{4.0, 6.0},
 		},
 		{
-			name:   "1 point intersect",
-			sphere: NewUnitSphere(),
+			name:      "1 point intersect",
+			sphere:    NewUnitSphere(),
+			transform: IdentityMatrix(),
 			args: args{
 				r: NewRay(NewPoint(0, 1, -5), NewVector(0, 0, 1)),
 			},
-			want: Intersections{
-				NewIntersection(NewUnitSphere(), 5.0),
-				NewIntersection(NewUnitSphere(), 5.0),
-			},
+			want: []float64{5.0, 5.0},
 		},
 		{
-			name:   "0 point intersect",
-			sphere: NewUnitSphere(),
+			name:      "0 point intersect",
+			sphere:    NewUnitSphere(),
+			transform: IdentityMatrix(),
 			args: args{
 				r: NewRay(NewPoint(0, 2, -5), NewVector(0, 0, 1)),
 			},
-			want: Intersections{},
+			want: []float64{},
 		},
 		{
-			name:   "ray inside sphere",
-			sphere: NewUnitSphere(),
+			name:      "ray inside sphere",
+			sphere:    NewUnitSphere(),
+			transform: IdentityMatrix(),
 			args: args{
 				r: NewRay(NewPoint(0, 0, 0), NewVector(0, 0, 1)),
 			},
-			want: Intersections{
-				NewIntersection(NewUnitSphere(), -1.0),
-				NewIntersection(NewUnitSphere(), 1.0),
-			},
+			want: []float64{-1.0, 1.0},
 		},
 		{
-			name:   "sphere behind ray",
-			sphere: NewUnitSphere(),
+			name:      "sphere behind ray",
+			sphere:    NewUnitSphere(),
+			transform: IdentityMatrix(),
 			args: args{
 				r: NewRay(NewPoint(0, 0, 5), NewVector(0, 0, 1)),
 			},
-			want: Intersections{
-				NewIntersection(NewUnitSphere(), -6.0),
-				NewIntersection(NewUnitSphere(), -4.0),
+			want: []float64{-6.0, -4.0},
+		},
+		{
+			name:      "scaled sphere",
+			sphere:    NewUnitSphere(),
+			transform: NewScaling(2, 2, 2),
+			args: args{
+				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
 			},
+			want: []float64{3.0, 7.0},
+		},
+		{
+			name:      "translated sphere",
+			sphere:    NewUnitSphere(),
+			transform: NewTranslation(5, 0, 0),
+			args: args{
+				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
+			},
+			want: []float64{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, tt.sphere.IntersectWith(tt.args.r))
+
+			want := Intersections{}
+			for _, int := range tt.want {
+				want = append(want, NewIntersection(tt.sphere, int))
+			}
+
+			tt.sphere.SetTransform(tt.transform)
+			assert.Equalf(t, want, tt.sphere.IntersectWith(tt.args.r), "should equal")
 		})
 	}
 }
