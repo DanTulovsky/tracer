@@ -1,4 +1,4 @@
-package tracer
+package constants
 
 const (
 	// Epsilon is used to compare floating point numbers

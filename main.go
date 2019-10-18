@@ -111,14 +111,26 @@ func clock() {
 
 func circle() {
 	// first circled drawn by a ray
-	//
+	canvasX := 100
+	canvasY := 100
+
+	c := tracer.NewCanvas(canvasX, canvasY)
+
+	// Export
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	c.ExportToPNG(f)
 }
 
 func main() {
 
 	// testCanvas()
 	// test1()
-	clock()
-	// circle()
+	// clock()
+	circle()
 
 }

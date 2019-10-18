@@ -1,6 +1,10 @@
 package tracer
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/DanTulovsky/tracer/utils"
+)
 
 // Point is a single point in 3D space. p[3] is always 1. Implements Tupler.
 type Point struct {
@@ -67,7 +71,7 @@ func (p Point) String() string {
 
 // Equals compares points
 func (p Point) Equals(s Point) bool {
-	if Equals(p.X(), s.X()) && Equals(p.Y(), s.Y()) && Equals(p.Z(), s.Z()) && Equals(p.W(), s.W()) {
+	if utils.Equals(p.X(), s.X()) && utils.Equals(p.Y(), s.Y()) && utils.Equals(p.Z(), s.Z()) && utils.Equals(p.W(), s.W()) {
 		return true
 	}
 	return false

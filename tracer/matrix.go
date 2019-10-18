@@ -1,6 +1,10 @@
 package tracer
 
-import "math"
+import (
+	"math"
+
+	"github.com/DanTulovsky/tracer/constants"
+)
 
 // Matrix defines a 2 diemnsional matrix
 type Matrix [][]float64
@@ -137,7 +141,7 @@ func (m Matrix) Equals(m2 Matrix) bool {
 
 	for x := 0; x < mR; x++ {
 		for y := 0; y < mC; y++ {
-			if math.Abs(m[x][y]-m2[x][y]) > Epsilon {
+			if math.Abs(m[x][y]-m2[x][y]) > constants.Epsilon {
 				return false
 			}
 		}

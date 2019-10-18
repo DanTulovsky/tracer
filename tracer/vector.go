@@ -3,6 +3,8 @@ package tracer
 import (
 	"fmt"
 	"math"
+
+	"github.com/DanTulovsky/tracer/utils"
 )
 
 // Vector is a vector in 3D space. v[3] is always 0. Implements Tuple.
@@ -103,7 +105,7 @@ func (v Vector) String() string {
 
 // Equals compares vectors
 func (v Vector) Equals(s Vector) bool {
-	if Equals(v.X(), s.X()) && Equals(v.Y(), s.Y()) && Equals(v.Z(), s.Z()) && Equals(v.W(), s.W()) {
+	if utils.Equals(v.X(), s.X()) && utils.Equals(v.Y(), s.Y()) && utils.Equals(v.Z(), s.Z()) && utils.Equals(v.W(), s.W()) {
 		return true
 	}
 	return false
