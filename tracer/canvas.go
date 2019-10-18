@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/png"
 	"io"
+	"sync"
 )
 
 // Canvas is the canvas for drawing on
@@ -65,12 +66,22 @@ func (c *Canvas) ExportToPNG(w io.Writer) error {
 
 	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
 
-	// TODO: Parallelize this
+	var wg sync.WaitGroup
+
+	// Almost certainly not needed here, but good exercise anyway
+	// TODO: Limit this to MAXProcs at a time - channels?
+	// e.g. https://medium.com/@zufolo/a-pattern-for-limiting-the-number-of-goroutines-in-execution-56e13b226e72
 	for col := 0; col < c.Width; col++ {
 		for row := 0; row < c.Height; row++ {
-			img.Set(col, row, c.data[col][row])
+			wg.Add(1)
+			go func(img *image.RGBA, col, row int, clr color.Color) {
+				img.Set(col, row, clr)
+				wg.Done()
+			}(img, col, row, c.data[col][row])
 		}
 	}
+
+	wg.Wait()
 
 	// Write
 	png.Encode(w, img)
