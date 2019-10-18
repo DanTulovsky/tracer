@@ -84,7 +84,9 @@ func (c *Canvas) ExportToPNG(w io.Writer) error {
 	wg.Wait()
 
 	// Write
-	png.Encode(w, img)
+	if err := png.Encode(w, img); err != nil {
+		fmt.Println(err)
+	}
 
 	return nil
 }

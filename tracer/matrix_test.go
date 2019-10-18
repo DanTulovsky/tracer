@@ -243,7 +243,6 @@ func TestMatrix_TimesMatrix(t *testing.T) {
 		name string
 		m    Matrix
 		args args
-		want Matrix
 	}{
 		{
 			name: "invalid dimensions1",

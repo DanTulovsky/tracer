@@ -198,10 +198,12 @@ func TestCanvas_Get(t *testing.T) {
 
 			switch tt.wantErr {
 			case true:
-				got, err = tt.canvas.Get(tt.args.x, tt.args.y)
+				_, err = tt.canvas.Get(tt.args.x, tt.args.y)
 				assert.Error(t, err, "should error")
 			case false:
-				tt.canvas.Set(tt.args.x, tt.args.y, tt.want)
+				if err := tt.canvas.Set(tt.args.x, tt.args.y, tt.want); err != nil {
+					t.Fail()
+				}
 				got, err = tt.canvas.Get(tt.args.x, tt.args.y)
 				assert.NoError(t, err, "should not error")
 				assert.Equal(t, tt.want, got, "should equal")
