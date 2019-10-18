@@ -109,10 +109,15 @@ func clock() {
 	c.ExportToPNG(f)
 }
 
+func circle() {
+	// first circled drawn by a ray
+}
+
 func main() {
 
 	// testCanvas()
 	// test1()
-	clock()
+	// clock()
+	circle()
 
 }
