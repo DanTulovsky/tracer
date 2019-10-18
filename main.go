@@ -111,6 +111,7 @@ func clock() {
 
 func circle() {
 	// first circled drawn by a ray
+	//
 }
 
 func main() {
