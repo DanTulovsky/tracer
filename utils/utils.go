@@ -1,11 +1,12 @@
 package utils
 
-import "math"
+import (
+	"math"
+
+	"github.com/DanTulovsky/tracer/constants"
+)
 
 // Equals is used to compare floating point numbers
 func Equals(a, b float64) bool {
-	if math.Abs(a-b) < Epsilon {
-		return true
-	}
-	return false
+	return math.Abs(a-b) < constants.Epsilon
 }

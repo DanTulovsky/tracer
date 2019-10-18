@@ -4,6 +4,7 @@ import (
 	"math"
 	"testing"
 
+	"github.com/DanTulovsky/tracer/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -211,7 +212,7 @@ func TestVector_Magnitude(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, Equals(tt.v.Magnitude(), tt.want), "should be equal")
+			assert.True(t, utils.Equals(tt.v.Magnitude(), tt.want), "should be equal")
 		})
 	}
 }
