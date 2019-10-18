@@ -118,7 +118,7 @@ func main() {
 
 	// testCanvas()
 	// test1()
-	// clock()
-	circle()
+	clock()
+	// circle()
 
 }
