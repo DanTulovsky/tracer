@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/image/colornames"
 )
 
 func TestNewWorld(t *testing.T) {
@@ -67,6 +68,114 @@ func TestWorld_Intersections(t *testing.T) {
 			for x := 0; x < len(is); x++ {
 				assert.Equal(t, tt.want[x], is[x].T())
 			}
+		})
+	}
+}
+
+func TestWorld_shadeHit(t *testing.T) {
+	type args struct {
+		i         Intersection
+		r         Ray
+		material  Material
+		transform Matrix
+		lights    []Light
+	}
+	tests := []struct {
+		name  string
+		world *World
+		args  args
+		want  Color
+	}{
+		{
+			name:  "test1",
+			world: NewDefaultTestWorld(),
+			args: args{
+				i:         NewIntersection(NewUnitSphere(), 4),
+				r:         NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
+				material:  NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200),
+				transform: IdentityMatrix(),
+				lights: []Light{
+					NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White)),
+				},
+			},
+			want: NewColor(0.38066, 0.47583, 0.2855),
+		},
+		{
+			name:  "inside",
+			world: NewDefaultTestWorld(),
+			args: args{
+				i:         NewIntersection(NewUnitSphere(), 0.5),
+				r:         NewRay(NewPoint(0, 0, 0), NewVector(0, 0, 1)),
+				material:  NewDefaultMaterial(),
+				transform: IdentityMatrix().Scale(0.5, 0.5, 0.5),
+				lights: []Light{
+					NewPointLight(NewPoint(0, 0.25, 0), ColorName(colornames.White)),
+				},
+			},
+			want: NewColor(0.90498, 0.90498, 0.90498),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.i.Object().SetMaterial(tt.args.material)
+			tt.args.i.Object().SetTransform(tt.args.transform)
+			tt.world.SetLights(tt.args.lights)
+
+			state := PrepareComputations(tt.args.i, tt.args.r)
+			assert.True(t, tt.want.Equal(tt.world.shadeHit(state)), "should equal")
+		})
+	}
+}
+
+func TestWorld_ColorAt(t *testing.T) {
+	type args struct {
+		r Ray
+	}
+	tests := []struct {
+		name   string
+		world  *World
+		args   args
+		m1, m2 Material
+		want   Color
+	}{
+		{
+			name:  "ray misses",
+			world: NewDefaultTestWorld(),
+			args: args{
+				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 1, 0)),
+			},
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200),
+			m2:   NewDefaultMaterial(),
+			want: ColorName(colornames.Black),
+		},
+		{
+			name:  "ray hits",
+			world: NewDefaultTestWorld(),
+			args: args{
+				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
+			},
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200),
+			m2:   NewDefaultMaterial(),
+			want: NewColor(0.38066, 0.47583, 0.2855),
+		},
+		{
+			name:  "color with an intersection behind the ray",
+			world: NewDefaultTestWorld(),
+			args: args{
+				r: NewRay(NewPoint(0, 0, 0.75), NewVector(0, 0, -1)),
+			},
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 1, 0.7, 0.2, 200),
+			m2:   NewMaterial(NewColor(1.0, 1.0, 1.0), 1, 0.9, 0.9, 200),
+			want: NewColor(1, 1, 1),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			tt.world.Objects[0].SetMaterial(tt.m1)
+			tt.world.Objects[1].SetMaterial(tt.m2)
+
+			assert.True(t, tt.want.Equal(tt.world.ColorAt(tt.args.r)), "should equal")
 		})
 	}
 }

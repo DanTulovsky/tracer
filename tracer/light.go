@@ -8,28 +8,40 @@ import (
 
 // Light is the interface all the lights use
 type Light interface {
+	Intensity() Color
+	Position() Point
 }
 
 // PointLight implements the light interface and is a single point light with no size
 type PointLight struct {
-	Position  Point
-	Intensity Color
+	position  Point
+	intensity Color
 }
 
 // NewPointLight returns a nw point light
 func NewPointLight(p Point, i Color) PointLight {
-	return PointLight{Position: p, Intensity: i}
+	return PointLight{position: p, intensity: i}
+}
+
+// Intensity returns the intensity of the light
+func (pl PointLight) Intensity() Color {
+	return pl.intensity
+}
+
+// Position returns the position of the light
+func (pl PointLight) Position() Point {
+	return pl.position
 }
 
 // lighting returns the color for a given point
-func lighting(m Material, p Point, l PointLight, eye, normal Vector) Color {
+func lighting(m Material, p Point, l Light, eye, normal Vector) Color {
 	var ambient, diffuse, specular Color
 
 	// combine surface color with light's color/intensity
-	effectiveColor := m.Color.Blend(l.Intensity)
+	effectiveColor := m.Color.Blend(l.Intensity())
 
 	// find the direction to the light source
-	lightv := l.Position.SubPoint(p).Normalize()
+	lightv := l.Position().SubPoint(p).Normalize()
 
 	// compute ambient contribution
 	ambient = effectiveColor.Scale(m.Ambient)
@@ -55,7 +67,7 @@ func lighting(m Material, p Point, l PointLight, eye, normal Vector) Color {
 		} else {
 			// compute the specular contrbution
 			factor := math.Pow(reflectDotEye, m.Shininess)
-			specular = l.Intensity.Scale(m.Specular).Scale(factor)
+			specular = l.Intensity().Scale(m.Specular).Scale(factor)
 		}
 	}
 
