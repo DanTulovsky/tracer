@@ -10,16 +10,25 @@ type Sphere struct {
 	Center    Point
 	Radius    float64
 	transform Matrix
+	material  Material
 }
 
 // NewUnitSphere returns a new Sphere centered at the origin with r=1
 func NewUnitSphere() *Sphere {
-	return &Sphere{Center: NewPoint(0, 0, 0), Radius: 1, transform: IdentityMatrix()}
+	return &Sphere{Center: NewPoint(0, 0, 0),
+		Radius:    1,
+		transform: IdentityMatrix(),
+		material:  NewDefaultMaterial(),
+	}
 }
 
 // NewSphere returns a new Sphere
 func NewSphere(c Point, r float64) *Sphere {
-	return &Sphere{Center: c, Radius: r, transform: IdentityMatrix()}
+	return &Sphere{Center: c,
+		Radius:    r,
+		transform: IdentityMatrix(),
+		material:  NewDefaultMaterial(),
+	}
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the Sphere in sorted order
@@ -65,6 +74,16 @@ func (s *Sphere) Transform() Matrix {
 // SetTransform sets the transformation matrix of the Sphere
 func (s *Sphere) SetTransform(m Matrix) {
 	s.transform = m
+}
+
+// Material returns the material of the sphere
+func (s *Sphere) Material() Material {
+	return s.material
+}
+
+// SetMaterial sets the material of the sphere
+func (s *Sphere) SetMaterial(m Material) {
+	s.material = m
 }
 
 // NormalAt returns the normal vector at the given point on the surface of the sphere

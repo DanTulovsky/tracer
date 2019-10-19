@@ -23,7 +23,7 @@ func TestNewSphere(t *testing.T) {
 				c: NewPoint(0, 0, 0),
 				r: 1.0,
 			},
-			want: Sphere{NewPoint(0, 0, 0), 1.0, IdentityMatrix()},
+			want: Sphere{NewPoint(0, 0, 0), 1.0, IdentityMatrix(), NewDefaultMaterial()},
 		},
 	}
 	for _, tt := range tests {
@@ -133,6 +133,7 @@ func TestNewUnitSphere(t *testing.T) {
 				Center:    NewPoint(0, 0, 0),
 				Radius:    1,
 				transform: IdentityMatrix(),
+				material:  NewDefaultMaterial(),
 			},
 		},
 	}
@@ -263,6 +264,53 @@ func TestSphere_NormalAt(t *testing.T) {
 
 			assert.True(t, tt.want.Equals(v), "should equal")
 			assert.True(t, v.Equals(v.Normalize()), "should equal")
+		})
+	}
+}
+
+func TestSphere_Material(t *testing.T) {
+	tests := []struct {
+		name   string
+		sphere *Sphere
+		want   Material
+	}{
+		{
+			name:   "default",
+			sphere: NewUnitSphere(),
+			want:   NewDefaultMaterial(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.sphere.Material(), "should equal")
+		})
+	}
+}
+
+func TestSphere_SetMaterial(t *testing.T) {
+	type args struct {
+		m Material
+	}
+	tests := []struct {
+		name   string
+		sphere *Sphere
+		args   args
+		want   Material
+	}{
+		{
+			name:   "test1",
+			sphere: NewUnitSphere(),
+			args: args{
+				m: NewDefaultMaterial(),
+			},
+			want: NewDefaultMaterial(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.sphere.SetMaterial(tt.args.m)
+			assert.Equal(t, tt.want, tt.sphere.Material(), "should equal")
+
 		})
 	}
 }
