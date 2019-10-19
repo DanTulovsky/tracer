@@ -92,3 +92,68 @@ func TestIntersections_Hit(t *testing.T) {
 		})
 	}
 }
+
+func TestPrepareComputations(t *testing.T) {
+	type args struct {
+		i Intersection
+		r Ray
+	}
+	tests := []struct {
+		name string
+		args args
+		want IntersectionState
+	}{
+		{
+			name: "state1",
+			args: args{
+				i: NewIntersection(NewUnitSphere(), 4),
+				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
+			},
+			want: IntersectionState{
+				T:       4,
+				Object:  NewUnitSphere(),
+				Point:   NewPoint(0, 0, -1),
+				EyeV:    NewVector(0, 0, -1),
+				NormalV: NewVector(0, 0, -1),
+				Inside:  false,
+			},
+		},
+		{
+			name: "outside",
+			args: args{
+				i: NewIntersection(NewUnitSphere(), 4),
+				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
+			},
+			want: IntersectionState{
+				T:       4,
+				Object:  NewUnitSphere(),
+				Point:   NewPoint(0, 0, -1),
+				EyeV:    NewVector(0, 0, -1),
+				NormalV: NewVector(0, 0, -1),
+				Inside:  false,
+			},
+		},
+		{
+			name: "inside",
+			args: args{
+				i: NewIntersection(NewUnitSphere(), 1),
+				r: NewRay(NewPoint(0, 0, 0), NewVector(0, 0, 1)),
+			},
+			want: IntersectionState{
+				T:       1,
+				Object:  NewUnitSphere(),
+				Point:   NewPoint(0, 0, 1),
+				EyeV:    NewVector(0, 0, -1),
+				NormalV: NewVector(0, 0, -1),
+				Inside:  true,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			comps := PrepareComputations(tt.args.i, tt.args.r)
+			assert.Equal(t, tt.want, comps, "should equal")
+		})
+	}
+}

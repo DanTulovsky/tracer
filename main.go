@@ -1,10 +1,16 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"math"
 	"os"
+	"runtime"
+	"runtime/pprof"
+	"sync"
+
+	_ "net/http/pprof"
 
 	"github.com/lucasb-eyer/go-colorful"
 
@@ -12,6 +18,9 @@ import (
 
 	"github.com/DanTulovsky/tracer/tracer"
 )
+
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
+var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
 type projectile struct {
 	Position tracer.Point
@@ -173,11 +182,125 @@ func circle() {
 	c.ExportToPNG(f)
 }
 
+func sphere() {
+
+	// first sphere drawn by a ray
+	canvasX := 200
+	canvasY := canvasX
+
+	c := tracer.NewCanvas(canvasX, canvasY)
+
+	// camera location
+	camera := tracer.NewPoint(0, 0, -5)
+
+	type wall struct {
+		Z    float64
+		Size float64
+	}
+
+	// wall is parallel to the y-axis, on negative z
+	// size is large enough to sho a unit spere at the origin from the camera
+	w := wall{Z: 10, Size: 7}
+
+	// size of a world pixel
+	pixelSize := w.Size / float64(canvasX)
+
+	// transform matrix
+	// m := tracer.IdentityMatrix().Scale(1, 0.5, 1).RotateZ(math.Pi/4).Shear(1, 0, 0, 0, 0, 0)
+	m := tracer.IdentityMatrix()
+
+	// material
+	mat := tracer.NewDefaultMaterial()
+	mat.Color = tracer.ColorName(colornames.Yellow)
+	mat.Ambient = 0.1
+	mat.Diffuse = 0.9
+	mat.Specular = 0.9
+	mat.Shininess = 30.0
+
+	shape := tracer.NewUnitSphere()
+	shape.SetTransform(m)
+	shape.SetMaterial(mat)
+
+	// light source
+	light := tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.ColorName(colornames.White))
+
+	var wg sync.WaitGroup
+
+	// for each row of pixels on the canvas
+	for y := 0.0; y < float64(canvasY); y++ {
+		for x := 0.0; x < float64(canvasX); x++ {
+
+			wg.Add(1)
+
+			go func(x, y float64) {
+
+				// world coordinate of y
+				wy := w.Size/2 - pixelSize*y
+				// world y coordinate of x
+				wx := -w.Size/2 + pixelSize*x
+
+				// point on the wall the ray is targetting
+				target := tracer.NewPoint(wx, wy, w.Z)
+
+				// the ray from camera to the world target
+				ray := tracer.NewRay(camera, target.SubPoint(camera).Normalize())
+
+				if hit, err := shape.IntersectWith(ray).Hit(); err == nil {
+
+					comp := tracer.PrepareComputations(hit, ray)
+					clr := tracer.ColorAtPoint(comp.Object.Material(), comp.Point, light, comp.EyeV, comp.NormalV)
+
+					c.SetFloat(x, y, clr)
+				}
+				wg.Done()
+
+			}(x, y)
+		}
+	}
+
+	wg.Wait()
+
+	// Export
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	c.ExportToPNG(f)
+}
+
 func main() {
+
+	flag.Parse()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close()
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 
 	// testCanvas()
 	// test1()
 	// clock()
-	circle()
+	// circle()
+	sphere()
+
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			log.Fatal("could not create memory profile: ", err)
+		}
+		defer f.Close()
+		runtime.GC() // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal("could not write memory profile: ", err)
+		}
+	}
 
 }

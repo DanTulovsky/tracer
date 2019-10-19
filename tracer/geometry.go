@@ -8,6 +8,9 @@ type Object interface {
 
 	NormalAt(Point) Vector
 
-	SetTransform(m Matrix)
+	Material() Material
+	SetMaterial(Material)
+
+	SetTransform(Matrix)
 	Transform() Matrix
 }
