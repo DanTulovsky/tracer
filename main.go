@@ -45,7 +45,7 @@ func addToCanvas(c *tracer.Canvas, p projectile) error {
 	x := int(pos.X())
 	y := c.Height - int(pos.Y())
 
-	c.Set(x, y, colornames.Red)
+	c.Set(x, y, tracer.ColorName(colornames.Red))
 
 	return nil
 }
@@ -99,7 +99,7 @@ func clock() {
 
 	// center
 	center := tracer.NewVector(275, 0, 300)
-	c.SetFloat(center.X(), center.Z(), colornames.Yellow)
+	c.SetFloat(center.X(), center.Z(), tracer.ColorName(colornames.Yellow))
 
 	radius := 7.0 / 8.0 * center.X()
 	twelve := tracer.NewPoint(0, 0, 1)
@@ -107,7 +107,7 @@ func clock() {
 	for hour := 1.0; hour <= 12; hour++ {
 		m := tracer.IdentityMatrix().RotateY(hour*(math.Pi/6.0)).Scale(radius, 1, radius).Translate(center.X(), center.Y(), center.Z())
 		p := twelve.TimesMatrix(m)
-		c.SetFloat(p.X(), p.Z(), colornames.Red)
+		c.SetFloat(p.X(), p.Z(), tracer.ColorName(colornames.Red))
 	}
 
 	// Export
@@ -148,7 +148,7 @@ func circle() {
 	shape := tracer.NewUnitSphere()
 	shape.SetTransform(m)
 
-	clr := colorful.HappyColor()
+	clr := tracer.ColorName(colorful.HappyColor())
 
 	// for each row of pixels on the canvas
 	for y := 0.0; y < float64(canvasY); y++ {
@@ -270,6 +270,86 @@ func sphere() {
 	c.ExportToPNG(f)
 }
 
+func scene() {
+
+	width, height := 300.0, 300.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+
+	// second light
+	l2 := tracer.NewPointLight(tracer.NewPoint(10, -10, 10), tracer.ColorName(colornames.Red))
+	w.AddLight(l2)
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 1.5, -5)
+	to := tracer.NewPoint(0, 1, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	// walls (as flat spheres for now)
+	floor := tracer.NewUnitSphere()
+	floor.SetTransform(tracer.IdentityMatrix().Scale(10, 0.01, 10))
+	material := floor.Material()
+	material.Color = tracer.ColorName(colornames.Beige)
+	material.Specular = 0
+	w.AddObject(floor)
+
+	// left wall
+	leftWall := tracer.NewUnitSphere()
+	leftWall.SetTransform(
+		tracer.IdentityMatrix().Scale(10, 0.01, 10).RotateX(math.Pi/2).RotateY(-math.Pi/4).Translate(0, 0, 5))
+	leftWall.SetMaterial(floor.Material())
+	w.AddObject(leftWall)
+
+	// right wall
+	rightWall := tracer.NewUnitSphere()
+	rightWall.SetTransform(
+		tracer.IdentityMatrix().Scale(10, 0.01, 10).RotateX(math.Pi/2).RotateY(math.Pi/4).Translate(0, 0, 5))
+	rightWall.SetMaterial(floor.Material())
+	w.AddObject(rightWall)
+
+	// sphere
+	middle := tracer.NewUnitSphere()
+	middle.SetTransform(tracer.IdentityMatrix().Translate(-0.5, 1, 0.5))
+	material = middle.Material()
+	material.Color = tracer.ColorName(colornames.Greenyellow)
+	material.Diffuse = 0.7
+	material.Specular = 0.3
+	w.AddObject(middle)
+
+	// another sphere
+	right := tracer.NewUnitSphere()
+	right.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(1.5, 0.5, -0.5))
+	material = right.Material()
+	material.Color = tracer.ColorName(colornames.Lime)
+	material.Diffuse = 0.7
+	material.Specular = 0.3
+	w.AddObject(right)
+
+	// one more sphere
+	left := tracer.NewUnitSphere()
+	left.SetTransform(tracer.IdentityMatrix().Scale(0.33, 0.33, 0.33).Translate(-1.5, 0.33, -0.75))
+	material = left.Material()
+	material.Color = tracer.ColorName(colornames.Lightblue)
+	material.Diffuse = 0.7
+	material.Specular = 0.3
+	w.AddObject(left)
+	canvas := w.Render()
+
+	// Export
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	canvas.ExportToPNG(f)
+
+}
+
 func main() {
 
 	flag.Parse()
@@ -289,7 +369,8 @@ func main() {
 	// test1()
 	// clock()
 	// circle()
-	sphere()
+	// sphere()
+	scene()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

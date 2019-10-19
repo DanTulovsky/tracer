@@ -272,7 +272,7 @@ func TestSphere_Material(t *testing.T) {
 	tests := []struct {
 		name   string
 		sphere *Sphere
-		want   Material
+		want   *Material
 	}{
 		{
 			name:   "default",
@@ -289,13 +289,13 @@ func TestSphere_Material(t *testing.T) {
 
 func TestSphere_SetMaterial(t *testing.T) {
 	type args struct {
-		m Material
+		m *Material
 	}
 	tests := []struct {
 		name   string
 		sphere *Sphere
 		args   args
-		want   Material
+		want   *Material
 	}{
 		{
 			name:   "test1",

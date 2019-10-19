@@ -10,7 +10,7 @@ type Sphere struct {
 	Center    Point
 	Radius    float64
 	transform Matrix
-	material  Material
+	material  *Material
 }
 
 // NewUnitSphere returns a new Sphere centered at the origin with r=1
@@ -77,12 +77,12 @@ func (s *Sphere) SetTransform(m Matrix) {
 }
 
 // Material returns the material of the sphere
-func (s *Sphere) Material() Material {
+func (s *Sphere) Material() *Material {
 	return s.material
 }
 
 // SetMaterial sets the material of the sphere
-func (s *Sphere) SetMaterial(m Material) {
+func (s *Sphere) SetMaterial(m *Material) {
 	s.material = m
 }
 

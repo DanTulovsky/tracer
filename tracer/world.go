@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"math"
 	"sort"
 
 	"golang.org/x/exp/shiny/materialdesign/colornames"
@@ -18,6 +19,20 @@ func NewWorld() *World {
 	return &World{}
 }
 
+// NewDefaultWorld returns a default world
+func NewDefaultWorld(width, height float64) *World {
+	defaultLight := NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White))
+	camera := NewCamera(width, height, math.Pi/3)
+	viewTransform := ViewTransform(NewPoint(0, 1.5, -5), NewPoint(0, 1, 0), NewVector(0, 1, 0))
+	camera.SetTransform(viewTransform)
+
+	return &World{
+		Objects: []Object{},
+		Lights:  []Light{defaultLight},
+		camera:  camera,
+	}
+}
+
 // NewDefaultTestWorld returns a world that many tests expect
 func NewDefaultTestWorld() *World {
 	l1 := NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White))
@@ -32,6 +47,11 @@ func NewDefaultTestWorld() *World {
 		Objects: []Object{s1, s2},
 		Lights:  []Light{l1},
 	}
+}
+
+// AddObject adds an object into the world
+func (w *World) AddObject(o Object) {
+	w.Objects = append(w.Objects, o)
 }
 
 // Intersections returns all the intersections in the world with the given ray
@@ -70,6 +90,11 @@ func (w *World) shadeHit(state IntersectionState) Color {
 // SetLights sets the world lights
 func (w *World) SetLights(l []Light) {
 	w.Lights = l
+}
+
+// AddLight adds a new light to the world
+func (w *World) AddLight(l Light) {
+	w.Lights = append(w.Lights, l)
 }
 
 // SetCamera sets the world camera

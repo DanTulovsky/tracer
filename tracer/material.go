@@ -7,9 +7,9 @@ type Material struct {
 }
 
 // NewMaterial returns a new material
-func NewMaterial(clr Color, ambient, diffuse, specular, shininess float64) Material {
+func NewMaterial(clr Color, ambient, diffuse, specular, shininess float64) *Material {
 
-	return Material{
+	return &Material{
 		Color:     clr,
 		Ambient:   ambient,
 		Diffuse:   diffuse,
@@ -19,9 +19,9 @@ func NewMaterial(clr Color, ambient, diffuse, specular, shininess float64) Mater
 }
 
 // NewDefaultMaterial returns a default material
-func NewDefaultMaterial() Material {
+func NewDefaultMaterial() *Material {
 
-	return Material{
+	return &Material{
 		Color:     NewColor(1, 1, 1),
 		Ambient:   0.1,
 		Diffuse:   0.9,
