@@ -111,10 +111,54 @@ func clock() {
 
 func circle() {
 	// first circled drawn by a ray
-	canvasX := 100
-	canvasY := 100
+	canvasX := 200
+	canvasY := canvasX
 
 	c := tracer.NewCanvas(canvasX, canvasY)
+
+	// camera location
+	camera := tracer.NewPoint(0, 0, -5)
+
+	type wall struct {
+		Z    float64
+		Size float64
+	}
+
+	// wall is parallel to the y-axis, on negative z
+	// size is large enough to sho a unit spere at the origin from the camera
+	w := wall{Z: 10, Size: 7}
+
+	// size of a world pixel
+	pixelSize := w.Size / float64(canvasX)
+
+	clr := colornames.Red
+
+	// transform matrix
+	m := tracer.IdentityMatrix().Scale(1, 0.5, 1).RotateZ(math.Pi/4).Shear(1, 0, 0, 0, 0, 0)
+
+	shape := tracer.NewUnitSphere()
+	shape.SetTransform(m)
+
+	// for each row of pixels on the canvas
+	for y := 0.0; y < float64(canvasY); y++ {
+		// world coordinate of y
+		wy := w.Size/2 - pixelSize*y
+
+		for x := 0.0; x < float64(canvasX); x++ {
+			// world y coordinate of x
+			wx := -w.Size/2 + pixelSize*x
+
+			// point on the wall the ray is targetting
+			target := tracer.NewPoint(wx, wy, w.Z)
+
+			// the ray from camera to the world target
+			ray := tracer.NewRay(camera, target.SubPoint(camera).Normalize())
+
+			if _, err := shape.IntersectWith(ray).Hit(); err == nil {
+				c.SetFloat(x, y, clr)
+			}
+		}
+	}
 
 	// Export
 	f, err := os.Create("image.png")
