@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -176,6 +177,35 @@ func TestWorld_ColorAt(t *testing.T) {
 			tt.world.Objects[1].SetMaterial(tt.m2)
 
 			assert.True(t, tt.want.Equal(tt.world.ColorAt(tt.args.r)), "should equal")
+		})
+	}
+}
+
+func TestWorld_Render(t *testing.T) {
+	tests := []struct {
+		name      string
+		world     *World
+		camera    *Camera
+		transform Matrix
+	}{
+		{
+			name:      "test1",
+			world:     NewDefaultTestWorld(),
+			camera:    NewCamera(11, 11, math.Pi/2),
+			transform: ViewTransform(NewPoint(0, 0, -5), NewPoint(0, 0, 0), NewVector(0, 1, 0)),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.world.SetCamera(tt.camera)
+			tt.world.Camera().SetTransform(tt.transform)
+			canvas := tt.world.Render()
+			got, err := canvas.Get(5, 5)
+			if err != nil {
+				t.Error(err)
+			}
+			assert.True(t, NewColor(0.38066, 0.47583, 0.2855).Equal(got), "should equal")
+
 		})
 	}
 }

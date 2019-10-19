@@ -10,6 +10,7 @@ import (
 type World struct {
 	Objects []Object
 	Lights  []Light
+	camera  *Camera
 }
 
 // NewWorld returns a new empty world
@@ -71,6 +72,16 @@ func (w *World) SetLights(l []Light) {
 	w.Lights = l
 }
 
+// SetCamera sets the world camera
+func (w *World) SetCamera(c *Camera) {
+	w.camera = c
+}
+
+// Camera returns the world camera
+func (w *World) Camera() *Camera {
+	return w.camera
+}
+
 // ColorAt returns the color in the world where the given ray hits
 func (w *World) ColorAt(r Ray) Color {
 	is := w.Intersections(r)
@@ -81,4 +92,19 @@ func (w *World) ColorAt(r Ray) Color {
 
 	state := PrepareComputations(hit, r)
 	return w.shadeHit(state).Clamp()
+}
+
+// Render renders the world using the world camera
+func (w *World) Render() *Canvas {
+	camera := w.Camera()
+	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))
+
+	for y := 0.0; y < camera.Vsize-1; y++ {
+		for x := 0.0; x < camera.Hsize-1; x++ {
+			ray := camera.RayForPixel(x, y)
+			clr := w.ColorAt(ray)
+			canvas.SetFloat(x, y, clr)
+		}
+	}
+	return canvas
 }
