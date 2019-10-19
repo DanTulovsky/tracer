@@ -46,3 +46,30 @@ func (w *World) Intersections(r Ray) Intersections {
 
 	return is
 }
+
+// ShadeHit returns the color at the intersection enapsulated by IntersectionState
+func (w *World) shadeHit(state IntersectionState) Color {
+	return lighting(
+		state.Object.Material(),
+		state.Point,
+		w.Lights[0],
+		state.EyeV,
+		state.NormalV)
+}
+
+// SetLights sets the world lights
+func (w *World) SetLights(l []Light) {
+	w.Lights = l
+}
+
+// ColorAt returns the color in the world where the given ray hits
+func (w *World) ColorAt(r Ray) Color {
+	is := w.Intersections(r)
+	hit, err := is.Hit()
+	if err != nil {
+		return ColorName(colornames.Black)
+	}
+
+	state := PrepareComputations(hit, r)
+	return w.shadeHit(state).Clamp()
+}
