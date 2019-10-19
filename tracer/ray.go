@@ -20,3 +20,16 @@ func (r Ray) Position(t float64) Point {
 func (r Ray) Transform(m Matrix) Ray {
 	return Ray{Origin: r.Origin.TimesMatrix(m), Dir: r.Dir.TimesMatrix(m)}
 }
+
+// Equals returns true if rays are equal within Epsilon of each other
+func (r Ray) Equals(s Ray) bool {
+	if !r.Origin.Equals(s.Origin) {
+		return false
+	}
+
+	if !r.Dir.Equals(s.Dir) {
+		return false
+	}
+
+	return true
+}

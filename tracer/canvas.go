@@ -7,23 +7,25 @@ import (
 	"image/png"
 	"io"
 	"sync"
+
+	"golang.org/x/exp/shiny/materialdesign/colornames"
 )
 
 // Canvas is the canvas for drawing on
 type Canvas struct {
 	Width, Height int
-	data          [][]color.Color
+	data          [][]Color
 }
 
 // NewCanvas returns a pointer to a new canvas
 func NewCanvas(w, h int) *Canvas {
 	// Allocate the top-level slice, the same as before.
-	data := make([][]color.Color, w) // One row per unit of y.
+	data := make([][]Color, w) // One row per unit of y.
 
 	for c := 0; c < w; c++ {
-		data[c] = make([]color.Color, h)
+		data[c] = make([]Color, h)
 		for r := 0; r < h; r++ {
-			data[c][r] = color.RGBA{0, 0, 0, 0xff}
+			data[c][r] = ColorName(colornames.Black)
 		}
 	}
 
@@ -31,7 +33,7 @@ func NewCanvas(w, h int) *Canvas {
 }
 
 // Set sets the color of a pixel
-func (c *Canvas) Set(x, y int, clr color.Color) error {
+func (c *Canvas) Set(x, y int, clr Color) error {
 	if x >= c.Width || y >= c.Height {
 		return fmt.Errorf("coordinates [%v, %v] are outside the canvas", x, y)
 	}
@@ -41,7 +43,7 @@ func (c *Canvas) Set(x, y int, clr color.Color) error {
 }
 
 // SetFloat sets the color of a pixel
-func (c *Canvas) SetFloat(x, y float64, clr color.Color) error {
+func (c *Canvas) SetFloat(x, y float64, clr Color) error {
 	if int(x) >= c.Width || int(y) >= c.Height {
 		return fmt.Errorf("coordinates [%v, %v] are outside the canvas", x, y)
 	}
@@ -51,9 +53,9 @@ func (c *Canvas) SetFloat(x, y float64, clr color.Color) error {
 }
 
 // Get returns the color at the given coordinates
-func (c *Canvas) Get(x, y int) (color.Color, error) {
+func (c *Canvas) Get(x, y int) (Color, error) {
 	if x >= c.Width || y >= c.Height {
-		return nil, fmt.Errorf("coordinates [%v, %v] are outside the canvas", x, y)
+		return ColorName(colornames.Black), fmt.Errorf("coordinates [%v, %v] are outside the canvas", x, y)
 	}
 	return c.data[x][y], nil
 }
