@@ -38,6 +38,26 @@ func (v Vector) W() float64 {
 	return v.w
 }
 
+// SetX sets x
+func (v Vector) SetX(a float64) {
+	v.x = a
+}
+
+// SetY sets y
+func (v Vector) SetY(a float64) {
+	v.y = a
+}
+
+// SetZ sets y
+func (v Vector) SetZ(a float64) {
+	v.z = a
+}
+
+// SetW sets w
+func (v Vector) SetW(a float64) {
+	v.w = a
+}
+
 // AddVector adds a vector  to a vector
 func (v Vector) AddVector(t Vector) Vector {
 	return NewVector(v.X()+t.X(), v.Y()+t.Y(), v.Z()+t.Z())
@@ -92,10 +112,26 @@ func (v Vector) Cross(w Vector) Vector {
 
 // TimesMatrix multiplies the vector by the matrix
 func (v Vector) TimesMatrix(m Matrix) Vector {
-	return NewVector(
-		m[0][0]*v.X()+m[0][1]*v.Y()+m[0][2]*v.Z()+m[0][3]*v.W(),
-		m[1][0]*v.X()+m[1][1]*v.Y()+m[1][2]*v.Z()+m[1][3]*v.W(),
-		m[2][0]*v.X()+m[2][1]*v.Y()+m[2][2]*v.Z()+m[2][3]*v.W())
+
+	r, _ := m.Dims()
+	var vec Vector
+
+	switch r {
+	case 3:
+		vec = NewVector(
+			m[0][0]*v.X()+m[0][1]*v.Y()+m[0][2]*v.Z(),
+			m[1][0]*v.X()+m[1][1]*v.Y()+m[1][2]*v.Z(),
+			m[2][0]*v.X()+m[2][1]*v.Y()+m[2][2]*v.Z())
+	case 4:
+		vec = NewVector(
+			m[0][0]*v.X()+m[0][1]*v.Y()+m[0][2]*v.Z()+m[0][3]*v.W(),
+			m[1][0]*v.X()+m[1][1]*v.Y()+m[1][2]*v.Z()+m[1][3]*v.W(),
+			m[2][0]*v.X()+m[2][1]*v.Y()+m[2][2]*v.Z()+m[2][3]*v.W())
+	default:
+		panic("only 3x3 and 4x4 matricies supported")
+	}
+
+	return vec
 }
 
 // String returns ...

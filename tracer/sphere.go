@@ -66,3 +66,17 @@ func (s *Sphere) Transform() Matrix {
 func (s *Sphere) SetTransform(m Matrix) {
 	s.transform = m
 }
+
+// NormalAt returns the normal vector at the given point on the surface of the sphere
+func (s *Sphere) NormalAt(p Point) Vector {
+
+	// move point to object space
+	op := p.TimesMatrix(s.Transform().Inverse())
+	// object normal
+	on := op.SubPoint(Origin())
+
+	// world normal
+	wn := on.TimesMatrix(s.Transform().Submatrix(3, 3).Inverse().Transpose())
+
+	return wn.Normalize()
+}

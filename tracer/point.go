@@ -11,6 +11,11 @@ type Point struct {
 	x, y, z, w float64
 }
 
+// Origin returns the point at the origin
+func Origin() Point {
+	return Point{0, 0, 0, 1.0}
+}
+
 // NewPoint returns a new Point
 func NewPoint(x, y, z float64) Point {
 	return Point{x, y, z, 1.0}

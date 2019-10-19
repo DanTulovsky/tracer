@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -185,6 +186,83 @@ func TestSphere_SetTransform(t *testing.T) {
 			tt.sphere.SetTransform(tt.args.m)
 			assert.Equal(t, tt.want, tt.sphere.Transform(), "should equal")
 
+		})
+	}
+}
+
+func TestSphere_NormalAt(t *testing.T) {
+	type args struct {
+		p Point
+	}
+	tests := []struct {
+		name   string
+		sphere *Sphere
+		args   args
+		m      Matrix // transform matrix
+		want   Vector
+	}{
+		{
+			name:   "x-axis",
+			sphere: NewUnitSphere(),
+			args: args{
+				p: NewPoint(1, 0, 0),
+			},
+			m:    IdentityMatrix(),
+			want: NewVector(1, 0, 0),
+		},
+		{
+			name:   "y-axis",
+			sphere: NewUnitSphere(),
+			args: args{
+				p: NewPoint(0, 1, 0),
+			},
+			m:    IdentityMatrix(),
+			want: NewVector(0, 1, 0),
+		},
+		{
+			name:   "z-axis",
+			sphere: NewUnitSphere(),
+			args: args{
+				p: NewPoint(0, 0, 1),
+			},
+			m:    IdentityMatrix(),
+			want: NewVector(0, 0, 1),
+		},
+		{
+			name:   "non-axial",
+			sphere: NewUnitSphere(),
+			args: args{
+				p: NewPoint(math.Sqrt(3)/3, math.Sqrt(3)/3, math.Sqrt(3)/3),
+			},
+			m:    IdentityMatrix(),
+			want: NewVector(math.Sqrt(3)/3, math.Sqrt(3)/3, math.Sqrt(3)/3),
+		},
+		{
+			name:   "translated",
+			sphere: NewUnitSphere(),
+			args: args{
+				p: NewPoint(0, 1.70711, -0.70711),
+			},
+			m:    IdentityMatrix().Translate(0, 1, 0),
+			want: NewVector(0, 0.70711, -0.70711),
+		},
+		{
+			name:   "transform",
+			sphere: NewUnitSphere(),
+			args: args{
+				p: NewPoint(0, math.Sqrt2/2, -math.Sqrt2/2),
+			},
+			m:    IdentityMatrix().RotateZ(math.Pi/5).Scale(1, 0.5, 1),
+			want: NewVector(0, 0.97014, -0.24254),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.sphere.SetTransform(tt.m)
+			v := tt.sphere.NormalAt(tt.args.p)
+
+			assert.True(t, tt.want.Equals(v), "should equal")
+			assert.True(t, v.Equals(v.Normalize()), "should equal")
 		})
 	}
 }
