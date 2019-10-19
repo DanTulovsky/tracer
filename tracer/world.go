@@ -49,12 +49,21 @@ func (w *World) Intersections(r Ray) Intersections {
 
 // ShadeHit returns the color at the intersection enapsulated by IntersectionState
 func (w *World) shadeHit(state IntersectionState) Color {
-	return lighting(
-		state.Object.Material(),
-		state.Point,
-		w.Lights[0],
-		state.EyeV,
-		state.NormalV)
+
+	var result Color
+
+	for _, l := range w.Lights {
+		c := lighting(
+			state.Object.Material(),
+			state.Point,
+			l,
+			state.EyeV,
+			state.NormalV)
+
+		result = result.Add(c)
+	}
+
+	return result
 }
 
 // SetLights sets the world lights
