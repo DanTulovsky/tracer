@@ -39,7 +39,7 @@ func TestNewPointLight(t *testing.T) {
 
 func Test_lighting(t *testing.T) {
 	type args struct {
-		m      Material
+		m      *Material
 		p      Point
 		l      PointLight
 		eye    Vector
@@ -115,7 +115,7 @@ func Test_lighting(t *testing.T) {
 
 func TestColorAtPoint(t *testing.T) {
 	type args struct {
-		m      Material
+		m      *Material
 		p      Point
 		l      PointLight
 		eye    Vector

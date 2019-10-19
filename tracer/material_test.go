@@ -19,7 +19,7 @@ func TestNewMaterial(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want Material
+		want *Material
 	}{
 		{
 			name: "test1",
@@ -30,7 +30,7 @@ func TestNewMaterial(t *testing.T) {
 				specular:  0.3,
 				shininess: 40,
 			},
-			want: Material{
+			want: &Material{
 				Color:     ColorName(colornames.Red),
 				Ambient:   0.5,
 				Diffuse:   0.4,

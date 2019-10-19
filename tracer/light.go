@@ -34,7 +34,7 @@ func (pl PointLight) Position() Point {
 }
 
 // lighting returns the color for a given point
-func lighting(m Material, p Point, l Light, eye, normal Vector) Color {
+func lighting(m *Material, p Point, l Light, eye, normal Vector) Color {
 	var ambient, diffuse, specular Color
 
 	// combine surface color with light's color/intensity
@@ -75,6 +75,6 @@ func lighting(m Material, p Point, l Light, eye, normal Vector) Color {
 }
 
 // ColorAtPoint returns the clamped color at the givn point
-func ColorAtPoint(m Material, p Point, l PointLight, eye, normal Vector) Color {
+func ColorAtPoint(m *Material, p Point, l PointLight, eye, normal Vector) Color {
 	return lighting(m, p, l, eye, normal).Clamp()
 }

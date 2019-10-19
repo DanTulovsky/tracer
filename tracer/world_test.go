@@ -77,7 +77,7 @@ func TestWorld_shadeHit(t *testing.T) {
 	type args struct {
 		i         Intersection
 		r         Ray
-		material  Material
+		material  *Material
 		transform Matrix
 		lights    []Light
 	}
@@ -136,7 +136,7 @@ func TestWorld_ColorAt(t *testing.T) {
 		name   string
 		world  *World
 		args   args
-		m1, m2 Material
+		m1, m2 *Material
 		want   Color
 	}{
 		{
