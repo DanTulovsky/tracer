@@ -371,3 +371,37 @@ func TestVector_TimesMatrix(t *testing.T) {
 		})
 	}
 }
+
+func TestVector_Reflect(t *testing.T) {
+	type args struct {
+		n Vector
+	}
+	tests := []struct {
+		name string
+		v    Vector
+		args args
+		want Vector
+	}{
+		{
+			name: "45 deg",
+			v:    NewVector(1, -1, 0),
+			args: args{
+				n: NewVector(0, 1, 0),
+			},
+			want: NewVector(1, 1, 0),
+		},
+		{
+			name: "slanted surface",
+			v:    NewVector(0, -1, 0),
+			args: args{
+				n: NewVector(math.Sqrt2/2, math.Sqrt2/2, 0),
+			},
+			want: NewVector(1, 0, 0),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.True(t, tt.want.Equals(tt.v.Reflect(tt.args.n)), "should be equal")
+		})
+	}
+}

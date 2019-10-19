@@ -116,6 +116,8 @@ func (v Vector) TimesMatrix(m Matrix) Vector {
 	r, _ := m.Dims()
 	var vec Vector
 
+	// Chap 6, page 82 claims Sphere.NormalAt requires this and SubMatrix
+	// but v.W() is always 0, so it should never matter
 	switch r {
 	case 3:
 		vec = NewVector(
@@ -145,4 +147,9 @@ func (v Vector) Equals(s Vector) bool {
 		return true
 	}
 	return false
+}
+
+// Reflect returns the vector reflected around another one
+func (v Vector) Reflect(n Vector) Vector {
+	return v.SubVector(n.Scale(2).Scale(v.Dot(n)))
 }
