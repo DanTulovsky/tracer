@@ -6,6 +6,8 @@ import (
 	"math"
 	"os"
 
+	"github.com/lucasb-eyer/go-colorful"
+
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
@@ -110,7 +112,7 @@ func clock() {
 }
 
 func circle() {
-	// first circled drawn by a ray
+	// first circle drawn by a ray
 	canvasX := 200
 	canvasY := canvasX
 
@@ -131,13 +133,13 @@ func circle() {
 	// size of a world pixel
 	pixelSize := w.Size / float64(canvasX)
 
-	clr := colornames.Red
-
 	// transform matrix
 	m := tracer.IdentityMatrix().Scale(1, 0.5, 1).RotateZ(math.Pi/4).Shear(1, 0, 0, 0, 0, 0)
 
 	shape := tracer.NewUnitSphere()
 	shape.SetTransform(m)
+
+	clr := colorful.HappyColor()
 
 	// for each row of pixels on the canvas
 	for y := 0.0; y < float64(canvasY); y++ {
@@ -145,6 +147,7 @@ func circle() {
 		wy := w.Size/2 - pixelSize*y
 
 		for x := 0.0; x < float64(canvasX); x++ {
+
 			// world y coordinate of x
 			wx := -w.Size/2 + pixelSize*x
 

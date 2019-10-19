@@ -6,6 +6,8 @@ package tracer
 type Object interface {
 	IntersectWith(Ray) Intersections
 
+	NormalAt(Point) Vector
+
 	SetTransform(m Matrix)
 	Transform() Matrix
 }
