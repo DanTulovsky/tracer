@@ -321,3 +321,53 @@ func TestGradientPattern_colorAt(t *testing.T) {
 		})
 	}
 }
+
+func TestRingPattern_colorAt(t *testing.T) {
+	type args struct {
+		p Point
+	}
+	tests := []struct {
+		name    string
+		pattern *RingPattern
+		args    args
+		want    Color
+	}{
+		{
+			name:    "test1",
+			pattern: NewRingPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 0, 0),
+			},
+			want: White(),
+		},
+		{
+			name:    "test2",
+			pattern: NewRingPattern(White(), Black()),
+			args: args{
+				p: NewPoint(1, 0, 0),
+			},
+			want: Black(),
+		},
+		{
+			name:    "test3",
+			pattern: NewRingPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 0, 1),
+			},
+			want: Black(),
+		},
+		{
+			name:    "test4",
+			pattern: NewRingPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0.708, 0, 0.708),
+			},
+			want: Black(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.pattern.colorAt(tt.args.p))
+		})
+	}
+}
