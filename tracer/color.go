@@ -23,6 +23,16 @@ func ColorName(c color.Color) Color {
 	return Color{clr.R, clr.G, clr.B}
 }
 
+// Black returns the color black
+func Black() Color {
+	return NewColor(0, 0, 0)
+}
+
+// White returns the color white
+func White() Color {
+	return NewColor(1, 1, 1)
+}
+
 // Clamp returns the color with values <0 set to 0 and values >1 set to 1
 func (c Color) Clamp() Color {
 	var r, g, b float64

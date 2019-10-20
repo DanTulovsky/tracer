@@ -3,6 +3,7 @@ package tracer
 // Material is a material to apply to shapes
 type Material struct {
 	Color                                 Color
+	Pattern                               Patterner
 	Ambient, Diffuse, Specular, Shininess float64
 }
 
@@ -28,4 +29,14 @@ func NewDefaultMaterial() *Material {
 		Specular:  0.9,
 		Shininess: 200.0,
 	}
+}
+
+// HasPattern returns true if a material has a pattern attached to it
+func (m *Material) HasPattern() bool {
+	return m.Pattern != nil
+}
+
+// SetPattern sets a pattern on a material
+func (m *Material) SetPattern(p Patterner) {
+	m.Pattern = p
 }

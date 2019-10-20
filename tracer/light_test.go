@@ -49,6 +49,7 @@ func Test_lighting(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
+		o    Shaper
 		want Color
 	}{
 		{
@@ -60,6 +61,7 @@ func Test_lighting(t *testing.T) {
 				eye:    NewVector(0, 0, -1),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(1.9, 1.9, 1.9),
 		},
 		{
@@ -72,6 +74,7 @@ func Test_lighting(t *testing.T) {
 				normal:   NewVector(0, 0, -1),
 				inShadow: true,
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(0.1, 0.1, 0.1),
 		},
 		{
@@ -83,6 +86,7 @@ func Test_lighting(t *testing.T) {
 				eye:    NewVector(0, math.Sqrt2/2, -math.Sqrt2/2),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(1.0, 1.0, 1.0),
 		},
 		{
@@ -94,6 +98,7 @@ func Test_lighting(t *testing.T) {
 				eye:    NewVector(0, 0, -1),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(0.7364, 0.7364, 0.7364),
 		},
 		{
@@ -105,6 +110,7 @@ func Test_lighting(t *testing.T) {
 				eye:    NewVector(0, -math.Sqrt2/2, -math.Sqrt2/2),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(1.6364, 1.6364, 1.6364),
 		},
 		{
@@ -116,12 +122,13 @@ func Test_lighting(t *testing.T) {
 				eye:    NewVector(0, 0, -1),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(0.1, 0.1, 0.1),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equal(lighting(tt.args.m, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)))
+			assert.True(t, tt.want.Equal(lighting(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)))
 		})
 	}
 }
@@ -138,6 +145,7 @@ func TestColorAtPoint(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
+		o    Shaper
 		want Color
 	}{
 		{
@@ -149,6 +157,7 @@ func TestColorAtPoint(t *testing.T) {
 				eye:    NewVector(0, 0, -1),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(1.0, 1.0, 1.0),
 		},
 		{
@@ -160,6 +169,7 @@ func TestColorAtPoint(t *testing.T) {
 				eye:    NewVector(0, math.Sqrt2/2, -math.Sqrt2/2),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(1.0, 1.0, 1.0),
 		},
 		{
@@ -171,6 +181,7 @@ func TestColorAtPoint(t *testing.T) {
 				eye:    NewVector(0, 0, -1),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(0.7364, 0.7364, 0.7364),
 		},
 		{
@@ -182,6 +193,7 @@ func TestColorAtPoint(t *testing.T) {
 				eye:    NewVector(0, -math.Sqrt2/2, -math.Sqrt2/2),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(1.0, 1.0, 1.0),
 		},
 		{
@@ -193,12 +205,13 @@ func TestColorAtPoint(t *testing.T) {
 				eye:    NewVector(0, 0, -1),
 				normal: NewVector(0, 0, -1),
 			},
+			o:    NewUnitSphere(),
 			want: NewColor(0.1, 0.1, 0.1),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equal(ColorAtPoint(tt.args.m, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)))
+			assert.True(t, tt.want.Equal(ColorAtPoint(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)))
 		})
 	}
 }

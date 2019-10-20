@@ -248,7 +248,7 @@ func sphere() {
 				if hit, err := shape.IntersectWith(ray).Hit(); err == nil {
 
 					comp := tracer.PrepareComputations(hit, ray)
-					clr := tracer.ColorAtPoint(comp.Object.Material(), comp.Point, light, comp.EyeV, comp.NormalV, false)
+					clr := tracer.ColorAtPoint(comp.Object.Material(), comp.Object, comp.Point, light, comp.EyeV, comp.NormalV, false)
 
 					c.SetFloat(x, y, clr)
 				}
@@ -279,8 +279,8 @@ func scene() {
 	w := tracer.NewDefaultWorld(width, height)
 
 	// second light
-	// l2 := tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.Red))
-	// w.AddLight(l2)
+	l2 := tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.Pink))
+	w.AddLight(l2)
 	// w.SetLights([]tracer.Light{l2})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -320,6 +320,9 @@ func scene() {
 	material.Color = tracer.ColorName(colornames.Greenyellow)
 	material.Diffuse = 0.7
 	material.Specular = 0.3
+	p1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Red), tracer.Black())
+	p1.SetTransform(tracer.IdentityMatrix().Scale(0.3, 0.1, 0.3).RotateX(math.Pi / 1.5).RotateY(math.Pi / 5))
+	material.SetPattern(p1)
 	w.AddObject(middle)
 
 	// another sphere
