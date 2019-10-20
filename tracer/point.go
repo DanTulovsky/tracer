@@ -41,6 +41,11 @@ func (p Point) W() float64 {
 	return p.w
 }
 
+// AddScalar adds a scalar to all the values of the point
+func (p Point) AddScalar(t float64) Point {
+	return NewPoint(p.X()+t, p.Y()+t, p.Z()+t)
+}
+
 // AddVector adds a point to a vector
 func (p Point) AddVector(t Vector) Point {
 	return NewPoint(p.X()+t.X(), p.Y()+t.Y(), p.Z()+t.Z())
