@@ -21,12 +21,12 @@ type Shape struct {
 
 // IntersectWith implements Shaper interface
 func (s *Shape) IntersectWith(r Ray) Intersections {
-	return Intersections{}
+	panic("must implement IntersectWith")
 }
 
 // NormalAt implements the Shaper interface
 func (s *Shape) NormalAt(p Point) Vector {
-	return NewVector(1, 1, 1)
+	panic("must implement NormalAt")
 }
 
 // Material returns the material of the shape

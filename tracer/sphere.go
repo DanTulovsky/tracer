@@ -5,13 +5,11 @@ import (
 	"sort"
 )
 
-// Sphere is a spherical object, implement Object
+// Sphere is a spherical object, implements Shaper
 type Sphere struct {
 	Center Point
 	Radius float64
 	Shape
-	// transform Matrix
-	// material  *Material
 }
 
 // NewUnitSphere returns a new Sphere centered at the origin with r=1
@@ -70,26 +68,6 @@ func (s *Sphere) IntersectWith(r Ray) Intersections {
 
 	return t
 }
-
-// // Transform returns the transformation matrix of the Sphere
-// func (s *Sphere) Transform() Matrix {
-// 	return s.transform
-// }
-
-// // SetTransform sets the transformation matrix of the Sphere
-// func (s *Sphere) SetTransform(m Matrix) {
-// 	s.transform = m
-// }
-
-// // Material returns the material of the sphere
-// func (s *Sphere) Material() *Material {
-// 	return s.material
-// }
-
-// // SetMaterial sets the material of the sphere
-// func (s *Sphere) SetMaterial(m *Material) {
-// 	s.material = m
-// }
 
 // NormalAt returns the normal vector at the given point on the surface of the sphere
 func (s *Sphere) NormalAt(p Point) Vector {
