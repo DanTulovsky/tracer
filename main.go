@@ -279,8 +279,8 @@ func scene() {
 	w := tracer.NewDefaultWorld(width, height)
 
 	// second light
-	l2 := tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.Pink))
-	w.AddLight(l2)
+	// l2 := tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.Pink))
+	// w.AddLight(l2)
 	// w.SetLights([]tracer.Light{l2})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -297,20 +297,26 @@ func scene() {
 	material = floor.Material()
 	material.Color = tracer.ColorName(colornames.Beige)
 	material.Specular = 0
+	p := tracer.NewGradientPattern(tracer.ColorName(colornames.Orange), tracer.ColorName(colornames.Yellow))
+	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).Scale(30, 1, 1).Translate(-15, 0, 0))
+	material.SetPattern(p)
 	w.AddObject(floor)
+
+	wallMaterial := tracer.NewDefaultMaterial()
+	wallMaterial.Color = tracer.ColorName(colornames.Whitesmoke)
 
 	// left wall
 	leftWall := tracer.NewPlane()
 	leftWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-15, 0, 0))
-	leftWall.SetMaterial(floor.Material())
+	leftWall.SetMaterial(wallMaterial)
 	w.AddObject(leftWall)
 
 	// right wall
 	rightWall := tracer.NewPlane()
 	rightWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
-	rightWall.SetMaterial(floor.Material())
+	rightWall.SetMaterial(wallMaterial)
 	w.AddObject(rightWall)
 
 	// sphere
@@ -332,6 +338,9 @@ func scene() {
 	material.Color = tracer.ColorName(colornames.Lime)
 	material.Diffuse = 0.7
 	material.Specular = 0.3
+	p2 := tracer.NewGradientPattern(tracer.ColorName(colornames.Black), tracer.ColorName(colornames.White))
+	p2.SetTransform(tracer.IdentityMatrix().Scale(2, 1, 1).Translate(-5, 0, 0).RotateY(math.Pi / 4))
+	material.SetPattern(p2)
 	w.AddObject(right)
 
 	// cube
