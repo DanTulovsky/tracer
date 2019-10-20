@@ -23,7 +23,7 @@ func TestNewSphere(t *testing.T) {
 				c: NewPoint(0, 0, 0),
 				r: 1.0,
 			},
-			want: Sphere{NewPoint(0, 0, 0), 1.0, IdentityMatrix(), NewDefaultMaterial()},
+			want: Sphere{NewPoint(0, 0, 0), 1.0, Shape{transform: IdentityMatrix(), material: NewDefaultMaterial()}},
 		},
 	}
 	for _, tt := range tests {
@@ -130,10 +130,12 @@ func TestNewUnitSphere(t *testing.T) {
 		{
 			name: "test1",
 			want: &Sphere{
-				Center:    NewPoint(0, 0, 0),
-				Radius:    1,
-				transform: IdentityMatrix(),
-				material:  NewDefaultMaterial(),
+				Center: NewPoint(0, 0, 0),
+				Radius: 1,
+				Shape: Shape{
+					transform: IdentityMatrix(),
+					material:  NewDefaultMaterial(),
+				},
 			},
 		},
 	}
