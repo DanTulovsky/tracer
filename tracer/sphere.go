@@ -14,7 +14,8 @@ type Sphere struct {
 
 // NewUnitSphere returns a new Sphere centered at the origin with r=1
 func NewUnitSphere() *Sphere {
-	return &Sphere{Center: NewPoint(0, 0, 0),
+	return &Sphere{
+		Center: NewPoint(0, 0, 0),
 		Radius: 1,
 		Shape: Shape{
 			transform: IdentityMatrix(),
@@ -25,7 +26,8 @@ func NewUnitSphere() *Sphere {
 
 // NewSphere returns a new Sphere
 func NewSphere(c Point, r float64) *Sphere {
-	return &Sphere{Center: c,
+	return &Sphere{
+		Center: c,
 		Radius: r,
 		Shape: Shape{
 			transform: IdentityMatrix(),
@@ -74,7 +76,8 @@ func (s *Sphere) NormalAt(p Point) Vector {
 
 	// move point to object space
 	op := p.TimesMatrix(s.Transform().Inverse())
-	// object normal
+
+	// object normal, this is different for each shape
 	on := op.SubPoint(Origin())
 
 	// world normal

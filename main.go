@@ -292,25 +292,24 @@ func scene() {
 
 	var material *tracer.Material
 
-	// walls (as flat spheres for now)
-	floor := tracer.NewUnitSphere()
-	floor.SetTransform(tracer.IdentityMatrix().Scale(10, 0.01, 10))
+	// floor
+	floor := tracer.NewPlane()
 	material = floor.Material()
 	material.Color = tracer.ColorName(colornames.Beige)
 	material.Specular = 0
 	w.AddObject(floor)
 
 	// left wall
-	leftWall := tracer.NewUnitSphere()
+	leftWall := tracer.NewPlane()
 	leftWall.SetTransform(
-		tracer.IdentityMatrix().Scale(10, 0.01, 10).RotateX(math.Pi/2).RotateY(-math.Pi/4).Translate(0, 0, 5))
+		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-15, 0, 0))
 	leftWall.SetMaterial(floor.Material())
 	w.AddObject(leftWall)
 
 	// right wall
-	rightWall := tracer.NewUnitSphere()
+	rightWall := tracer.NewPlane()
 	rightWall.SetTransform(
-		tracer.IdentityMatrix().Scale(10, 0.01, 10).RotateX(math.Pi/2).RotateY(math.Pi/4).Translate(0, 0, 5))
+		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
 	rightWall.SetMaterial(floor.Material())
 	w.AddObject(rightWall)
 
@@ -323,23 +322,23 @@ func scene() {
 	material.Specular = 0.3
 	w.AddObject(middle)
 
-	// // another sphere
-	// right := tracer.NewUnitSphere()
-	// right.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(1.5, 0.5, -0.5))
-	// material = right.Material()
-	// material.Color = tracer.ColorName(colornames.Lime)
-	// material.Diffuse = 0.7
-	// material.Specular = 0.3
-	// w.AddObject(right)
+	// another sphere
+	right := tracer.NewUnitSphere()
+	right.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(1.5, 0.5, -0.5))
+	material = right.Material()
+	material.Color = tracer.ColorName(colornames.Lime)
+	material.Diffuse = 0.7
+	material.Specular = 0.3
+	w.AddObject(right)
 
-	// // one more sphere
-	// left := tracer.NewUnitSphere()
-	// left.SetTransform(tracer.IdentityMatrix().Scale(0.33, 0.33, 0.33).Translate(-1.5, 0.33, -0.75))
-	// material = left.Material()
-	// material.Color = tracer.ColorName(colornames.Lightblue)
-	// material.Diffuse = 0.7
-	// material.Specular = 0.3
-	// w.AddObject(left)
+	// one more sphere
+	left := tracer.NewUnitSphere()
+	left.SetTransform(tracer.IdentityMatrix().Scale(0.33, 0.33, 0.33).Translate(-1.5, 0.33, -0.75))
+	material = left.Material()
+	material.Color = tracer.ColorName(colornames.Lightblue)
+	material.Diffuse = 0.7
+	material.Specular = 0.3
+	w.AddObject(left)
 
 	canvas := w.Render()
 
