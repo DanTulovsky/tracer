@@ -3,6 +3,7 @@ package tracer
 import "math"
 
 // Patterner is a pattern that can be applied to a material
+// This does not do UV Mapping, the pattern is set on the 3D Space of the object
 type Patterner interface {
 	// Returns the correct color at the given point on the given object for this pattern
 	ColorAtObject(Shaper, Point) Color
@@ -86,11 +87,7 @@ func NewGradientPattern(c1, c2 Color) *GradientPattern {
 
 // ColorAtObject returns the color for the given pattern on the given object
 func (gp *GradientPattern) ColorAtObject(o Shaper, p Point) Color {
-	// return gp.colorAt(gp.objectSpacePoint(o, p))
-	op := p.TimesMatrix(o.Transform().Inverse())
-	pp := op.TimesMatrix(gp.Transform().Inverse())
-
-	return gp.colorAt(pp)
+	return gp.colorAt(gp.objectSpacePoint(o, p))
 }
 
 // ColorAt implements Patterner
@@ -99,4 +96,34 @@ func (gp *GradientPattern) colorAt(p Point) Color {
 	f := p.X() - math.Floor(p.X())
 
 	return gp.a.Add(d.Scale(f))
+}
+
+// RingPattern implements a gradient pattern
+type RingPattern struct {
+	basePattern
+	a, b Color
+}
+
+// NewRingPattern returns a new gradient pattern with the given colors
+func NewRingPattern(c1, c2 Color) *RingPattern {
+	return &RingPattern{
+		a: c1,
+		b: c2,
+		basePattern: basePattern{
+			transform: IdentityMatrix(),
+		},
+	}
+}
+
+// ColorAtObject returns the color for the given pattern on the given object
+func (rp *RingPattern) ColorAtObject(o Shaper, p Point) Color {
+	return rp.colorAt(rp.objectSpacePoint(o, p))
+}
+
+// ColorAt implements Patterner
+func (rp *RingPattern) colorAt(p Point) Color {
+	if int(math.Floor(math.Sqrt(math.Pow(p.X(), 2)+math.Pow(p.Z(), 2))))%2 == 0 {
+		return rp.a
+	}
+	return rp.b
 }
