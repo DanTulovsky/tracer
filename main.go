@@ -300,7 +300,7 @@ func scene() {
 	p := tracer.NewRingPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
 	// p := tracer.NewGradientPattern(tracer.ColorName(colornames.Orange), tracer.ColorName(colornames.Yellow))
 	// p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).Scale(30, 1, 1).Translate(-15, 0, 0))
-	material.SetPattern(p)
+	floor.Material().SetPattern(p)
 	w.AddObject(floor)
 
 	wallMaterial := tracer.NewDefaultMaterial()
@@ -317,9 +317,8 @@ func scene() {
 	rightWall := tracer.NewPlane()
 	rightWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
-	rightWall.SetMaterial(wallMaterial)
-	pWall := tracer.NewRingPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
-	wallMaterial.SetPattern(pWall)
+	pRightWall := tracer.NewCheckerPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
+	rightWall.Material().SetPattern(pRightWall)
 	w.AddObject(rightWall)
 
 	// sphere

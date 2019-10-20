@@ -371,3 +371,93 @@ func TestRingPattern_colorAt(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckerPattern_colorAt(t *testing.T) {
+	type args struct {
+		p Point
+	}
+	tests := []struct {
+		name    string
+		pattern *CheckerPattern
+		args    args
+		want    Color
+	}{
+		{
+			name:    "x1",
+			pattern: NewCheckerPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 0, 0),
+			},
+			want: White(),
+		},
+		{
+			name:    "x2",
+			pattern: NewCheckerPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0.99, 0, 0),
+			},
+			want: White(),
+		},
+		{
+			name:    "x3",
+			pattern: NewCheckerPattern(White(), Black()),
+			args: args{
+				p: NewPoint(1.01, 0, 0),
+			},
+			want: Black(),
+		},
+		{
+			name:    "y1",
+			pattern: NewCheckerPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 0, 0),
+			},
+			want: White(),
+		},
+		{
+			name:    "y2",
+			pattern: NewCheckerPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 0.99, 0),
+			},
+			want: White(),
+		},
+		{
+			name:    "y3",
+			pattern: NewCheckerPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 1.01, 0),
+			},
+			want: Black(),
+		},
+		{
+			name:    "z1",
+			pattern: NewCheckerPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 0, 0),
+			},
+			want: White(),
+		},
+		{
+			name:    "z2",
+			pattern: NewCheckerPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 0, 0.99),
+			},
+			want: White(),
+		},
+		{
+			name:    "z3",
+			pattern: NewCheckerPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 0, 1.01),
+			},
+			want: Black(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.pattern.colorAt(tt.args.p))
+		})
+	}
+}
