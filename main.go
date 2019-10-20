@@ -279,8 +279,9 @@ func scene() {
 	w := tracer.NewDefaultWorld(width, height)
 
 	// second light
-	l2 := tracer.NewPointLight(tracer.NewPoint(10, -10, 10), tracer.ColorName(colornames.Red))
+	l2 := tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.Red))
 	w.AddLight(l2)
+	// w.SetLights([]tracer.Light{l2})
 
 	// where the camera is and where it's pointing; also which way is "up"
 	from := tracer.NewPoint(0, 1.5, -5)
@@ -289,10 +290,12 @@ func scene() {
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
 
+	var material *tracer.Material
+
 	// walls (as flat spheres for now)
 	floor := tracer.NewUnitSphere()
 	floor.SetTransform(tracer.IdentityMatrix().Scale(10, 0.01, 10))
-	material := floor.Material()
+	material = floor.Material()
 	material.Color = tracer.ColorName(colornames.Beige)
 	material.Specular = 0
 	w.AddObject(floor)
@@ -320,23 +323,24 @@ func scene() {
 	material.Specular = 0.3
 	w.AddObject(middle)
 
-	// another sphere
-	right := tracer.NewUnitSphere()
-	right.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(1.5, 0.5, -0.5))
-	material = right.Material()
-	material.Color = tracer.ColorName(colornames.Lime)
-	material.Diffuse = 0.7
-	material.Specular = 0.3
-	w.AddObject(right)
+	// // another sphere
+	// right := tracer.NewUnitSphere()
+	// right.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(1.5, 0.5, -0.5))
+	// material = right.Material()
+	// material.Color = tracer.ColorName(colornames.Lime)
+	// material.Diffuse = 0.7
+	// material.Specular = 0.3
+	// w.AddObject(right)
 
-	// one more sphere
-	left := tracer.NewUnitSphere()
-	left.SetTransform(tracer.IdentityMatrix().Scale(0.33, 0.33, 0.33).Translate(-1.5, 0.33, -0.75))
-	material = left.Material()
-	material.Color = tracer.ColorName(colornames.Lightblue)
-	material.Diffuse = 0.7
-	material.Specular = 0.3
-	w.AddObject(left)
+	// // one more sphere
+	// left := tracer.NewUnitSphere()
+	// left.SetTransform(tracer.IdentityMatrix().Scale(0.33, 0.33, 0.33).Translate(-1.5, 0.33, -0.75))
+	// material = left.Material()
+	// material.Color = tracer.ColorName(colornames.Lightblue)
+	// material.Diffuse = 0.7
+	// material.Specular = 0.3
+	// w.AddObject(left)
+
 	canvas := w.Render()
 
 	// Export

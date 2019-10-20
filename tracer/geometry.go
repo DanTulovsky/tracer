@@ -1,9 +1,7 @@
 package tracer
 
-// Tupler ...
-
-// Object represents an physical object
-type Object interface {
+// Shaper represents an physical object
+type Shaper interface {
 	IntersectWith(Ray) Intersections
 
 	NormalAt(Point) Vector

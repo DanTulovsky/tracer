@@ -46,6 +46,11 @@ func lighting(m *Material, p Point, l Light, eye, normal Vector, inShadow bool) 
 	// compute ambient contribution
 	ambient = effectiveColor.Scale(m.Ambient)
 
+	// light not visible, ignore diffuse ans specular components
+	if inShadow {
+		return ambient
+	}
+
 	// lightDotNormal represnets the cosine of the angle btween the light vector and the normal vector
 	// a negaive number means the light is on the other side of the surface
 	lightDotNormal := lightv.Dot(normal)
@@ -69,11 +74,6 @@ func lighting(m *Material, p Point, l Light, eye, normal Vector, inShadow bool) 
 			factor := math.Pow(reflectDotEye, m.Shininess)
 			specular = l.Intensity().Scale(m.Specular).Scale(factor)
 		}
-	}
-
-	// light not visible, ignore diffuse ans specular components
-	if inShadow {
-		return ambient
 	}
 
 	return ambient.Add(diffuse).Add(specular)
