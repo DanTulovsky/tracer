@@ -172,7 +172,7 @@ type PertrubedPattern struct {
 	maxNoise float64
 }
 
-// NewPertrubedPattern returns a new pertrubed pattrner
+// NewPertrubedPattern returns a new pertrubed patterner
 // maxNoise is a [0, 1] value which clamps how much the noise affects the input
 func NewPertrubedPattern(p Patterner, maxNoise float64) *PertrubedPattern {
 
@@ -199,4 +199,34 @@ func (pp *PertrubedPattern) ColorAtObject(o Shaper, p Point) Color {
 
 	// pass it to the real patterner
 	return pp.p.ColorAtObject(o, p.AddScalar(n))
+}
+
+// BlendedPattern blends the output of two patterns
+type BlendedPattern struct {
+	basePattern
+	p1 Patterner // real pattern to delegate to
+	p2 Patterner // real pattern to delegate to
+}
+
+// NewBlendedPattern returns a new blended patterner
+func NewBlendedPattern(p1, p2 Patterner) *BlendedPattern {
+
+	return &BlendedPattern{
+		p1: p1,
+		p2: p2,
+		basePattern: basePattern{
+			transform: IdentityMatrix(),
+		},
+	}
+}
+
+// ColorAtObject returns the color for the given pattern on the given object
+func (bp *BlendedPattern) ColorAtObject(o Shaper, p Point) Color {
+
+	c1 := bp.p1.ColorAtObject(o, p)
+	c2 := bp.p2.ColorAtObject(o, p)
+
+	// blend them together
+	return c1.Blend(c2)
+
 }

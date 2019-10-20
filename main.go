@@ -272,8 +272,8 @@ func sphere() {
 
 func scene() {
 
-	// width, height := 300.0, 300.0
-	width, height := 1000.0, 1000.0
+	width, height := 300.0, 300.0
+	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -298,10 +298,18 @@ func scene() {
 	material.Color = tracer.ColorName(colornames.Beige)
 	material.Specular = 0
 	// p := tracer.NewRingPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
-	p := tracer.NewPertrubedPattern(
-		tracer.NewRingPattern(
-			tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
-		0.9)
+	// p := tracer.NewPertrubedPattern(
+	// 	tracer.NewRingPattern(
+	// 		tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
+	// 	0.9)
+	bp1 := tracer.NewPertrubedPattern(
+		tracer.NewStripedPattern(
+			tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White)),
+		0.8)
+	bp2 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
+	// rotate bp2 by 90 degrees
+	bp2.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi / 2))
+	p := tracer.NewBlendedPattern(bp1, bp2)
 	floor.Material().SetPattern(p)
 	w.AddObject(floor)
 
