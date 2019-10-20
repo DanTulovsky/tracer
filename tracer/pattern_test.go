@@ -45,17 +45,19 @@ func Test_basePattern_ColorAt(t *testing.T) {
 	tests := []struct {
 		name string
 		bp   *basePattern
+		o    Shaper
 		args args
 		want Color
 	}{
 		{
 			name: "panic1",
 			bp:   &basePattern{},
+			o:    NewUnitSphere(),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Panics(t, func() { tt.bp.ColorAtObject(NewPoint(0, 0, 0)) }, "should panic")
+			assert.Panics(t, func() { tt.bp.ColorAtObject(tt.o, NewPoint(0, 0, 0)) }, "should panic")
 		})
 	}
 }
@@ -226,6 +228,96 @@ func TestStripedPattern_ColorAtObject(t *testing.T) {
 			tt.args.o.SetTransform(tt.oTransform)
 			tt.pattern.SetTransform(tt.pTransform)
 			assert.Equal(t, tt.want, tt.pattern.ColorAtObject(tt.args.o, tt.args.p))
+		})
+	}
+}
+
+func TestNewGradientPattern(t *testing.T) {
+	type args struct {
+		c1 Color
+		c2 Color
+	}
+	tests := []struct {
+		name string
+		args args
+		want *GradientPattern
+	}{
+		{
+			name: "test1",
+			args: args{
+				c1: White(),
+				c2: Black(),
+			},
+			want: &GradientPattern{
+				a: White(),
+				b: Black(),
+				basePattern: basePattern{
+					transform: IdentityMatrix(),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, NewGradientPattern(tt.args.c1, tt.args.c2))
+		})
+	}
+}
+
+func TestGradientPattern_colorAt(t *testing.T) {
+	type args struct {
+		p Point
+	}
+	tests := []struct {
+		name    string
+		pattern *GradientPattern
+		args    args
+		want    Color
+	}{
+		{
+			name:    "test1",
+			pattern: NewGradientPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0, 0, 0),
+			},
+			want: White(),
+		},
+		{
+			name:    "test2",
+			pattern: NewGradientPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0.25, 0, 0),
+			},
+			want: NewColor(0.75, 0.75, 0.75),
+		},
+		{
+			name:    "test3",
+			pattern: NewGradientPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0.5, 0, 0),
+			},
+			want: NewColor(0.5, 0.5, 0.5),
+		},
+		{
+			name:    "test4",
+			pattern: NewGradientPattern(White(), Black()),
+			args: args{
+				p: NewPoint(0.75, 0, 0),
+			},
+			want: NewColor(0.25, 0.25, 0.25),
+		},
+		{
+			name:    "test5",
+			pattern: NewGradientPattern(White(), Black()),
+			args: args{
+				p: NewPoint(1, 0, 0),
+			},
+			want: White(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.pattern.colorAt(tt.args.p))
 		})
 	}
 }

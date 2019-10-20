@@ -27,8 +27,14 @@ func (bp *basePattern) SetTransform(m Matrix) {
 }
 
 // ColorAt implements Patterner
-func (bp *basePattern) ColorAtObject(p Point) Color {
+func (bp *basePattern) ColorAtObject(o Shaper, p Point) Color {
 	panic("need to implement ColorAt")
+}
+
+// objectSpacePoint returns the world point as object point
+func (bp *basePattern) objectSpacePoint(o Shaper, p Point) Point {
+	op := p.TimesMatrix(o.Transform().Inverse())
+	return op.TimesMatrix(bp.Transform().Inverse())
 }
 
 // StripedPattern is a patternt at overlays stripes
@@ -50,11 +56,7 @@ func NewStripedPattern(c1, c2 Color) *StripedPattern {
 
 // ColorAtObject returns the color for the given pattern on the given object
 func (sp *StripedPattern) ColorAtObject(o Shaper, p Point) Color {
-	// move point to object space
-	op := p.TimesMatrix(o.Transform().Inverse())
-	pp := op.TimesMatrix(sp.Transform().Inverse())
-
-	return sp.colorAt(pp)
+	return sp.colorAt(sp.objectSpacePoint(o, p))
 }
 
 // ColorAt implements Patterner
@@ -63,4 +65,38 @@ func (sp *StripedPattern) colorAt(p Point) Color {
 		return sp.a
 	}
 	return sp.b
+}
+
+// GradientPattern implements a gradient pattern
+type GradientPattern struct {
+	basePattern
+	a, b Color
+}
+
+// NewGradientPattern returns a new gradient pattern with the given colors
+func NewGradientPattern(c1, c2 Color) *GradientPattern {
+	return &GradientPattern{
+		a: c1,
+		b: c2,
+		basePattern: basePattern{
+			transform: IdentityMatrix(),
+		},
+	}
+}
+
+// ColorAtObject returns the color for the given pattern on the given object
+func (gp *GradientPattern) ColorAtObject(o Shaper, p Point) Color {
+	// return gp.colorAt(gp.objectSpacePoint(o, p))
+	op := p.TimesMatrix(o.Transform().Inverse())
+	pp := op.TimesMatrix(gp.Transform().Inverse())
+
+	return gp.colorAt(pp)
+}
+
+// ColorAt implements Patterner
+func (gp *GradientPattern) colorAt(p Point) Color {
+	d := gp.b.Sub(gp.a)
+	f := p.X() - math.Floor(p.X())
+
+	return gp.a.Add(d.Scale(f))
 }
