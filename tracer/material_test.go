@@ -3,9 +3,8 @@ package tracer
 import (
 	"testing"
 
-	"golang.org/x/image/colornames"
-
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/image/colornames"
 )
 
 func TestNewMaterial(t *testing.T) {
@@ -41,5 +40,34 @@ func TestNewMaterial(t *testing.T) {
 	}
 	for _, tt := range tests {
 		assert.Equal(t, tt.want, NewMaterial(tt.args.clr, tt.args.ambient, tt.args.diffuse, tt.args.specular, tt.args.shininess))
+	}
+}
+
+func TestMaterial_HasPattern(t *testing.T) {
+	tests := []struct {
+		name string
+		m    *Material
+		p    Patterner
+		want bool
+	}{
+		{
+			name: "has pattern",
+			m:    NewDefaultMaterial(),
+			p:    NewStripedPattern(Black(), White()),
+			want: true,
+		},
+		{
+			name: "no pattern",
+			m:    NewDefaultMaterial(),
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		if tt.p != nil {
+			tt.m.SetPattern(tt.p)
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.m.HasPattern(), "should equal")
+		})
 	}
 }

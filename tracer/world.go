@@ -110,6 +110,7 @@ func (w *World) shadeHit(state IntersectionState) Color {
 
 		c := lighting(
 			state.Object.Material(),
+			state.Object,
 			state.OverPoint,
 			l,
 			state.EyeV,
