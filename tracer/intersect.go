@@ -68,11 +68,11 @@ func (a byT) Less(i, j int) bool { return a[i].t < a[j].t }
 type IntersectionState struct {
 	T         float64 // How far away from Ray origin did this occur?
 	Object    Object  // The object we intersected
-	Point     Point
-	EyeV      Vector
-	NormalV   Vector
-	Inside    bool // did the hit occure inside or outside the shape?
-	OverPoint Point
+	Point     Point   // the point of intersection
+	EyeV      Vector  // eye vector
+	NormalV   Vector  // normal vector
+	Inside    bool    // did the hit occure inside or outside the shape?
+	OverPoint Point   // offset to properly render shadows due to floating point errors
 }
 
 // PrepareComputations prepopulates the IntersectionState structure
