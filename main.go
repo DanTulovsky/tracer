@@ -272,15 +272,15 @@ func sphere() {
 
 func scene() {
 
-	width, height := 300.0, 300.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 300.0, 300.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
 
 	// second light
-	// l2 := tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.Pink))
-	// w.AddLight(l2)
+	l2 := tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.Pink))
+	w.AddLight(l2)
 	// w.SetLights([]tracer.Light{l2})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -297,9 +297,11 @@ func scene() {
 	material = floor.Material()
 	material.Color = tracer.ColorName(colornames.Beige)
 	material.Specular = 0
-	p := tracer.NewRingPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
-	// p := tracer.NewGradientPattern(tracer.ColorName(colornames.Orange), tracer.ColorName(colornames.Yellow))
-	// p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).Scale(30, 1, 1).Translate(-15, 0, 0))
+	// p := tracer.NewRingPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
+	p := tracer.NewPertrubedPattern(
+		tracer.NewRingPattern(
+			tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
+		0.9)
 	floor.Material().SetPattern(p)
 	w.AddObject(floor)
 
@@ -317,21 +319,24 @@ func scene() {
 	rightWall := tracer.NewPlane()
 	rightWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
-	pRightWall := tracer.NewCheckerPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
+	pRightWall := tracer.NewPertrubedPattern(
+		tracer.NewCheckerPattern(
+			tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
+		0.5)
 	rightWall.Material().SetPattern(pRightWall)
 	w.AddObject(rightWall)
 
 	// sphere
-	// middle := tracer.NewUnitSphere()
-	// middle.SetTransform(tracer.IdentityMatrix().Translate(-0.5, 1, 0.5))
-	// material = middle.Material()
-	// material.Color = tracer.ColorName(colornames.Greenyellow)
-	// material.Diffuse = 0.7
-	// material.Specular = 0.3
-	// p1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Red), tracer.Black())
-	// p1.SetTransform(tracer.IdentityMatrix().Scale(0.3, 0.1, 0.3).RotateX(math.Pi / 1.5).RotateY(math.Pi / 5))
-	// material.SetPattern(p1)
-	// w.AddObject(middle)
+	middle := tracer.NewUnitSphere()
+	middle.SetTransform(tracer.IdentityMatrix().Translate(-0.5, 1, 0.5))
+	material = middle.Material()
+	material.Color = tracer.ColorName(colornames.Greenyellow)
+	material.Diffuse = 0.7
+	material.Specular = 0.3
+	p1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Red), tracer.Black())
+	p1.SetTransform(tracer.IdentityMatrix().Scale(0.3, 0.1, 0.3).RotateX(math.Pi / 1.5).RotateY(math.Pi / 5))
+	material.SetPattern(p1)
+	w.AddObject(middle)
 
 	// another sphere
 	right := tracer.NewUnitSphere()
@@ -340,23 +345,25 @@ func scene() {
 	material.Color = tracer.ColorName(colornames.Lime) // ignored when pattern
 	material.Diffuse = 0.7
 	material.Specular = 0.3
-	p2 := tracer.NewStripedPattern(tracer.ColorName(colornames.Red), tracer.ColorName(colornames.Green))
+	p2 := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Red), tracer.ColorName(colornames.Green))
 	p2.SetTransform(tracer.IdentityMatrix().Scale(0.1, 0.1, 0.1).RotateX(math.Pi / 4))
-	material.SetPattern(p2)
+	p3 := tracer.NewPertrubedPattern(p2, 0.6)
+	material.SetPattern(p3)
 	w.AddObject(right)
 
 	// cube
-	// left := tracer.NewUnitCube()
-	// left.SetTransform(
-	// 	tracer.IdentityMatrix().Scale(0.33, 0.33, 0.33).RotateX(math.Pi/4).RotateY(math.Pi/4).RotateZ(math.Pi/4).Translate(-1.5, 2, -0.5))
-	// material = left.Material()
-	// material.Color = tracer.ColorName(colornames.Lightblue)
-	// material.Diffuse = 0.7
-	// material.Specular = 0.3
-	// p3 := tracer.NewGradientPattern(tracer.ColorName(colornames.Black), tracer.ColorName(colornames.White))
-	// p3.SetTransform(tracer.IdentityMatrix().Scale(0.2, 1, 1))
-	// material.SetPattern(p3)
-	// w.AddObject(left)
+	left := tracer.NewUnitCube()
+	left.SetTransform(
+		tracer.IdentityMatrix().Scale(0.33, 0.33, 0.33).RotateX(math.Pi/4).RotateY(math.Pi/4).RotateZ(math.Pi/4).Translate(-1.5, 2, -0.5))
+	material = left.Material()
+	material.Color = tracer.ColorName(colornames.Lightblue)
+	material.Diffuse = 0.7
+	material.Specular = 0.3
+	p4 := tracer.NewGradientPattern(tracer.ColorName(colornames.Black), tracer.ColorName(colornames.White))
+	p4.SetTransform(tracer.IdentityMatrix().Scale(0.2, 1, 1))
+	material.SetPattern(p4)
+	w.AddObject(left)
 
 	canvas := w.Render()
 

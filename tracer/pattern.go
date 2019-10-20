@@ -1,6 +1,11 @@
 package tracer
 
-import "math"
+import (
+	"math"
+	"time"
+
+	"github.com/ojrac/opensimplex-go"
+)
 
 // Patterner is a pattern that can be applied to a material
 // This does not do UV Mapping, the pattern is set on the 3D Space of the object
@@ -156,4 +161,42 @@ func (cp *CheckerPattern) colorAt(p Point) Color {
 		return cp.a
 	}
 	return cp.b
+}
+
+// PertrubedPattern jitters the points before passing them on to the real pattern
+// Using Opensimplex: https://github.com/ojrac/opensimplex-go
+type PertrubedPattern struct {
+	basePattern
+	p        Patterner // real pattern to delegate to
+	noise    opensimplex.Noise
+	maxNoise float64
+}
+
+// NewPertrubedPattern returns a new pertrubed pattrner
+// maxNoise is a [0, 1] value which clamps how much the noise affects the input
+func NewPertrubedPattern(p Patterner, maxNoise float64) *PertrubedPattern {
+
+	if maxNoise < 0 || maxNoise > 1 {
+		panic("maxNoise must be between 0 and 1")
+	}
+
+	n := opensimplex.NewNormalized(time.Now().Unix())
+
+	return &PertrubedPattern{
+		p:        p,
+		noise:    n,
+		maxNoise: maxNoise,
+		basePattern: basePattern{
+			transform: IdentityMatrix(),
+		},
+	}
+}
+
+// ColorAtObject returns the color for the given pattern on the given object
+func (pp *PertrubedPattern) ColorAtObject(o Shaper, p Point) Color {
+	// change p using opensimplex
+	n := pp.noise.Eval3(p.X(), p.Y(), p.Z()) * pp.maxNoise
+
+	// pass it to the real patterner
+	return pp.p.ColorAtObject(o, p.AddScalar(n))
 }
