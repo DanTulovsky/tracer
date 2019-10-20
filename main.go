@@ -248,7 +248,7 @@ func sphere() {
 				if hit, err := shape.IntersectWith(ray).Hit(); err == nil {
 
 					comp := tracer.PrepareComputations(hit, ray)
-					clr := tracer.ColorAtPoint(comp.Object.Material(), comp.Point, light, comp.EyeV, comp.NormalV)
+					clr := tracer.ColorAtPoint(comp.Object.Material(), comp.Point, light, comp.EyeV, comp.NormalV, false)
 
 					c.SetFloat(x, y, clr)
 				}
@@ -272,8 +272,8 @@ func sphere() {
 
 func scene() {
 
-	width, height := 300.0, 300.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 300.0, 300.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)

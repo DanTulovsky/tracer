@@ -74,12 +74,14 @@ func (w *World) shadeHit(state IntersectionState) Color {
 	var result Color
 
 	for _, l := range w.Lights {
+		isShadowed := w.IsShadowed(state.OverPoint, l)
 		c := lighting(
 			state.Object.Material(),
-			state.Point,
+			state.OverPoint,
 			l,
 			state.EyeV,
-			state.NormalV)
+			state.NormalV,
+			isShadowed)
 
 		result = result.Add(c)
 	}
@@ -117,6 +119,25 @@ func (w *World) ColorAt(r Ray) Color {
 
 	state := PrepareComputations(hit, r)
 	return w.shadeHit(state).Clamp()
+}
+
+// IsShadowed returns true if p is in a shadow
+func (w *World) IsShadowed(p Point, l Light) bool {
+	var inShadow bool
+
+	v := l.Position().SubPoint(p)
+	distance := v.Magnitude()
+	direction := v.Normalize()
+
+	r := NewRay(p, direction)
+	intersections := w.Intersections(r)
+
+	h, err := intersections.Hit()
+	if err == nil && h.T() < distance {
+		inShadow = true
+	}
+
+	return inShadow
 }
 
 // Render renders the world using the world camera

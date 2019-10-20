@@ -4,6 +4,8 @@ import (
 	"math"
 	"testing"
 
+	"github.com/DanTulovsky/tracer/constants"
+
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/image/colornames"
 )
@@ -128,6 +130,37 @@ func TestWorld_shadeHit(t *testing.T) {
 	}
 }
 
+func TestWorld_shadeHitShadow(t *testing.T) {
+	w := NewDefaultTestWorld()
+	w.SetLights([]Light{NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White))})
+
+	s1 := NewUnitSphere()
+	w.AddObject(s1)
+
+	s2 := NewUnitSphere()
+	s2.SetTransform(IdentityMatrix().Translate(0, 0, 10))
+	w.AddObject(s2)
+
+	r := NewRay(NewPoint(0, 0, 5), NewVector(0, 0, 1))
+	i := NewIntersection(s2, 4)
+
+	state := PrepareComputations(i, r)
+	c := w.shadeHit(state)
+	assert.Equal(t, NewColor(0.1, 0.1, 0.1), c, "should equal")
+}
+
+func TestWorld_shadeHitOffset(t *testing.T) {
+	r := NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1))
+	shape := NewUnitSphere()
+	shape.SetTransform(IdentityMatrix().Translate(0, 0, 1))
+	i := NewIntersection(shape, 5)
+
+	state := PrepareComputations(i, r)
+
+	assert.Less(t, state.OverPoint.Z(), -constants.Epsilon/2)
+	assert.Greater(t, state.Point.Z(), state.OverPoint.Z())
+}
+
 func TestWorld_ColorAt(t *testing.T) {
 	type args struct {
 		r Ray
@@ -206,6 +239,57 @@ func TestWorld_Render(t *testing.T) {
 			}
 			assert.True(t, NewColor(0.38066, 0.47583, 0.2855).Equal(got), "should equal")
 
+		})
+	}
+}
+
+func TestWorld_IsShadowed(t *testing.T) {
+	type args struct {
+		p Point
+	}
+	tests := []struct {
+		name  string
+		world *World
+		args  args
+		want  bool
+	}{
+		{
+			name:  "nothing collinear with point and light; no shadow",
+			world: NewDefaultTestWorld(),
+			args: args{
+				p: NewPoint(0, 10, 0),
+			},
+			want: false,
+		},
+		{
+			name:  "object between point and light; shadow",
+			world: NewDefaultTestWorld(),
+			args: args{
+				p: NewPoint(10, -10, 10),
+			},
+			want: true,
+		},
+		{
+			name:  "object is behind light; no shadow",
+			world: NewDefaultTestWorld(),
+			args: args{
+				p: NewPoint(-20, 20, -20),
+			},
+			want: false,
+		},
+		{
+			name:  "object is behind the point; no shadow",
+			world: NewDefaultTestWorld(),
+			args: args{
+				p: NewPoint(-2, 2, -2),
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// default world has only one light
+			assert.Equal(t, tt.want, tt.world.IsShadowed(tt.args.p, tt.world.Lights[0]))
 		})
 	}
 }
