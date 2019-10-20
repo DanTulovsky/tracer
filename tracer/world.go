@@ -3,7 +3,6 @@ package tracer
 import (
 	"math"
 	"sort"
-	"sync"
 
 	"golang.org/x/exp/shiny/materialdesign/colornames"
 )
@@ -69,27 +68,6 @@ func (w *World) Intersections(r Ray) Intersections {
 	return is
 }
 
-// ShadeHit returns the color at the intersection enapsulated by IntersectionState
-func (w *World) shadeHit(state IntersectionState) Color {
-
-	var result Color
-
-	for _, l := range w.Lights {
-		isShadowed := w.IsShadowed(state.OverPoint, l)
-		c := lighting(
-			state.Object.Material(),
-			state.OverPoint,
-			l,
-			state.EyeV,
-			state.NormalV,
-			isShadowed)
-
-		result = result.Add(c)
-	}
-
-	return result
-}
-
 // SetLights sets the world lights
 func (w *World) SetLights(l []Light) {
 	w.Lights = l
@@ -122,7 +100,29 @@ func (w *World) ColorAt(r Ray) Color {
 	return w.shadeHit(state).Clamp()
 }
 
-// IsShadowed returns true if p is in a shadow
+// ShadeHit returns the color at the intersection enapsulated by IntersectionState
+func (w *World) shadeHit(state IntersectionState) Color {
+
+	var result Color
+
+	for _, l := range w.Lights {
+		isShadowed := w.IsShadowed(state.OverPoint, l)
+
+		c := lighting(
+			state.Object.Material(),
+			state.OverPoint,
+			l,
+			state.EyeV,
+			state.NormalV,
+			isShadowed)
+
+		result = result.Add(c)
+	}
+
+	return result
+}
+
+// IsShadowed returns true if p is in a shadow from the given light
 func (w *World) IsShadowed(p Point, l Light) bool {
 	var inShadow bool
 
@@ -146,21 +146,21 @@ func (w *World) Render() *Canvas {
 	camera := w.Camera()
 	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))
 
-	var wg sync.WaitGroup
+	// var wg sync.WaitGroup
 
 	for y := 0.0; y < camera.Vsize-1; y++ {
 		for x := 0.0; x < camera.Hsize-1; x++ {
-			wg.Add(1)
-			go func(x, y float64) {
-				ray := camera.RayForPixel(x, y)
-				clr := w.ColorAt(ray)
-				canvas.SetFloat(x, y, clr)
-				wg.Done()
-			}(x, y)
+			// wg.Add(1)
+			// go func(x, y float64) {
+			ray := camera.RayForPixel(x, y)
+			clr := w.ColorAt(ray)
+			canvas.SetFloat(x, y, clr)
+			// wg.Done()
+			// }(x, y)
 		}
 	}
 
-	wg.Wait()
+	// wg.Wait()
 
 	return canvas
 }
