@@ -279,8 +279,8 @@ func scene() {
 	w := tracer.NewDefaultWorld(width, height)
 
 	// second light
-	l2 := tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.Red))
-	w.AddLight(l2)
+	// l2 := tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.Red))
+	// w.AddLight(l2)
 	// w.SetLights([]tracer.Light{l2})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -331,9 +331,10 @@ func scene() {
 	material.Specular = 0.3
 	w.AddObject(right)
 
-	// one more sphere
-	left := tracer.NewUnitSphere()
-	left.SetTransform(tracer.IdentityMatrix().Scale(0.33, 0.33, 0.33).Translate(-1.5, 0.33, -0.75))
+	// cube
+	left := tracer.NewUnitCube()
+	left.SetTransform(
+		tracer.IdentityMatrix().Scale(0.33, 0.33, 0.33).RotateX(math.Pi/4).RotateY(math.Pi/4).RotateZ(math.Pi/4).Translate(-1.5, 2, -0.5))
 	material = left.Material()
 	material.Color = tracer.ColorName(colornames.Lightblue)
 	material.Diffuse = 0.7
