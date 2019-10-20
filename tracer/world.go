@@ -3,6 +3,7 @@ package tracer
 import (
 	"math"
 	"sort"
+	"sync"
 
 	"golang.org/x/exp/shiny/materialdesign/colornames"
 )
@@ -145,12 +146,21 @@ func (w *World) Render() *Canvas {
 	camera := w.Camera()
 	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))
 
+	var wg sync.WaitGroup
+
 	for y := 0.0; y < camera.Vsize-1; y++ {
 		for x := 0.0; x < camera.Hsize-1; x++ {
-			ray := camera.RayForPixel(x, y)
-			clr := w.ColorAt(ray)
-			canvas.SetFloat(x, y, clr)
+			wg.Add(1)
+			go func(x, y float64) {
+				ray := camera.RayForPixel(x, y)
+				clr := w.ColorAt(ray)
+				canvas.SetFloat(x, y, clr)
+				wg.Done()
+			}(x, y)
 		}
 	}
+
+	wg.Wait()
+
 	return canvas
 }
