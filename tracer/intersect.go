@@ -3,6 +3,8 @@ package tracer
 import (
 	"fmt"
 	"sort"
+
+	"github.com/DanTulovsky/tracer/constants"
 )
 
 // Intersection encapsulates an intersection t value an an object
@@ -64,12 +66,13 @@ func (a byT) Less(i, j int) bool { return a[i].t < a[j].t }
 
 // IntersectionState holds precomputed values for an intersection
 type IntersectionState struct {
-	T       float64 // How far away from Ray origin did this occur?
-	Object  Object  // The object we intersected
-	Point   Point
-	EyeV    Vector
-	NormalV Vector
-	Inside  bool // did the hit occure inside or outside the shape?
+	T         float64 // How far away from Ray origin did this occur?
+	Object    Object  // The object we intersected
+	Point     Point
+	EyeV      Vector
+	NormalV   Vector
+	Inside    bool // did the hit occure inside or outside the shape?
+	OverPoint Point
 }
 
 // PrepareComputations prepopulates the IntersectionState structure
@@ -86,12 +89,15 @@ func PrepareComputations(i Intersection, r Ray) IntersectionState {
 		normalv = normalv.Negate()
 	}
 
+	overPoint := point.AddVector(normalv.Scale(constants.Epsilon))
+
 	return IntersectionState{
-		T:       i.T(),
-		Object:  object,
-		Point:   point,
-		EyeV:    eyev,
-		NormalV: normalv,
-		Inside:  inside,
+		T:         i.T(),
+		Object:    object,
+		Point:     point,
+		EyeV:      eyev,
+		NormalV:   normalv,
+		Inside:    inside,
+		OverPoint: overPoint,
 	}
 }

@@ -39,11 +39,12 @@ func TestNewPointLight(t *testing.T) {
 
 func Test_lighting(t *testing.T) {
 	type args struct {
-		m      *Material
-		p      Point
-		l      PointLight
-		eye    Vector
-		normal Vector
+		m        *Material
+		p        Point
+		l        PointLight
+		eye      Vector
+		normal   Vector
+		inShadow bool
 	}
 	tests := []struct {
 		name string
@@ -60,6 +61,18 @@ func Test_lighting(t *testing.T) {
 				normal: NewVector(0, 0, -1),
 			},
 			want: NewColor(1.9, 1.9, 1.9),
+		},
+		{
+			name: "surface in shadow",
+			args: args{
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
+				eye:      NewVector(0, 0, -1),
+				normal:   NewVector(0, 0, -1),
+				inShadow: true,
+			},
+			want: NewColor(0.1, 0.1, 0.1),
 		},
 		{
 			name: "eye between light and surface, eye offset 45 degrees",
@@ -108,18 +121,19 @@ func Test_lighting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equal(lighting(tt.args.m, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal)))
+			assert.True(t, tt.want.Equal(lighting(tt.args.m, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)))
 		})
 	}
 }
 
 func TestColorAtPoint(t *testing.T) {
 	type args struct {
-		m      *Material
-		p      Point
-		l      PointLight
-		eye    Vector
-		normal Vector
+		m        *Material
+		p        Point
+		l        PointLight
+		eye      Vector
+		normal   Vector
+		inShadow bool
 	}
 	tests := []struct {
 		name string
@@ -184,7 +198,7 @@ func TestColorAtPoint(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equal(ColorAtPoint(tt.args.m, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal)))
+			assert.True(t, tt.want.Equal(ColorAtPoint(tt.args.m, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)))
 		})
 	}
 }
