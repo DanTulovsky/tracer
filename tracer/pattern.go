@@ -98,13 +98,13 @@ func (gp *GradientPattern) colorAt(p Point) Color {
 	return gp.a.Add(d.Scale(f))
 }
 
-// RingPattern implements a gradient pattern
+// RingPattern implements a ring pattern
 type RingPattern struct {
 	basePattern
 	a, b Color
 }
 
-// NewRingPattern returns a new gradient pattern with the given colors
+// NewRingPattern returns a new ring pattern with the given colors
 func NewRingPattern(c1, c2 Color) *RingPattern {
 	return &RingPattern{
 		a: c1,
@@ -126,4 +126,34 @@ func (rp *RingPattern) colorAt(p Point) Color {
 		return rp.a
 	}
 	return rp.b
+}
+
+// CheckerPattern implements a checker pattern
+type CheckerPattern struct {
+	basePattern
+	a, b Color
+}
+
+// NewCheckerPattern returns a new checker pattern with the given colors
+func NewCheckerPattern(c1, c2 Color) *CheckerPattern {
+	return &CheckerPattern{
+		a: c1,
+		b: c2,
+		basePattern: basePattern{
+			transform: IdentityMatrix(),
+		},
+	}
+}
+
+// ColorAtObject returns the color for the given pattern on the given object
+func (cp *CheckerPattern) ColorAtObject(o Shaper, p Point) Color {
+	return cp.colorAt(cp.objectSpacePoint(o, p))
+}
+
+// ColorAt implements Patterner
+func (cp *CheckerPattern) colorAt(p Point) Color {
+	if int(math.Floor(p.X())+math.Floor(p.Y())+math.Floor(p.Z()))%2 == 0 {
+		return cp.a
+	}
+	return cp.b
 }
