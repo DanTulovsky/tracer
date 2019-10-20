@@ -8,7 +8,7 @@ import (
 
 func TestNewIntersection(t *testing.T) {
 	type args struct {
-		o Object
+		o Shaper
 		t float64
 	}
 	tests := []struct {

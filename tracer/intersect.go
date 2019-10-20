@@ -9,12 +9,12 @@ import (
 
 // Intersection encapsulates an intersection t value an an object
 type Intersection struct {
-	o Object
+	o Shaper
 	t float64
 }
 
 // NewIntersection returns an intersection object
-func NewIntersection(o Object, t float64) Intersection {
+func NewIntersection(o Shaper, t float64) Intersection {
 	return Intersection{o: o, t: t}
 }
 
@@ -24,7 +24,7 @@ func (i Intersection) T() float64 {
 }
 
 // Object returns the object of the intersection
-func (i Intersection) Object() Object {
+func (i Intersection) Object() Shaper {
 	return i.o
 }
 
@@ -67,7 +67,7 @@ func (a byT) Less(i, j int) bool { return a[i].t < a[j].t }
 // IntersectionState holds precomputed values for an intersection
 type IntersectionState struct {
 	T         float64 // How far away from Ray origin did this occur?
-	Object    Object  // The object we intersected
+	Object    Shaper  // The object we intersected
 	Point     Point   // the point of intersection
 	EyeV      Vector  // eye vector
 	NormalV   Vector  // normal vector

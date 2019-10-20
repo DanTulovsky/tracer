@@ -9,7 +9,7 @@ import (
 
 // World holds everything in it
 type World struct {
-	Objects []Object
+	Objects []Shaper
 	Lights  []Light
 	camera  *Camera
 }
@@ -27,7 +27,7 @@ func NewDefaultWorld(width, height float64) *World {
 	camera.SetTransform(viewTransform)
 
 	return &World{
-		Objects: []Object{},
+		Objects: []Shaper{},
 		Lights:  []Light{defaultLight},
 		camera:  camera,
 	}
@@ -44,13 +44,13 @@ func NewDefaultTestWorld() *World {
 	s2.SetTransform(IdentityMatrix().Scale(0.5, 0.5, 0.5))
 
 	return &World{
-		Objects: []Object{s1, s2},
+		Objects: []Shaper{s1, s2},
 		Lights:  []Light{l1},
 	}
 }
 
 // AddObject adds an object into the world
-func (w *World) AddObject(o Object) {
+func (w *World) AddObject(o Shaper) {
 	w.Objects = append(w.Objects, o)
 }
 
