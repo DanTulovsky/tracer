@@ -228,5 +228,4 @@ func (bp *BlendedPattern) ColorAtObject(o Shaper, p Point) Color {
 
 	// blend them together
 	return c1.Blend(c2)
-
 }
