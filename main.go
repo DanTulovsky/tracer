@@ -304,13 +304,13 @@ func scene() {
 	// 	tracer.NewRingPattern(
 	// 		tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
 	// 	0.9)
-	// bp1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
-	// bp2 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
+	bp1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
+	bp2 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
 	// rotate bp2 by 90 degrees
-	// bp2.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi / 2))
+	bp2.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi / 2))
 
-	// p := tracer.NewBlendedPattern(bp1, bp2)
-	// floor.Material().SetPattern(bp1)
+	p := tracer.NewBlendedPattern(bp1, bp2)
+	floor.Material().SetPattern(p)
 	w.AddObject(floor)
 
 	wallMaterial := tracer.NewDefaultMaterial()
@@ -327,12 +327,12 @@ func scene() {
 	rightWall := tracer.NewPlane()
 	rightWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
-	// pRightWall := tracer.NewPertrubedPattern(
-	// 	tracer.NewCheckerPattern(
-	// 		tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
-	// 	0.5)
-	// rightWall.Material().SetPattern(pRightWall)
-	rightWall.Material().Color = tracer.ColorName(colornames.Lightseagreen)
+	pRightWall := tracer.NewPertrubedPattern(
+		tracer.NewCheckerPattern(
+			tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
+		0.5)
+	rightWall.Material().SetPattern(pRightWall)
+	// rightWall.Material().Color = tracer.ColorName(colornames.Lightseagreen)
 	w.AddObject(rightWall)
 
 	// sphere
