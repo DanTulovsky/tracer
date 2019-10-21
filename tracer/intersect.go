@@ -73,6 +73,7 @@ type IntersectionState struct {
 	NormalV   Vector  // normal vector
 	Inside    bool    // did the hit occure inside or outside the shape?
 	OverPoint Point   // offset to properly render shadows due to floating point errors
+	ReflectV  Vector  // reflection vector
 }
 
 // PrepareComputations prepopulates the IntersectionState structure
@@ -90,6 +91,7 @@ func PrepareComputations(i Intersection, r Ray) IntersectionState {
 	}
 
 	overPoint := point.AddVector(normalv.Scale(constants.Epsilon))
+	reflectv := r.Dir.Reflect(normalv)
 
 	return IntersectionState{
 		T:         i.T(),
@@ -99,5 +101,6 @@ func PrepareComputations(i Intersection, r Ray) IntersectionState {
 		NormalV:   normalv,
 		Inside:    inside,
 		OverPoint: overPoint,
+		ReflectV:  reflectv,
 	}
 }

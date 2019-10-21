@@ -1,7 +1,10 @@
 package tracer
 
 import (
+	"math"
 	"testing"
+
+	"github.com/DanTulovsky/tracer/constants"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -117,6 +120,7 @@ func TestPrepareComputations(t *testing.T) {
 				NormalV:   NewVector(0, 0, -1),
 				Inside:    false,
 				OverPoint: NewPoint(0, 0, -1.00001),
+				ReflectV:  NewVector(0, 0, -1),
 			},
 		},
 		{
@@ -133,6 +137,7 @@ func TestPrepareComputations(t *testing.T) {
 				NormalV:   NewVector(0, 0, -1),
 				Inside:    false,
 				OverPoint: NewPoint(0, 0, -1.00001),
+				ReflectV:  NewVector(0, 0, -1),
 			},
 		},
 		{
@@ -149,6 +154,24 @@ func TestPrepareComputations(t *testing.T) {
 				NormalV:   NewVector(0, 0, -1),
 				Inside:    true,
 				OverPoint: NewPoint(0, 0, 0.99999),
+				ReflectV:  NewVector(0, 0, -1),
+			},
+		},
+		{
+			name: "reflection vector",
+			args: args{
+				i: NewIntersection(NewPlane(), math.Sqrt2),
+				r: NewRay(NewPoint(0, 1, -1), NewVector(0, -math.Sqrt2/2, math.Sqrt2/2)),
+			},
+			want: IntersectionState{
+				T:         math.Sqrt2,
+				Object:    NewUnitSphere(),
+				Point:     NewPoint(0, 0, 0),
+				EyeV:      NewVector(0, math.Sqrt2/2, -math.Sqrt2/2),
+				NormalV:   NewVector(0, 1, 0),
+				Inside:    false,
+				OverPoint: NewPoint(0, 0.00001, 0),
+				ReflectV:  NewVector(0, math.Sqrt2/2, math.Sqrt2/2),
 			},
 		},
 	}
@@ -156,7 +179,13 @@ func TestPrepareComputations(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			comps := PrepareComputations(tt.args.i, tt.args.r)
-			assert.Equal(t, tt.want, comps, "should equal")
+			// assert.Equal(t, tt.want, comps, "should equal")
+			assert.InEpsilon(t, tt.want.T, comps.T, constants.Epsilon, "should equal")
+			assert.True(t, tt.want.Point.Equals(comps.Point))
+			assert.True(t, tt.want.EyeV.Equals(comps.EyeV))
+			assert.True(t, tt.want.NormalV.Equals(comps.NormalV))
+			assert.True(t, tt.want.OverPoint.Equals(comps.OverPoint))
+			assert.True(t, tt.want.ReflectV.Equals(comps.ReflectV))
 		})
 	}
 }

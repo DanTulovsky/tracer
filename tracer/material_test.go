@@ -9,11 +9,12 @@ import (
 
 func TestNewMaterial(t *testing.T) {
 	type args struct {
-		clr       Color
-		ambient   float64
-		diffuse   float64
-		specular  float64
-		shininess float64
+		clr        Color
+		ambient    float64
+		diffuse    float64
+		specular   float64
+		shininess  float64
+		reflective float64
 	}
 	tests := []struct {
 		name string
@@ -23,23 +24,28 @@ func TestNewMaterial(t *testing.T) {
 		{
 			name: "test1",
 			args: args{
-				clr:       ColorName(colornames.Red),
-				ambient:   0.5,
-				diffuse:   0.4,
-				specular:  0.3,
-				shininess: 40,
+				clr:        ColorName(colornames.Red),
+				ambient:    0.5,
+				diffuse:    0.4,
+				specular:   0.3,
+				shininess:  40,
+				reflective: 0.5,
 			},
 			want: &Material{
-				Color:     ColorName(colornames.Red),
-				Ambient:   0.5,
-				Diffuse:   0.4,
-				Specular:  0.3,
-				Shininess: 40,
+				Color:      ColorName(colornames.Red),
+				Ambient:    0.5,
+				Diffuse:    0.4,
+				Specular:   0.3,
+				Shininess:  40,
+				Reflective: 0.5,
 			},
 		},
 	}
 	for _, tt := range tests {
-		assert.Equal(t, tt.want, NewMaterial(tt.args.clr, tt.args.ambient, tt.args.diffuse, tt.args.specular, tt.args.shininess))
+		assert.Equal(
+			t,
+			tt.want,
+			NewMaterial(tt.args.clr, tt.args.ambient, tt.args.diffuse, tt.args.specular, tt.args.shininess, tt.args.reflective))
 	}
 }
 

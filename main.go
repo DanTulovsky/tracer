@@ -280,10 +280,8 @@ func scene() {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		// tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.ColorName(colornames.White)),
-		// tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.ColorName(colornames.Red)),
-		tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.NewColor(20, 0, 0)),
-		// tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.ColorName(colornames.White)),
+		tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.NewColor(2, 2, 2)),
+		// tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -300,6 +298,7 @@ func scene() {
 	material = floor.Material()
 	material.Color = tracer.ColorName(colornames.Beige)
 	material.Specular = 0
+	material.Reflective = 0.5
 	// p := tracer.NewRingPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
 	// p := tracer.NewPertrubedPattern(
 	// 	tracer.NewRingPattern(
@@ -423,8 +422,8 @@ func main() {
 	// clock()
 	// circle()
 	// sphere()
-	// scene()
-	colors()
+	scene()
+	// colors()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

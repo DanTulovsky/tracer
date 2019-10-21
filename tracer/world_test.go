@@ -1,11 +1,11 @@
 package tracer
 
 import (
+	"log"
 	"math"
 	"testing"
 
 	"github.com/DanTulovsky/tracer/constants"
-
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/image/colornames"
 )
@@ -95,7 +95,7 @@ func TestWorld_shadeHit(t *testing.T) {
 			args: args{
 				i:         NewIntersection(NewUnitSphere(), 4),
 				r:         NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
-				material:  NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200),
+				material:  NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0),
 				transform: IdentityMatrix(),
 				lights: []Light{
 					NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White)),
@@ -125,7 +125,7 @@ func TestWorld_shadeHit(t *testing.T) {
 			tt.world.SetLights(tt.args.lights)
 
 			state := PrepareComputations(tt.args.i, tt.args.r)
-			assert.True(t, tt.want.Equal(tt.world.shadeHit(state)), "should equal")
+			assert.True(t, tt.want.Equal(tt.world.shadeHit(state, 1)), "should equal")
 		})
 	}
 }
@@ -145,7 +145,7 @@ func TestWorld_shadeHitShadow(t *testing.T) {
 	i := NewIntersection(s2, 4)
 
 	state := PrepareComputations(i, r)
-	c := w.shadeHit(state)
+	c := w.shadeHit(state, 1)
 	assert.Equal(t, NewColor(0.1, 0.1, 0.1), c, "should equal")
 }
 
@@ -178,7 +178,7 @@ func TestWorld_ColorAt(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 1, 0)),
 			},
-			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200),
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0),
 			m2:   NewDefaultMaterial(),
 			want: ColorName(colornames.Black),
 		},
@@ -188,7 +188,7 @@ func TestWorld_ColorAt(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
 			},
-			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200),
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0),
 			m2:   NewDefaultMaterial(),
 			want: NewColor(0.38066, 0.47583, 0.2855),
 		},
@@ -198,8 +198,8 @@ func TestWorld_ColorAt(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, 0.75), NewVector(0, 0, -1)),
 			},
-			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 1, 0.7, 0.2, 200),
-			m2:   NewMaterial(NewColor(1.0, 1.0, 1.0), 1, 0.9, 0.9, 200),
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 1, 0.7, 0.2, 200, 0),
+			m2:   NewMaterial(NewColor(1.0, 1.0, 1.0), 1, 0.9, 0.9, 200, 0),
 			want: NewColor(1, 1, 1),
 		},
 	}
@@ -209,7 +209,7 @@ func TestWorld_ColorAt(t *testing.T) {
 			tt.world.Objects[0].SetMaterial(tt.m1)
 			tt.world.Objects[1].SetMaterial(tt.m2)
 
-			assert.True(t, tt.want.Equal(tt.world.ColorAt(tt.args.r)), "should equal")
+			assert.True(t, tt.want.Equal(tt.world.ColorAt(tt.args.r, 1)), "should equal")
 		})
 	}
 }
@@ -292,4 +292,95 @@ func TestWorld_IsShadowed(t *testing.T) {
 			assert.Equal(t, tt.want, tt.world.IsShadowed(tt.args.p, tt.world.Lights[0]))
 		})
 	}
+}
+
+func TestWorld_ReflectedColor_NotReflective(t *testing.T) {
+	w := NewDefaultTestWorld()
+	r := NewRay(Origin(), NewVector(0, 0, 1))
+
+	shape := w.Objects[1]
+	shape.Material().Ambient = 1
+	i := NewIntersection(shape, 1)
+
+	state := PrepareComputations(i, r)
+	clr := w.ReflectedColor(state, 1)
+
+	assert.Equal(t, Black(), clr, "should equal")
+}
+
+func TestWorld_ReflectedColor_Reflective(t *testing.T) {
+	w := NewDefaultTestWorld()
+	r := NewRay(NewPoint(0, 0, -3), NewVector(0, -math.Sqrt2/2, math.Sqrt2/2))
+
+	shape := NewPlane()
+	shape.Material().Reflective = 0.5
+	shape.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	w.AddObject(shape)
+
+	i := NewIntersection(shape, math.Sqrt2)
+
+	state := PrepareComputations(i, r)
+	clr := w.ReflectedColor(state, 1)
+	expected := NewColor(0.19033, 0.23791, 0.142749)
+
+	assert.True(t, expected.Equal(clr), "should equal")
+}
+
+func TestWorld_shadeHit_Reflective(t *testing.T) {
+	w := NewDefaultTestWorld()
+	r := NewRay(NewPoint(0, 0, -3), NewVector(0, -math.Sqrt2/2, math.Sqrt2/2))
+
+	shape := NewPlane()
+	shape.Material().Reflective = 0.5
+	shape.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	w.AddObject(shape)
+
+	i := NewIntersection(shape, math.Sqrt2)
+
+	state := PrepareComputations(i, r)
+	clr := w.shadeHit(state, 1)
+	expected := NewColor(0.876757, 0.924340, 0.829174)
+
+	assert.True(t, expected.Equal(clr), "should equal")
+}
+
+func TestWorld_AvoidInfRecursion(t *testing.T) {
+	w := NewDefaultTestWorld()
+	w.Objects = []Shaper{}
+
+	w.SetLights([]Light{NewPointLight(Origin(), NewColor(1, 1, 1))})
+
+	lower := NewPlane()
+	lower.Material().Reflective = 1
+	lower.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	w.AddObject(lower)
+
+	upper := NewPlane()
+	upper.Material().Reflective = 1
+	upper.SetTransform(IdentityMatrix().Translate(0, 1, 0))
+	w.AddObject(upper)
+
+	r := NewRay(NewPoint(0, 0, 0), NewVector(0, 1, 0))
+
+	clr := w.ColorAt(r, 4)
+	assert.NotNil(t, clr)
+}
+
+func TestWorld_shadeHit_MaxRecursiveReflected(t *testing.T) {
+	w := NewDefaultTestWorld()
+	r := NewRay(NewPoint(0, 0, -3), NewVector(0, -math.Sqrt2/2, math.Sqrt2/2))
+
+	shape := NewPlane()
+	shape.Material().Reflective = 0.5
+	shape.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	w.AddObject(shape)
+
+	i := NewIntersection(shape, math.Sqrt2)
+
+	state := PrepareComputations(i, r)
+	clr := w.ReflectedColor(state, 0)
+	expected := Black()
+	log.Println(clr)
+
+	assert.True(t, expected.Equal(clr), "should equal")
 }
