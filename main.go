@@ -404,7 +404,7 @@ func colors() {
 
 func mirrors() {
 
-	width, height := 200.0, 200.0
+	width, height := 300.0, 300.0
 	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
@@ -427,6 +427,7 @@ func mirrors() {
 	floor.Material().Color = tracer.ColorName(colornames.White)
 	floor.Material().Specular = 0
 	floor.Material().Reflective = 0
+	floor.Material().Color = tracer.ColorName(colornames.Lightgrey)
 	w.AddObject(floor)
 
 	leftWall := tracer.NewPlane()
@@ -435,6 +436,7 @@ func mirrors() {
 	leftWall.Material().Reflective = 0
 	leftWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-15, 0, 0))
+	leftWall.Material().Color = tracer.ColorName(colornames.Lightblue)
 	w.AddObject(leftWall)
 
 	rightWall := tracer.NewPlane()
@@ -443,6 +445,7 @@ func mirrors() {
 	rightWall.Material().Reflective = 0
 	rightWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
+	rightWall.Material().Color = tracer.ColorName(colornames.Lightblue)
 	w.AddObject(rightWall)
 
 	// mirror1
