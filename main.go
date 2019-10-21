@@ -404,20 +404,20 @@ func colors() {
 
 func mirrors() {
 
-	// width, height := 300.0, 300.0
-	width, height := 1000.0, 1000.0
+	width, height := 200.0, 200.0
+	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 10, 0), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 1.5, -9)
-	to := tracer.NewPoint(0, 1, 0)
+	from := tracer.NewPoint(1, 1.5, -10)
+	to := tracer.NewPoint(-5.0, 1, 0)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
@@ -445,18 +445,18 @@ func mirrors() {
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
 	w.AddObject(rightWall)
 
-	// cube1
+	// mirror1
 	cube1 := tracer.NewUnitCube()
 	cube1.SetTransform(
-		tracer.IdentityMatrix().Scale(0.01, 1, 5).Translate(-2, 2, 0))
+		tracer.IdentityMatrix().Scale(0.01, 1, 10).Translate(-2, 2, 0))
 	cube1.Material().Reflective = 1
 	// cube1.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(cube1)
 
-	// cube2
+	// mirror2
 	cube2 := tracer.NewUnitCube()
 	cube2.SetTransform(
-		tracer.IdentityMatrix().Scale(0.01, 1, 5).Translate(2, 2, 0))
+		tracer.IdentityMatrix().Scale(0.01, 1, 10).Translate(2, 2, 0))
 	cube2.Material().Reflective = 1
 	// cube2.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(cube2)
