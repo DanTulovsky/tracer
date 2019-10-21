@@ -38,7 +38,7 @@ func NewDefaultTestWorld() *World {
 	l1 := NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White))
 
 	s1 := NewUnitSphere()
-	s1.SetMaterial(NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200))
+	s1.SetMaterial(NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0))
 
 	s2 := NewUnitSphere()
 	s2.SetTransform(IdentityMatrix().Scale(0.5, 0.5, 0.5))
@@ -89,7 +89,7 @@ func (w *World) Camera() *Camera {
 }
 
 // ColorAt returns the color in the world where the given ray hits
-func (w *World) ColorAt(r Ray) Color {
+func (w *World) ColorAt(r Ray, remaining int) Color {
 	is := w.Intersections(r)
 	hit, err := is.Hit()
 	if err != nil {
@@ -97,18 +97,31 @@ func (w *World) ColorAt(r Ray) Color {
 	}
 
 	state := PrepareComputations(hit, r)
-	return w.shadeHit(state).Clamp()
+	return w.shadeHit(state, remaining).Clamp()
+}
+
+// ReflectedColor returns the reflected color given an IntersectionState
+// remaining controls how many times a light ray can bounce between the same objects
+func (w *World) ReflectedColor(state IntersectionState, remaining int) Color {
+	if remaining <= 0 || state.Object.Material().Reflective == 0 {
+		return Black()
+	}
+
+	reflectR := NewRay(state.OverPoint, state.ReflectV)
+	clr := w.ColorAt(reflectR, remaining-1)
+
+	return clr.Scale(state.Object.Material().Reflective)
 }
 
 // ShadeHit returns the color at the intersection enapsulated by IntersectionState
-func (w *World) shadeHit(state IntersectionState) Color {
+func (w *World) shadeHit(state IntersectionState, remaining int) Color {
 
 	var result Color
 
 	for _, l := range w.Lights {
 		isShadowed := w.IsShadowed(state.OverPoint, l)
 
-		c := lighting(
+		surface := lighting(
 			state.Object.Material(),
 			state.Object,
 			state.OverPoint,
@@ -117,7 +130,9 @@ func (w *World) shadeHit(state IntersectionState) Color {
 			state.NormalV,
 			isShadowed)
 
-		result = result.Add(c)
+		reflected := w.ReflectedColor(state, remaining)
+
+		result = result.Add(surface.Add(reflected))
 	}
 
 	return result
@@ -146,6 +161,7 @@ func (w *World) IsShadowed(p Point, l Light) bool {
 func (w *World) Render() *Canvas {
 	camera := w.Camera()
 	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))
+	maxRecursion := 4
 
 	// var wg sync.WaitGroup
 
@@ -154,7 +170,7 @@ func (w *World) Render() *Canvas {
 			// wg.Add(1)
 			// go func(x, y float64) {
 			ray := camera.RayForPixel(x, y)
-			clr := w.ColorAt(ray)
+			clr := w.ColorAt(ray, maxRecursion)
 			canvas.SetFloat(x, y, clr)
 			// wg.Done()
 			// }(x, y)
