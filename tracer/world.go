@@ -93,7 +93,7 @@ func (w *World) ColorAt(r Ray, remaining int) Color {
 	is := w.Intersections(r)
 	hit, err := is.Hit()
 	if err != nil {
-		return ColorName(colornames.Black)
+		return Black()
 	}
 
 	state := PrepareComputations(hit, r)

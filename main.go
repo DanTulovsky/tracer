@@ -280,7 +280,7 @@ func scene() {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.NewColor(2, 2, 2)),
+		tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.NewColor(1, 1, 1)),
 		// tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.NewColor(1, 1, 1)),
 	})
 
@@ -296,7 +296,7 @@ func scene() {
 	// floor
 	floor := tracer.NewPlane()
 	material = floor.Material()
-	material.Color = tracer.ColorName(colornames.Beige)
+	material.Color = tracer.NewColor(1, 1, 1)
 	material.Specular = 0
 	material.Reflective = 0.5
 	// p := tracer.NewRingPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
@@ -304,13 +304,13 @@ func scene() {
 	// 	tracer.NewRingPattern(
 	// 		tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
 	// 	0.9)
-	bp1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
-	bp2 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
+	// bp1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
+	// bp2 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
 	// rotate bp2 by 90 degrees
-	bp2.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi / 2))
+	// bp2.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi / 2))
 
-	p := tracer.NewBlendedPattern(bp1, bp2)
-	floor.Material().SetPattern(p)
+	// p := tracer.NewBlendedPattern(bp1, bp2)
+	// floor.Material().SetPattern(bp1)
 	w.AddObject(floor)
 
 	wallMaterial := tracer.NewDefaultMaterial()
