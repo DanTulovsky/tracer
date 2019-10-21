@@ -87,7 +87,7 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 	return ambient.Add(diffuse).Add(specular)
 }
 
-// ColorAtPoint returns the clamped color at the givn point
+// ColorAtPoint returns the clamped color at the given point
 func ColorAtPoint(m *Material, o Shaper, p Point, l PointLight, eye, normal Vector, inShadow bool) Color {
 	return lighting(m, o, p, l, eye, normal, inShadow).Clamp()
 }
