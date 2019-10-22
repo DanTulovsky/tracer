@@ -77,7 +77,7 @@ type IntersectionState struct {
 }
 
 // PrepareComputations prepopulates the IntersectionState structure
-func PrepareComputations(i Intersection, r Ray) IntersectionState {
+func PrepareComputations(i Intersection, r Ray) *IntersectionState {
 	point := r.Position(i.T())
 	object := i.Object()
 	normalv := object.NormalAt(point)
@@ -93,7 +93,7 @@ func PrepareComputations(i Intersection, r Ray) IntersectionState {
 	overPoint := point.AddVector(normalv.Scale(constants.Epsilon))
 	reflectv := r.Dir.Reflect(normalv)
 
-	return IntersectionState{
+	return &IntersectionState{
 		T:         i.T(),
 		Object:    object,
 		Point:     point,

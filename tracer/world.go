@@ -121,7 +121,7 @@ func (w *World) ColorAt(r Ray, remaining int) Color {
 
 // ReflectedColor returns the reflected color given an IntersectionState
 // remaining controls how many times a light ray can bounce between the same objects
-func (w *World) ReflectedColor(state IntersectionState, remaining int) Color {
+func (w *World) ReflectedColor(state *IntersectionState, remaining int) Color {
 	if remaining <= 0 || state.Object.Material().Reflective == 0 {
 		return Black()
 	}
@@ -133,11 +133,12 @@ func (w *World) ReflectedColor(state IntersectionState, remaining int) Color {
 }
 
 // ShadeHit returns the color at the intersection enapsulated by IntersectionState
-func (w *World) shadeHit(state IntersectionState, remaining int) Color {
+func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 
 	var result Color
 
 	for _, l := range w.Lights {
+		// TODO: Does not handle reflected shadows
 		isShadowed := w.IsShadowed(state.OverPoint, l)
 
 		surface := lighting(
