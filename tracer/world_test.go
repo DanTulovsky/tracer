@@ -17,12 +17,14 @@ func TestNewWorld(t *testing.T) {
 	}{
 		{
 			name: "empty world",
-			want: &World{},
+			want: &World{
+				Config: NewWorldConfig(),
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, NewWorld())
+			assert.Equal(t, tt.want, NewWorld(NewWorldConfig()))
 		})
 	}
 }

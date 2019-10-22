@@ -8,16 +8,32 @@ import (
 	"golang.org/x/exp/shiny/materialdesign/colornames"
 )
 
+// WorldConfig collects various settings to configure the world
+type WorldConfig struct {
+	// How many times to allow the ray to bounce between two objects (controls reflections of reflections)
+	MaxRecusions int
+}
+
+// NewWorldConfig returns a new world config with default settings
+func NewWorldConfig() *WorldConfig {
+	return &WorldConfig{
+		MaxRecusions: 4,
+	}
+}
+
 // World holds everything in it
 type World struct {
 	Objects []Shaper
 	Lights  []Light
 	camera  *Camera
+	Config  *WorldConfig
 }
 
 // NewWorld returns a new empty world
-func NewWorld() *World {
-	return &World{}
+func NewWorld(config *WorldConfig) *World {
+	return &World{
+		Config: config,
+	}
 }
 
 // NewDefaultWorld returns a default world
@@ -31,6 +47,7 @@ func NewDefaultWorld(width, height float64) *World {
 		Objects: []Shaper{},
 		Lights:  []Light{defaultLight},
 		camera:  camera,
+		Config:  NewWorldConfig(),
 	}
 }
 
@@ -44,10 +61,11 @@ func NewDefaultTestWorld() *World {
 	s2 := NewUnitSphere()
 	s2.SetTransform(IdentityMatrix().Scale(0.5, 0.5, 0.5))
 
-	return &World{
-		Objects: []Shaper{s1, s2},
-		Lights:  []Light{l1},
-	}
+	w := NewWorld(NewWorldConfig())
+	w.Objects = []Shaper{s1, s2}
+	w.Lights = []Light{l1}
+	return w
+
 }
 
 // AddObject adds an object into the world
@@ -162,7 +180,7 @@ func (w *World) IsShadowed(p Point, l Light) bool {
 func (w *World) Render() *Canvas {
 	camera := w.Camera()
 	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))
-	maxRecursion := 4
+	maxRecursion := w.Config.MaxRecusions
 
 	var wg sync.WaitGroup
 
