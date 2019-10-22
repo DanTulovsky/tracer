@@ -14,6 +14,7 @@ type Intersection struct {
 }
 
 // NewIntersection returns an intersection object
+// TODO: Return as pointer
 func NewIntersection(o Shaper, t float64) Intersection {
 	return Intersection{o: o, t: t}
 }
@@ -29,6 +30,7 @@ func (i Intersection) Object() Shaper {
 }
 
 // Intersections is a collection of Intersections
+// TODO: Return as list of pointers
 type Intersections []Intersection
 
 // NewIntersections aggregates the given intersections into a sorted list

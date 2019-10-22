@@ -16,7 +16,7 @@ func TestNewPointLight(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want PointLight
+		want *PointLight
 	}{
 		{
 			name: "test1",
@@ -24,7 +24,7 @@ func TestNewPointLight(t *testing.T) {
 				p: NewPoint(0, 0, 0),
 				i: ColorName(colornames.White),
 			},
-			want: PointLight{
+			want: &PointLight{
 				NewPoint(0, 0, 0),
 				ColorName(colornames.White),
 			},
@@ -41,7 +41,7 @@ func Test_lighting(t *testing.T) {
 	type args struct {
 		m        *Material
 		p        Point
-		l        PointLight
+		l        *PointLight
 		eye      Vector
 		normal   Vector
 		inShadow bool
@@ -137,7 +137,7 @@ func TestColorAtPoint(t *testing.T) {
 	type args struct {
 		m        *Material
 		p        Point
-		l        PointLight
+		l        *PointLight
 		eye      Vector
 		normal   Vector
 		inShadow bool
