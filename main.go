@@ -417,8 +417,8 @@ func mirrors() {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(1, 1.5, -10)
-	to := tracer.NewPoint(-5.0, 1, 0)
+	from := tracer.NewPoint(3, 2, -10)
+	to := tracer.NewPoint(-4.5, 1, 0)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
@@ -427,8 +427,7 @@ func mirrors() {
 	floor := tracer.NewPlane()
 	floor.Material().Color = tracer.ColorName(colornames.White)
 	floor.Material().Specular = 0
-	floor.Material().Reflective = 0
-	floor.Material().Color = tracer.ColorName(colornames.Lightcoral)
+	floor.Material().Reflective = 0.5
 	w.AddObject(floor)
 
 	leftWall := tracer.NewPlane()
@@ -452,7 +451,7 @@ func mirrors() {
 	// mirror1
 	cube1 := tracer.NewUnitCube()
 	cube1.SetTransform(
-		tracer.IdentityMatrix().Scale(0.01, 1, 10).Translate(-2, 2, 0))
+		tracer.IdentityMatrix().Scale(0.001, 1, 10).Translate(-2, 2, 0))
 	cube1.Material().Reflective = 1
 	// cube1.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(cube1)
@@ -460,7 +459,7 @@ func mirrors() {
 	// mirror2
 	cube2 := tracer.NewUnitCube()
 	cube2.SetTransform(
-		tracer.IdentityMatrix().Scale(0.01, 1, 10).Translate(2, 2, 0))
+		tracer.IdentityMatrix().Scale(0.001, 1, 5).Translate(2, 2, 0))
 	cube2.Material().Reflective = 1
 	// cube2.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(cube2)
@@ -470,6 +469,9 @@ func mirrors() {
 	sphere1.SetTransform(
 		tracer.IdentityMatrix().Scale(.5, .5, .5).Translate(0, 2, 2))
 	sphere1.Material().Color = tracer.ColorName(colornames.Yellow)
+	sphere1pattern := tracer.NewStripedPattern(tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Purple))
+	sphere1pattern.SetTransform(tracer.IdentityMatrix().Scale(0.2, 1, 1))
+	sphere1.Material().SetPattern(sphere1pattern)
 	w.AddObject(sphere1)
 
 	canvas := w.Render()
