@@ -8,7 +8,7 @@ import (
 	"io"
 	"sync"
 
-	"golang.org/x/exp/shiny/materialdesign/colornames"
+	"golang.org/x/image/colornames"
 )
 
 // Canvas is the canvas for drawing on
