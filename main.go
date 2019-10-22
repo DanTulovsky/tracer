@@ -304,13 +304,13 @@ func scene() {
 	// 	tracer.NewRingPattern(
 	// 		tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
 	// 	0.9)
-	// bp1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
-	// bp2 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
+	bp1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
+	bp2 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
 	// rotate bp2 by 90 degrees
-	// bp2.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi / 2))
+	bp2.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi / 2))
 
-	// p := tracer.NewBlendedPattern(bp1, bp2)
-	// floor.Material().SetPattern(bp1)
+	p := tracer.NewBlendedPattern(bp1, bp2)
+	floor.Material().SetPattern(p)
 	w.AddObject(floor)
 
 	wallMaterial := tracer.NewDefaultMaterial()
@@ -327,12 +327,12 @@ func scene() {
 	rightWall := tracer.NewPlane()
 	rightWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
-	// pRightWall := tracer.NewPertrubedPattern(
-	// 	tracer.NewCheckerPattern(
-	// 		tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
-	// 	0.5)
-	// rightWall.Material().SetPattern(pRightWall)
-	rightWall.Material().Color = tracer.ColorName(colornames.Lightseagreen)
+	pRightWall := tracer.NewPertrubedPattern(
+		tracer.NewCheckerPattern(
+			tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
+		0.5)
+	rightWall.Material().SetPattern(pRightWall)
+	// rightWall.Material().Color = tracer.ColorName(colornames.Lightseagreen)
 	w.AddObject(rightWall)
 
 	// sphere
@@ -402,6 +402,87 @@ func colors() {
 	log.Printf("colorful.MakeColor(NewColor(10, 0, 0)): %v", c2mc)
 }
 
+func mirrors() {
+
+	width, height := 300.0, 300.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(0, 10, 0), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(1, 1.5, -10)
+	to := tracer.NewPoint(-5.0, 1, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	// floor
+	floor := tracer.NewPlane()
+	floor.Material().Color = tracer.ColorName(colornames.White)
+	floor.Material().Specular = 0
+	floor.Material().Reflective = 0
+	floor.Material().Color = tracer.ColorName(colornames.Lightgrey)
+	w.AddObject(floor)
+
+	leftWall := tracer.NewPlane()
+	leftWall.Material().Color = tracer.ColorName(colornames.White)
+	leftWall.Material().Specular = 0
+	leftWall.Material().Reflective = 0
+	leftWall.SetTransform(
+		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-15, 0, 0))
+	leftWall.Material().Color = tracer.ColorName(colornames.Lightblue)
+	w.AddObject(leftWall)
+
+	rightWall := tracer.NewPlane()
+	rightWall.Material().Color = tracer.ColorName(colornames.White)
+	rightWall.Material().Specular = 0
+	rightWall.Material().Reflective = 0
+	rightWall.SetTransform(
+		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
+	rightWall.Material().Color = tracer.ColorName(colornames.Lightblue)
+	w.AddObject(rightWall)
+
+	// mirror1
+	cube1 := tracer.NewUnitCube()
+	cube1.SetTransform(
+		tracer.IdentityMatrix().Scale(0.01, 1, 10).Translate(-2, 2, 0))
+	cube1.Material().Reflective = 1
+	// cube1.Material().Color = tracer.ColorName(colornames.Black)
+	w.AddObject(cube1)
+
+	// mirror2
+	cube2 := tracer.NewUnitCube()
+	cube2.SetTransform(
+		tracer.IdentityMatrix().Scale(0.01, 1, 10).Translate(2, 2, 0))
+	cube2.Material().Reflective = 1
+	// cube2.Material().Color = tracer.ColorName(colornames.Black)
+	w.AddObject(cube2)
+
+	// sphere1
+	sphere1 := tracer.NewUnitSphere()
+	sphere1.SetTransform(
+		tracer.IdentityMatrix().Scale(.5, .5, .5).Translate(0, 2, 2))
+	sphere1.Material().Color = tracer.ColorName(colornames.Yellow)
+	w.AddObject(sphere1)
+
+	canvas := w.Render()
+
+	// Export
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	canvas.ExportToPNG(f)
+}
+
 func main() {
 
 	flag.Parse()
@@ -422,8 +503,9 @@ func main() {
 	// clock()
 	// circle()
 	// sphere()
-	scene()
+	// scene()
 	// colors()
+	mirrors()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
