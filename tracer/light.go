@@ -19,17 +19,17 @@ type PointLight struct {
 }
 
 // NewPointLight returns a nw point light
-func NewPointLight(p Point, i Color) PointLight {
-	return PointLight{position: p, intensity: i}
+func NewPointLight(p Point, i Color) *PointLight {
+	return &PointLight{position: p, intensity: i}
 }
 
 // Intensity returns the intensity of the light
-func (pl PointLight) Intensity() Color {
+func (pl *PointLight) Intensity() Color {
 	return pl.intensity
 }
 
 // Position returns the position of the light
-func (pl PointLight) Position() Point {
+func (pl *PointLight) Position() Point {
 	return pl.position
 }
 
@@ -88,6 +88,6 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 }
 
 // ColorAtPoint returns the clamped color at the given point
-func ColorAtPoint(m *Material, o Shaper, p Point, l PointLight, eye, normal Vector, inShadow bool) Color {
+func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow bool) Color {
 	return lighting(m, o, p, l, eye, normal, inShadow).Clamp()
 }
