@@ -3,7 +3,7 @@ package tracer
 import (
 	"math"
 
-	"golang.org/x/exp/shiny/materialdesign/colornames"
+	"golang.org/x/image/colornames"
 )
 
 // Light is the interface all the lights use
