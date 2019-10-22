@@ -409,6 +409,7 @@ func mirrors() {
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 3
 
 	// override light here
 	w.SetLights([]tracer.Light{
@@ -427,7 +428,7 @@ func mirrors() {
 	floor.Material().Color = tracer.ColorName(colornames.White)
 	floor.Material().Specular = 0
 	floor.Material().Reflective = 0
-	floor.Material().Color = tracer.ColorName(colornames.Lightgrey)
+	floor.Material().Color = tracer.ColorName(colornames.Lightcoral)
 	w.AddObject(floor)
 
 	leftWall := tracer.NewPlane()
@@ -445,7 +446,7 @@ func mirrors() {
 	rightWall.Material().Reflective = 0
 	rightWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
-	rightWall.Material().Color = tracer.ColorName(colornames.Lightblue)
+	rightWall.Material().Color = tracer.ColorName(colornames.Lightcoral)
 	w.AddObject(rightWall)
 
 	// mirror1
