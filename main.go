@@ -501,35 +501,35 @@ func mirror() {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(3, 2, -10)
-	to := tracer.NewPoint(-4.5, 1, 0)
+	from := tracer.NewPoint(6, 2, -7)
+	to := tracer.NewPoint(-3.5, 1, 0)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
 
 	// floor
 	floor := tracer.NewPlane()
-	floor.Material().Color = tracer.ColorName(colornames.White)
+	// floor.Material().Color = tracer.ColorName(colornames.Gray)
 	floor.Material().Specular = 0
 	floor.Material().Reflective = 0
+	floorP := tracer.NewCheckerPattern(tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.Yellow))
+	floor.Material().SetPattern(floorP)
 	w.AddObject(floor)
 
 	leftWall := tracer.NewPlane()
-	leftWall.Material().Color = tracer.ColorName(colornames.White)
+	leftWall.Material().Color = tracer.ColorName(colornames.Lightskyblue)
 	leftWall.Material().Specular = 0
 	leftWall.Material().Reflective = 0
 	leftWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-15, 0, 0))
-	leftWall.Material().Color = tracer.ColorName(colornames.Lightblue)
 	w.AddObject(leftWall)
 
 	rightWall := tracer.NewPlane()
-	rightWall.Material().Color = tracer.ColorName(colornames.White)
+	rightWall.Material().Color = tracer.ColorName(colornames.Lightgreen)
 	rightWall.Material().Specular = 0
 	rightWall.Material().Reflective = 0
 	rightWall.SetTransform(
 		tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
-	rightWall.Material().Color = tracer.ColorName(colornames.Lightcoral)
 	w.AddObject(rightWall)
 
 	// mirror1
