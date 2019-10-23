@@ -1,5 +1,9 @@
 # Notes
 
+## General
+
+- Usually you scale first, then rotate and finally translate.
+
 ## translate and scale
 
 This is a unit cube created with:
