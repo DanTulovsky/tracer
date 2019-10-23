@@ -540,6 +540,13 @@ func mirror() {
 	// cube1.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(cube1)
 
+	// top border
+	topBorder := tracer.NewUnitCube()
+	topBorder.SetTransform(
+		tracer.IdentityMatrix().Scale(0.001, .2, 4).Translate(-2, 4.2, 0))
+	topBorder.Material().Color = tracer.ColorName(colornames.Brown)
+	w.AddObject(topBorder)
+
 	// sphere1
 	sphere1 := tracer.NewUnitSphere()
 	sphere1.SetTransform(
