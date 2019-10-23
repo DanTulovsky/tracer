@@ -488,7 +488,8 @@ func mirrors() {
 
 func mirror() {
 
-	width, height := 300.0, 300.0
+	// width, height := 300.0, 300.0
+	width, height := 500.0, 500.0
 	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
@@ -535,7 +536,7 @@ func mirror() {
 	// mirror1
 	cube1 := tracer.NewUnitCube()
 	cube1.SetTransform(
-		tracer.IdentityMatrix().Scale(0.001, 4, 4).Translate(-2, 0, 0))
+		tracer.IdentityMatrix().Translate(-2, 1.5, 0).Scale(0.001, 1, 4))
 	cube1.Material().Reflective = 1
 	// cube1.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(cube1)
@@ -543,16 +544,37 @@ func mirror() {
 	// top border
 	topBorder := tracer.NewUnitCube()
 	topBorder.SetTransform(
-		tracer.IdentityMatrix().Scale(0.001, .2, 4).Translate(-2, 4.2, 0))
-	topBorder.Material().Color = tracer.ColorName(colornames.Brown)
+		tracer.IdentityMatrix().Translate(-2, 2.8, 0).Scale(0.001, .2, 4))
+	// topBorder.Material().Color = tracer.ColorName(colornames.Brown)
+	topBorderStripes := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Red), tracer.ColorName(colornames.White))
+	topBorderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.03, 1, 1).RotateY(math.Pi / 2))
+	topBorderP := tracer.NewPertrubedPattern(topBorderStripes, 0.5)
+	// this produces a completely different pattern than applying the transform on the inner pattern
+	// topBorderP.SetTransform(tracer.IdentityMatrix().Scale(0.1, 1, 1).RotateY(math.Pi / 2))
+	topBorder.Material().SetPattern(topBorderP)
 	w.AddObject(topBorder)
+
+	// bottom border
+	bottomBorder := tracer.NewUnitCube()
+	bottomBorder.SetTransform(
+		tracer.IdentityMatrix().Scale(0.001, .2, 4).Translate(-2, 0, 0))
+	bottomBorderStripes := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Red), tracer.ColorName(colornames.White))
+	bottomBorderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.03, 1, 1).RotateY(math.Pi / 2))
+	bottomBorderP := tracer.NewPertrubedPattern(bottomBorderStripes, 0.5)
+	// this produces a completely different pattern than applying the transform on the inner pattern
+	// topBorderP.SetTransform(tracer.IdentityMatrix().Scale(0.1, 1, 1).RotateY(math.Pi / 2))
+	bottomBorder.Material().SetPattern(bottomBorderP)
+	w.AddObject(bottomBorder)
 
 	// sphere1
 	sphere1 := tracer.NewUnitSphere()
 	sphere1.SetTransform(
 		tracer.IdentityMatrix().Scale(.5, .5, .5).Translate(0, 2, 2))
 	sphere1.Material().Color = tracer.ColorName(colornames.Yellow)
-	sphere1pattern := tracer.NewStripedPattern(tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Purple))
+	sphere1pattern := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Purple))
 	sphere1pattern.SetTransform(tracer.IdentityMatrix().Scale(0.2, 1, 1))
 	sphere1.Material().SetPattern(sphere1pattern)
 	w.AddObject(sphere1)
@@ -568,6 +590,56 @@ func mirror() {
 	log.Printf("Exporting canvas to %v", f.Name())
 	canvas.ExportToPNG(f)
 }
+
+func cube() {
+
+	// width, height := 300.0, 300.0
+	width, height := 500.0, 500.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 1
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(0, 10, -2), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(6, 2, -7)
+	to := tracer.NewPoint(-3.5, 1, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	// floor
+	floor := tracer.NewPlane()
+	// floor.Material().Color = tracer.ColorName(colornames.Gray)
+	floor.Material().Specular = 0
+	floor.Material().Reflective = 0
+	floorP := tracer.NewCheckerPattern(tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.Yellow))
+	floor.Material().SetPattern(floorP)
+	w.AddObject(floor)
+
+	cube := tracer.NewUnitCube()
+	cube.Material().Color = tracer.ColorName(colornames.Lightgreen)
+	// cube.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 0).Scale(1, .5, 1))
+	cube.SetTransform(tracer.IdentityMatrix().Scale(1, .5, 1).Translate(0, 1, 0))
+	w.AddObject(cube)
+
+	canvas := w.Render()
+
+	// Export
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	canvas.ExportToPNG(f)
+}
+
 func main() {
 
 	flag.Parse()
@@ -592,6 +664,7 @@ func main() {
 	// colors()
 	// mirrors()
 	mirror()
+	// cube()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
