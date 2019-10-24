@@ -544,8 +544,10 @@ func mirror() {
 	// border
 	borderStripes := tracer.NewStripedPattern(
 		tracer.ColorName(colornames.Lightgray), tracer.ColorName(colornames.White))
-	borderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1, 1).RotateY(math.Pi / 2))
-	borderP := tracer.NewPertrubedPattern(borderStripes, 0.1)
+	// borderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1, 1).RotateY(math.Pi / 2))
+	borderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1, 1))
+	// borderP := tracer.NewPertrubedPattern(borderStripes, 0.1)
+	borderP := borderStripes
 	// this produces a completely different pattern than applying the transform on the inner pattern
 	// borderP.SetTransform(tracer.IdentityMatrix().Scale(0.1, 1, 1).RotateY(math.Pi / 2))
 
@@ -563,7 +565,7 @@ func mirror() {
 
 	// left border
 	leftBorder := tracer.NewUnitCube()
-	leftBorder.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1.9, 0.2).Translate(-2, 1.9, -3.2))
+	leftBorder.SetTransform(tracer.IdentityMatrix().Scale(1, 1.9, 0.2).Translate(-2, 1.9, -3.2))
 	leftBorder.Material().SetPattern(borderP)
 	w.AddObject(leftBorder)
 
