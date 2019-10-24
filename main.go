@@ -489,8 +489,8 @@ func mirrors() {
 func mirror() {
 
 	// width, height := 300.0, 300.0
-	width, height := 400.0, 400.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 400.0, 400.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -502,7 +502,7 @@ func mirror() {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(1.3, 2, -3)
+	from := tracer.NewPoint(3.5, 3.8, -5.7)
 	to := tracer.NewPoint(-2, 0, 0)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -536,42 +536,55 @@ func mirror() {
 	// mirror1
 	cube1 := tracer.NewUnitCube()
 	cube1.SetTransform(
-		tracer.IdentityMatrix().Scale(0.1, 1, 2).Translate(-2, 1.1, 0))
-	cube1.Material().Reflective = 0
-	cube1.Material().Color = tracer.ColorName(colornames.Red)
+		tracer.IdentityMatrix().Scale(0.01, 1.5, 3).Translate(-2, 1.9, 0))
+	cube1.Material().Reflective = 1
+	cube1.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(cube1)
 
-	// // top border
-	// topBorder := tracer.NewUnitCube()
-	// topBorder.SetTransform(
-	// 	tracer.IdentityMatrix().Translate(-2, 2.0, 0).Scale(0.001, .2, 4))
-	// // topBorder.Material().Color = tracer.ColorName(colornames.Brown)
-	// topBorderStripes := tracer.NewStripedPattern(
-	// 	tracer.ColorName(colornames.Red), tracer.ColorName(colornames.White))
-	// topBorderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.03, 1, 1).RotateY(math.Pi / 2))
-	// topBorderP := tracer.NewPertrubedPattern(topBorderStripes, 0.5)
-	// // this produces a completely different pattern than applying the transform on the inner pattern
-	// // topBorderP.SetTransform(tracer.IdentityMatrix().Scale(0.1, 1, 1).RotateY(math.Pi / 2))
-	// topBorder.Material().SetPattern(topBorderP)
-	// w.AddObject(topBorder)
+	// border
+	borderStripes := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Lightgray), tracer.ColorName(colornames.White))
+	borderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1, 1).RotateY(math.Pi / 2))
+	borderP := tracer.NewPertrubedPattern(borderStripes, 0.5)
+	// this produces a completely different pattern than applying the transform on the inner pattern
+	// borderP.SetTransform(tracer.IdentityMatrix().Scale(0.1, 1, 1).RotateY(math.Pi / 2))
 
-	// // bottom border
-	// bottomBorder := tracer.NewUnitCube()
-	// bottomBorder.SetTransform(
-	// 	tracer.IdentityMatrix().Translate(-2, 0, 0).Scale(0.001, .2, 4))
-	// bottomBorderStripes := tracer.NewStripedPattern(
-	// 	tracer.ColorName(colornames.Violet), tracer.ColorName(colornames.White))
-	// bottomBorderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.03, 1, 1).RotateY(math.Pi / 2))
-	// bottomBorderP := tracer.NewPertrubedPattern(bottomBorderStripes, 0.5)
-	// // this produces a completely different pattern than applying the transform on the inner pattern
-	// // topBorderP.SetTransform(tracer.IdentityMatrix().Scale(0.1, 1, 1).RotateY(math.Pi / 2))
-	// bottomBorder.Material().SetPattern(bottomBorderP)
-	// w.AddObject(bottomBorder)
+	// top border
+	topBorder := tracer.NewUnitCube()
+	topBorder.SetTransform(tracer.IdentityMatrix().Scale(0.01, .2, 3).Translate(-2, 3.6, 0))
+	topBorder.Material().SetPattern(borderP)
+	w.AddObject(topBorder)
+
+	// bottom border
+	bottomBorder := tracer.NewUnitCube()
+	bottomBorder.SetTransform(tracer.IdentityMatrix().Scale(0.01, .2, 3).Translate(-2, 0.2, 0))
+	bottomBorder.Material().SetPattern(borderP)
+	w.AddObject(bottomBorder)
+
+	// left border
+	leftBorder := tracer.NewUnitCube()
+	leftBorder.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1.9, 0.2).Translate(-2, 1.9, -3.2))
+	leftBorder.Material().SetPattern(borderP)
+	w.AddObject(leftBorder)
+
+	// right border
+	rightBorder := tracer.NewUnitCube()
+	rightBorder.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1.9, 0.2).Translate(-2, 1.9, 3.2))
+	rightBorder.Material().SetPattern(borderP)
+	w.AddObject(rightBorder)
+
+	// table
+	table := tracer.NewUnitCube()
+	table.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(0, 0.5, 0))
+	table.Material().Reflective = 0
+	table.Material().Color = tracer.ColorName(colornames.Lightslategray)
+	w.AddObject(table)
 
 	// sphere1
 	sphere1 := tracer.NewUnitSphere()
 	sphere1.SetTransform(
-		tracer.IdentityMatrix().Scale(.5, .5, .5).Translate(0, 0.5, 0))
+		tracer.IdentityMatrix().Scale(.5, .5, .5).Translate(0, 1.5, 0)) // half sphere + full cube (scaled by half())
 	// sphere1.Material().Color = tracer.ColorName(colornames.Yellow)
 	sphere1pattern := tracer.NewStripedPattern(
 		tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Purple))
