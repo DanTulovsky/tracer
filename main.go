@@ -486,6 +486,52 @@ func mirrors() {
 	canvas.ExportToPNG(f)
 }
 
+func play() {
+	width, height := 300.0, 300.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	light := tracer.NewPointLight(tracer.NewPoint(1, 5, 0), tracer.White())
+	w.SetLights([]tracer.Light{light})
+
+	from := tracer.NewPoint(0, 1, -5)
+	to := tracer.NewPoint(0, 0, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	// sphere
+	sphere := tracer.NewUnitSphere()
+	sphere.Material().Color = tracer.ColorName(
+		colornames.Mediumblue)
+	st := tracer.IdentityMatrix().Translate(0, 1, 0)
+	sphere.SetTransform(st)
+	w.AddObject(sphere)
+
+	// plane
+	plane := tracer.NewPlane()
+	pp := tracer.NewRingPattern(
+		tracer.ColorName(colornames.Lightskyblue),
+		tracer.ColorName(colornames.Mediumseagreen))
+	plane.Material().SetPattern(pp)
+	pt := tracer.IdentityMatrix().Scale(.5, .5, .5)
+	pp.SetTransform(pt)
+	w.AddObject(plane)
+
+	// draw picture
+	canvas := w.Render()
+
+	// Export
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	canvas.ExportToPNG(f)
+}
+
 func main() {
 
 	flag.Parse()
@@ -508,7 +554,8 @@ func main() {
 	// sphere()
 	// scene()
 	// colors()
-	mirrors()
+	// mirrors()
+	play()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
