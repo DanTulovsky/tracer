@@ -489,8 +489,8 @@ func mirrors() {
 func mirror() {
 
 	// width, height := 300.0, 300.0
-	// width, height := 400.0, 400.0
-	width, height := 1000.0, 1000.0
+	width, height := 400.0, 400.0
+	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -545,7 +545,7 @@ func mirror() {
 	borderStripes := tracer.NewStripedPattern(
 		tracer.ColorName(colornames.Lightgray), tracer.ColorName(colornames.White))
 	borderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1, 1).RotateY(math.Pi / 2))
-	borderP := tracer.NewPertrubedPattern(borderStripes, 0.5)
+	borderP := tracer.NewPertrubedPattern(borderStripes, 0.1)
 	// this produces a completely different pattern than applying the transform on the inner pattern
 	// borderP.SetTransform(tracer.IdentityMatrix().Scale(0.1, 1, 1).RotateY(math.Pi / 2))
 
