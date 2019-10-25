@@ -97,7 +97,7 @@ func TestWorld_shadeHit(t *testing.T) {
 			args: args{
 				i:         NewIntersection(NewUnitSphere(), 4),
 				r:         NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
-				material:  NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0),
+				material:  NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1),
 				transform: IdentityMatrix(),
 				lights: []Light{
 					NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White)),
@@ -126,7 +126,9 @@ func TestWorld_shadeHit(t *testing.T) {
 			tt.args.i.Object().SetTransform(tt.args.transform)
 			tt.world.SetLights(tt.args.lights)
 
-			state := PrepareComputations(tt.args.i, tt.args.r)
+			xs := NewIntersections(tt.args.i)
+
+			state := PrepareComputations(tt.args.i, tt.args.r, xs)
 			assert.True(t, tt.want.Equal(tt.world.shadeHit(state, 1)), "should equal")
 		})
 	}
@@ -144,9 +146,11 @@ func TestWorld_shadeHitShadow(t *testing.T) {
 	w.AddObject(s2)
 
 	r := NewRay(NewPoint(0, 0, 5), NewVector(0, 0, 1))
-	i := NewIntersection(s2, 4)
+	xs := NewIntersections(
+		NewIntersection(s2, 4))
+	i := xs[0]
 
-	state := PrepareComputations(i, r)
+	state := PrepareComputations(i, r, xs)
 	c := w.shadeHit(state, 1)
 	assert.Equal(t, NewColor(0.1, 0.1, 0.1), c, "should equal")
 }
@@ -155,9 +159,12 @@ func TestWorld_shadeHitOffset(t *testing.T) {
 	r := NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1))
 	shape := NewUnitSphere()
 	shape.SetTransform(IdentityMatrix().Translate(0, 0, 1))
-	i := NewIntersection(shape, 5)
 
-	state := PrepareComputations(i, r)
+	xs := NewIntersections(
+		NewIntersection(shape, 5))
+	i := xs[0]
+
+	state := PrepareComputations(i, r, xs)
 
 	assert.Less(t, state.OverPoint.Z(), -constants.Epsilon/2)
 	assert.Greater(t, state.Point.Z(), state.OverPoint.Z())
@@ -180,7 +187,7 @@ func TestWorld_ColorAt(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 1, 0)),
 			},
-			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0),
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1),
 			m2:   NewDefaultMaterial(),
 			want: ColorName(colornames.Black),
 		},
@@ -190,7 +197,7 @@ func TestWorld_ColorAt(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
 			},
-			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0),
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1),
 			m2:   NewDefaultMaterial(),
 			want: NewColor(0.38066, 0.47583, 0.2855),
 		},
@@ -200,8 +207,8 @@ func TestWorld_ColorAt(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, 0.75), NewVector(0, 0, -1)),
 			},
-			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 1, 0.7, 0.2, 200, 0),
-			m2:   NewMaterial(NewColor(1.0, 1.0, 1.0), 1, 0.9, 0.9, 200, 0),
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 1, 0.7, 0.2, 200, 0, 0, 1),
+			m2:   NewMaterial(NewColor(1.0, 1.0, 1.0), 1, 0.9, 0.9, 200, 0, 0, 1),
 			want: NewColor(1, 1, 1),
 		},
 	}
@@ -302,9 +309,12 @@ func TestWorld_ReflectedColor_NotReflective(t *testing.T) {
 
 	shape := w.Objects[1]
 	shape.Material().Ambient = 1
-	i := NewIntersection(shape, 1)
 
-	state := PrepareComputations(i, r)
+	xs := NewIntersections(
+		NewIntersection(shape, math.Sqrt2))
+	i := xs[0]
+
+	state := PrepareComputations(i, r, xs)
 	clr := w.ReflectedColor(state, 1)
 
 	assert.Equal(t, Black(), clr, "should equal")
@@ -319,9 +329,11 @@ func TestWorld_ReflectedColor_Reflective(t *testing.T) {
 	shape.SetTransform(IdentityMatrix().Translate(0, -1, 0))
 	w.AddObject(shape)
 
-	i := NewIntersection(shape, math.Sqrt2)
+	xs := NewIntersections(
+		NewIntersection(shape, math.Sqrt2))
+	i := xs[0]
 
-	state := PrepareComputations(i, r)
+	state := PrepareComputations(i, r, xs)
 	clr := w.ReflectedColor(state, 1)
 	expected := NewColor(0.19033, 0.23791, 0.142749)
 
@@ -337,9 +349,11 @@ func TestWorld_shadeHit_Reflective(t *testing.T) {
 	shape.SetTransform(IdentityMatrix().Translate(0, -1, 0))
 	w.AddObject(shape)
 
-	i := NewIntersection(shape, math.Sqrt2)
+	xs := NewIntersections(
+		NewIntersection(shape, math.Sqrt2))
+	i := xs[0]
 
-	state := PrepareComputations(i, r)
+	state := PrepareComputations(i, r, xs)
 	clr := w.shadeHit(state, 1)
 	expected := NewColor(0.876757, 0.924340, 0.829174)
 
@@ -377,9 +391,11 @@ func TestWorld_shadeHit_MaxRecursiveReflected(t *testing.T) {
 	shape.SetTransform(IdentityMatrix().Translate(0, -1, 0))
 	w.AddObject(shape)
 
-	i := NewIntersection(shape, math.Sqrt2)
+	xs := NewIntersections(
+		NewIntersection(shape, math.Sqrt2))
+	i := xs[0]
 
-	state := PrepareComputations(i, r)
+	state := PrepareComputations(i, r, xs)
 	clr := w.ReflectedColor(state, 0)
 	expected := Black()
 	log.Println(clr)

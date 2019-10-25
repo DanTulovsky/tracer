@@ -76,10 +76,75 @@ type IntersectionState struct {
 	Inside    bool    // did the hit occure inside or outside the shape?
 	OverPoint Point   // offset to properly render shadows due to floating point errors
 	ReflectV  Vector  // reflection vector
+	N1, N2    float64 // RefractiveIndex of (n1) leaving material and (n2) entering material
+}
+
+func objectInList(o Shaper, list []Shaper) bool {
+	for _, obj := range list {
+		if o == obj {
+			return true
+		}
+	}
+	return false
+}
+
+// findObjectInList returns the index of o in list, or error if it not in list
+func findObjectInList(o Shaper, list []Shaper) (int, error) {
+	for i, n := range list {
+		if o == n {
+			return i, nil
+		}
+	}
+	return len(list), fmt.Errorf("%v not found in list", o)
+}
+
+// delObjectFromList deletes the object from the list
+func delObjectFromList(o Shaper, list []Shaper) []Shaper {
+	for i, obj := range list {
+		if o == obj {
+			copy(list[i:], list[i+1:]) // Shift a[i+1:] left one index.
+			list[len(list)-1] = nil    // Erase last element (write zero value).
+			list = list[:len(list)-1]  // Truncate slice.
+		}
+	}
+	return list
+}
+
+// findRefractiveIndexes returns the refractive indexes of leaving material and entering material
+func findRefractiveIndexes(hit Intersection, xs Intersections) (n1, n2 float64) {
+	var containers []Shaper
+
+	for _, i := range xs {
+		if i == hit {
+			if len(containers) == 0 {
+				n1 = 1.0
+			} else {
+				n1 = containers[len(containers)-1].Material().RefractiveIndex
+			}
+		}
+
+		if objectInList(i.Object(), containers) {
+			containers = delObjectFromList(i.Object(), containers)
+		} else {
+			containers = append(containers, i.Object())
+		}
+
+		if i == hit {
+			if len(containers) == 0 {
+				n2 = 1.0
+			} else {
+				n2 = containers[len(containers)-1].Material().RefractiveIndex
+			}
+			return n1, n2
+		}
+	}
+
+	return n1, n2
 }
 
 // PrepareComputations prepopulates the IntersectionState structure
-func PrepareComputations(i Intersection, r Ray) *IntersectionState {
+func PrepareComputations(i Intersection, r Ray, xs Intersections) *IntersectionState {
+	var n1, n2 float64
 	point := r.Position(i.T())
 	object := i.Object()
 	normalv := object.NormalAt(point)
@@ -94,6 +159,7 @@ func PrepareComputations(i Intersection, r Ray) *IntersectionState {
 
 	overPoint := point.AddVector(normalv.Scale(constants.Epsilon))
 	reflectv := r.Dir.Reflect(normalv)
+	n1, n2 = findRefractiveIndexes(i, xs)
 
 	return &IntersectionState{
 		T:         i.T(),
@@ -104,5 +170,7 @@ func PrepareComputations(i Intersection, r Ray) *IntersectionState {
 		Inside:    inside,
 		OverPoint: overPoint,
 		ReflectV:  reflectv,
+		N1:        n1,
+		N2:        n2,
 	}
 }

@@ -24,7 +24,19 @@ func NewUnitSphere() *Sphere {
 	}
 }
 
-// NewSphere returns a new Sphere
+// NewGlassSphere returns a new Sphere centered at the origin with r=1, with a transparent material
+func NewGlassSphere() *Sphere {
+	return &Sphere{
+		Center: NewPoint(0, 0, 0),
+		Radius: 1,
+		Shape: Shape{
+			transform: IdentityMatrix(),
+			material:  NewDefaultGlassMaterial(),
+		},
+	}
+}
+
+// NewSphere returns a new Sphere; not actually used anywhere yet
 func NewSphere(c Point, r float64) *Sphere {
 	return &Sphere{
 		Center: c,
