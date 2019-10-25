@@ -95,7 +95,8 @@ func (v Vector) Normalize() Vector {
 	if magnitude == 0 {
 		panic(fmt.Sprintf("magnitude of %v is 0!", v))
 	}
-	return NewVector(v.X()/magnitude, v.Y()/magnitude, v.Z()/magnitude)
+	m := 1 / magnitude // optimization
+	return NewVector(v.X()*m, v.Y()*m, v.Z()*m)
 }
 
 // Dot returns the dot product of the two vectors
