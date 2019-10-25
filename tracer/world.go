@@ -56,7 +56,7 @@ func NewDefaultTestWorld() *World {
 	l1 := NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White))
 
 	s1 := NewUnitSphere()
-	s1.SetMaterial(NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0))
+	s1.SetMaterial(NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1))
 
 	s2 := NewUnitSphere()
 	s2.SetTransform(IdentityMatrix().Scale(0.5, 0.5, 0.5))
@@ -109,13 +109,13 @@ func (w *World) Camera() *Camera {
 
 // ColorAt returns the color in the world where the given ray hits
 func (w *World) ColorAt(r Ray, remaining int) Color {
-	is := w.Intersections(r)
-	hit, err := is.Hit()
+	xs := w.Intersections(r)
+	hit, err := xs.Hit()
 	if err != nil {
 		return Black()
 	}
 
-	state := PrepareComputations(hit, r)
+	state := PrepareComputations(hit, r, xs)
 	return w.shadeHit(state, remaining).Clamp()
 }
 
@@ -138,7 +138,6 @@ func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 	var result Color
 
 	for _, l := range w.Lights {
-		// TODO: Does not handle reflected shadows
 		isShadowed := w.IsShadowed(state.OverPoint, l)
 
 		surface := lighting(

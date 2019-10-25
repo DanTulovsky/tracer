@@ -316,3 +316,23 @@ func TestSphere_SetMaterial(t *testing.T) {
 		})
 	}
 }
+
+func TestNewGlassSphere(t *testing.T) {
+	tests := []struct {
+		name                    string
+		wantTranparency, wantRI float64
+	}{
+		{
+			name:            "test1",
+			wantTranparency: 1.0,
+			wantRI:          1.5,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := NewGlassSphere()
+			assert.Equal(t, tt.wantTranparency, s.Material().Transparency, "should equal")
+			assert.Equal(t, tt.wantRI, s.Material().RefractiveIndex, "should equal")
+		})
+	}
+}
