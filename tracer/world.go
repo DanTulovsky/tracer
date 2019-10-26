@@ -193,7 +193,16 @@ func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 		reflected := w.ReflectedColor(state, remaining)
 		refracted := w.RefractedColor(state, remaining)
 
-		result = result.Add(surface.Add(reflected.Add(refracted)))
+		m := state.Object.Material()
+		if m.Reflective > 0 && m.Transparency > 0 {
+			// Use Schlick approximation for the Fresnel Effect
+			reflectance := Schlick(state)
+
+			result = surface.Add(reflected.Scale(reflectance)).Add(refracted.Scale((1 - reflectance)))
+		} else {
+
+			result = result.Add(surface.Add(reflected.Add(refracted)))
+		}
 	}
 
 	return result

@@ -2,6 +2,7 @@ package tracer
 
 import (
 	"fmt"
+	"math"
 	"sort"
 
 	"github.com/DanTulovsky/tracer/constants"
@@ -175,4 +176,29 @@ func PrepareComputations(i Intersection, r Ray, xs Intersections) *IntersectionS
 		N1:         n1,
 		N2:         n2,
 	}
+}
+
+// Schlick returns the reflectance - the fraction of light that is reflected [0,1]
+func Schlick(s *IntersectionState) float64 {
+	// cos of the angle between the eye and normal vectors
+	cos := s.EyeV.Dot(s.NormalV)
+
+	// total intrnal reflection can only occur if n1 > n2
+	if s.N1 > s.N2 {
+		n := s.N1 / s.N2
+		sin2t := math.Pow(n, 2) * (1.0 - math.Pow(cos, 2))
+		if sin2t > 1.0 {
+			return 1.0
+		}
+
+		// compute cosine of theta_t using trig identity
+		cost := math.Sqrt(1.0 - sin2t)
+
+		// when n1 > n2, use cos(theta_t) instead
+		cos = cost
+	}
+
+	r0 := math.Pow((s.N1-s.N2)/(s.N1+s.N2), 2)
+
+	return r0 + (1-r0)*math.Pow((1-cos), 5)
 }

@@ -504,5 +504,30 @@ func TestWorld_shadeHit_Transparent(t *testing.T) {
 	clr := w.shadeHit(state, 5)
 
 	assert.True(t, NewColor(0.936425, 0.686425, 0.686425).Equal(clr), "should be true")
+}
+
+func TestWorld_shadeHit_Schlick(t *testing.T) {
+	w := NewDefaultTestWorld()
+
+	floor := NewPlane()
+	floor.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	floor.Material().Transparency = 0.5
+	floor.Material().Reflective = 0.5
+	floor.Material().RefractiveIndex = 1.5
+	w.AddObject(floor)
+
+	ball := NewUnitSphere()
+	ball.Material().Color = NewColor(1, 0, 0)
+	ball.Material().Ambient = 0.5
+	ball.SetTransform(IdentityMatrix().Translate(0, -3.5, -0.5))
+	w.AddObject(ball)
+
+	r := NewRay(NewPoint(0, 0, -3), NewVector(0, -math.Sqrt2/2, math.Sqrt2/2))
+	xs := NewIntersections(NewIntersection(floor, math.Sqrt2))
+
+	state := PrepareComputations(xs[0], r, xs)
+	clr := w.shadeHit(state, 5)
+
+	assert.True(t, NewColor(0.93391, 0.69643, 0.69243).Equal(clr), "should be true")
 
 }
