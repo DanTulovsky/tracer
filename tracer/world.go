@@ -5,7 +5,7 @@ import (
 	"sort"
 	"sync"
 
-	"golang.org/x/exp/shiny/materialdesign/colornames"
+	"golang.org/x/image/colornames"
 )
 
 // WorldConfig collects various settings to configure the world
