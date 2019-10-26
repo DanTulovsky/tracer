@@ -720,7 +720,7 @@ func window() {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 1, -7)
+	from := tracer.NewPoint(0, 1, -6)
 	to := tracer.NewPoint(0, 0, 0)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -736,10 +736,18 @@ func window() {
 	floor.Material().SetPattern(floorP)
 	w.AddObject(floor)
 
+	cube := tracer.NewUnitCube()
+	cube.SetTransform(tracer.IdentityMatrix().Translate(-2, 0, -4))
+	cube.Material().Color = tracer.ColorName(colornames.Red)
+
 	wind := tracer.NewUnitCube()
-	wind.SetTransform(tracer.IdentityMatrix().Scale(1.5, 1.5, 0.01).Translate(0, 0, -3))
-	wind.Material().Transparency = 1.0
+	wind.SetTransform(tracer.IdentityMatrix().Scale(1.5, 1.1, 0.01).Translate(0, 0, -3))
+	wind.Material().Transparency = 1
+	wind.Material().Reflective = 1
 	wind.Material().RefractiveIndex = 1.5
+	wind.Material().Ambient = 0.1
+	wind.Material().Diffuse = 0.1
+	wind.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(wind)
 
 	ball := tracer.NewUnitSphere()
@@ -750,7 +758,7 @@ func window() {
 	canvas := w.Render()
 
 	// Export
-	f, err := os.Create("image.png")
+	f, err := os.Create("/Users/dant/Downloads/image.png")
 	if err != nil {
 		log.Fatalln(err)
 	}

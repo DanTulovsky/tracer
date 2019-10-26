@@ -330,3 +330,57 @@ func Test_delObjectFromList(t *testing.T) {
 	assert.Equal(t, want, got, "should equal")
 	assert.Error(t, err, "error")
 }
+
+func TestSchlick(t *testing.T) {
+	type args struct {
+		s *IntersectionState
+	}
+	tests := []struct {
+		name    string
+		args    args
+		shape   Shaper
+		ray     Ray
+		xsT     []float64
+		xsIndex int
+		want    float64
+	}{
+		{
+			name:    "total internal reflection",
+			shape:   NewGlassSphere(),
+			ray:     NewRay(NewPoint(0, 0, math.Sqrt2/2), NewVector(0, 1, 0)),
+			xsT:     []float64{-math.Sqrt2 / 2, math.Sqrt2 / 2},
+			xsIndex: 1,
+			want:    1.0,
+		},
+		{
+			name:    "perpendicular viewing angle",
+			shape:   NewGlassSphere(),
+			ray:     NewRay(NewPoint(0, 0, 0), NewVector(0, 1, 0)),
+			xsT:     []float64{-1, 1},
+			xsIndex: 1,
+			want:    0.04,
+		},
+		{
+			name:    "small angle and n2 > n1",
+			shape:   NewGlassSphere(),
+			ray:     NewRay(NewPoint(0, 0.99, -2), NewVector(0, 0, 1)),
+			xsT:     []float64{1.8589},
+			xsIndex: 0,
+			want:    0.48873,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			xs := NewIntersections()
+
+			for i := range tt.xsT {
+				xs = append(xs, NewIntersection(tt.shape, tt.xsT[i]))
+			}
+
+			state := PrepareComputations(xs[tt.xsIndex], tt.ray, xs)
+			got := Schlick(state)
+
+			assert.InDelta(t, tt.want, got, constants.Epsilon, "should equal")
+		})
+	}
+}
