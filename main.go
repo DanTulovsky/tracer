@@ -659,11 +659,11 @@ func glass() {
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
-	w.Config.MaxRecusions = 1
+	w.Config.MaxRecusions = 5
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(0, 10, -2), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(2, 10, -2), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -685,9 +685,12 @@ func glass() {
 
 	ball := tracer.NewGlassSphere()
 	ball.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 0))
-	ball.Material().Color = tracer.Black()
-	ball.Material().Diffuse = 0
-	ball.Material().Ambient = 0
+	ball.Material().Color = tracer.White()
+	ball.Material().Diffuse = 0.1
+	ball.Material().Ambient = 0.1
+	ball.Material().Reflective = 0
+	ball.Material().RefractiveIndex = 1.1
+	ball.Material().Transparency = 1
 	w.AddObject(ball)
 
 	canvas := w.Render()
