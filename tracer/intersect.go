@@ -68,15 +68,15 @@ func (a byT) Less(i, j int) bool { return a[i].t < a[j].t }
 
 // IntersectionState holds precomputed values for an intersection
 type IntersectionState struct {
-	T         float64 // How far away from Ray origin did this occur?
-	Object    Shaper  // The object we intersected
-	Point     Point   // the point of intersection
-	EyeV      Vector  // eye vector
-	NormalV   Vector  // normal vector
-	Inside    bool    // did the hit occure inside or outside the shape?
-	OverPoint Point   // offset to properly render shadows due to floating point errors
-	ReflectV  Vector  // reflection vector
-	N1, N2    float64 // RefractiveIndex of (n1) leaving material and (n2) entering material
+	T                     float64 // How far away from Ray origin did this occur?
+	Object                Shaper  // The object we intersected
+	Point                 Point   // the point of intersection
+	EyeV                  Vector  // eye vector
+	NormalV               Vector  // normal vector
+	Inside                bool    // did the hit occure inside or outside the shape?
+	OverPoint, UnderPoint Point   // offset to properly render shadows and refraction due to floating point errors
+	ReflectV              Vector  // reflection vector
+	N1, N2                float64 // RefractiveIndex of (n1) leaving material and (n2) entering material
 }
 
 func objectInList(o Shaper, list []Shaper) bool {
@@ -158,19 +158,21 @@ func PrepareComputations(i Intersection, r Ray, xs Intersections) *IntersectionS
 	}
 
 	overPoint := point.AddVector(normalv.Scale(constants.Epsilon))
+	underPoint := point.SubVector(normalv.Scale(constants.Epsilon))
 	reflectv := r.Dir.Reflect(normalv)
 	n1, n2 = findRefractiveIndexes(i, xs)
 
 	return &IntersectionState{
-		T:         i.T(),
-		Object:    object,
-		Point:     point,
-		EyeV:      eyev,
-		NormalV:   normalv,
-		Inside:    inside,
-		OverPoint: overPoint,
-		ReflectV:  reflectv,
-		N1:        n1,
-		N2:        n2,
+		T:          i.T(),
+		Object:     object,
+		Point:      point,
+		EyeV:       eyev,
+		NormalV:    normalv,
+		Inside:     inside,
+		OverPoint:  overPoint,
+		UnderPoint: underPoint,
+		ReflectV:   reflectv,
+		N1:         n1,
+		N2:         n2,
 	}
 }

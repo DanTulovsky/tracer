@@ -132,6 +132,47 @@ func (w *World) ReflectedColor(state *IntersectionState, remaining int) Color {
 	return clr.Scale(state.Object.Material().Reflective)
 }
 
+// RefractedColor returns the refracted color given an IntersectionState
+// remaining controls how many times a light ray can bounce between the same objects
+func (w *World) RefractedColor(state *IntersectionState, remaining int) Color {
+	if remaining <= 0 || state.Object.Material().Transparency == 0 {
+		return Black()
+	}
+
+	// check for total internal reflection
+
+	// find the ratio of the first index of refraction to the second
+	nRatio := state.N1 / state.N2
+
+	// cos(theta_i) is the same as the dot product of the two vectors
+	cosi := state.EyeV.Dot(state.NormalV)
+
+	// find sun(theta_t)^2 via trigonometric identity
+	sin2t := math.Pow(nRatio, 2) * (1 - math.Pow(cosi, 2))
+
+	if sin2t > 1 { // total internal reflection
+		return Black()
+	}
+
+	// find refracted color
+
+	// find cos(theta_t) via trigonometric identity
+	cost := math.Sqrt(1.0 - sin2t)
+
+	// compute the direction of the refracted ray
+	dir := state.NormalV.Scale(nRatio*cosi - cost).SubVector(state.EyeV.Scale(nRatio))
+
+	// create the refracted ray
+	refractedRay := NewRay(state.UnderPoint, dir)
+
+	// find the color of the refracted ray, making sure to multiply
+	// by the transparency value to account for any opacity
+	clr := w.ColorAt(refractedRay, remaining-1).Scale(state.Object.Material().Transparency)
+
+	return clr
+
+}
+
 // ShadeHit returns the color at the intersection enapsulated by IntersectionState
 func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 
@@ -150,8 +191,9 @@ func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 			isShadowed)
 
 		reflected := w.ReflectedColor(state, remaining)
+		refracted := w.RefractedColor(state, remaining)
 
-		result = result.Add(surface.Add(reflected))
+		result = result.Add(surface.Add(reflected.Add(refracted)))
 	}
 
 	return result

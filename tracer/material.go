@@ -46,7 +46,7 @@ func NewDefaultGlassMaterial() *Material {
 		Diffuse:         0.9,
 		Specular:        0.9,
 		Shininess:       200.0,
-		Reflective:      0,
+		Reflective:      0.0,
 		Transparency:    1.0,
 		RefractiveIndex: 1.5,
 	}

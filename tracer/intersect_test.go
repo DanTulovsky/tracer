@@ -190,6 +190,21 @@ func TestPrepareComputations(t *testing.T) {
 	}
 }
 
+func TestUnderPoint(t *testing.T) {
+
+	ray := NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1))
+	shape := NewGlassSphere()
+	shape.SetTransform(IdentityMatrix().Translate(0, 0, 1))
+
+	i := NewIntersection(shape, 5)
+	xs := NewIntersections(i)
+
+	comps := PrepareComputations(i, ray, xs)
+
+	assert.Less(t, constants.Epsilon/2, comps.UnderPoint.Z(), "should be less")
+	assert.Less(t, comps.Point.Z(), comps.UnderPoint.Z(), "should be less")
+}
+
 func Test_findRefractiveIndexes(t *testing.T) {
 	tests := []struct {
 		name   string

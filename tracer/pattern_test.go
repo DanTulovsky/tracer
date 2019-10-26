@@ -6,6 +6,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type testPattern struct {
+	basePattern
+}
+
+func newTestPattern() Patterner {
+	return &testPattern{
+		basePattern: basePattern{
+			transform: IdentityMatrix(),
+		},
+	}
+}
+
+func (tp *testPattern) ColorAtObject(o Shaper, p Point) Color {
+	return NewColor(p.X(), p.Y(), p.Z())
+}
+
 func TestNewStripedPattern(t *testing.T) {
 	type args struct {
 		c1 Color

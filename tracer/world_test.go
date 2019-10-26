@@ -402,3 +402,107 @@ func TestWorld_shadeHit_MaxRecursiveReflected(t *testing.T) {
 
 	assert.True(t, expected.Equal(clr), "should equal")
 }
+
+func TestWorld_RefractedColor_Opaque(t *testing.T) {
+	w := NewDefaultTestWorld()
+	r := NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1))
+
+	shape := w.Objects[0]
+
+	xs := NewIntersections(
+		NewIntersection(shape, 4),
+		NewIntersection(shape, 6))
+	i := xs[0]
+
+	state := PrepareComputations(i, r, xs)
+	clr := w.RefractedColor(state, 5)
+
+	assert.Equal(t, Black(), clr, "should equal")
+}
+
+func TestWorld_efractedColor_MaxRecursion(t *testing.T) {
+	w := NewDefaultTestWorld()
+	r := NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1))
+
+	shape := w.Objects[0]
+	shape.Material().Transparency = 1
+	shape.Material().RefractiveIndex = 1.5
+
+	xs := NewIntersections(
+		NewIntersection(shape, 4),
+		NewIntersection(shape, 6))
+	i := xs[0]
+
+	state := PrepareComputations(i, r, xs)
+	clr := w.RefractedColor(state, 0)
+
+	assert.Equal(t, Black(), clr, "should equal")
+}
+
+func TestWorldRefractedColor_TotalInternalReflection(t *testing.T) {
+	w := NewDefaultTestWorld()
+	r := NewRay(NewPoint(0, 0, math.Sqrt2/2), NewVector(0, 1, 0))
+
+	shape := w.Objects[0]
+	shape.Material().Transparency = 1
+	shape.Material().RefractiveIndex = 1.5
+
+	xs := NewIntersections(
+		NewIntersection(shape, -math.Sqrt2/2),
+		NewIntersection(shape, math.Sqrt2/2))
+	i := xs[1] // inside the sphere
+
+	state := PrepareComputations(i, r, xs)
+	clr := w.RefractedColor(state, 5)
+
+	assert.Equal(t, Black(), clr, "should equal")
+}
+
+func TestWorldRefractedColor_Normal(t *testing.T) {
+	w := NewDefaultTestWorld()
+	r := NewRay(NewPoint(0, 0, 0.1), NewVector(0, 1, 0))
+
+	a := w.Objects[0]
+	a.Material().Ambient = 1
+	a.Material().SetPattern(newTestPattern())
+
+	b := w.Objects[1]
+	b.Material().Transparency = 1.0
+	b.Material().RefractiveIndex = 1.5
+
+	xs := NewIntersections(
+		NewIntersection(a, -0.9899),
+		NewIntersection(b, -0.4899),
+		NewIntersection(b, 0.4899),
+		NewIntersection(a, 0.9899))
+
+	state := PrepareComputations(xs[2], r, xs)
+	clr := w.RefractedColor(state, 5)
+
+	assert.True(t, NewColor(0, 0.998874, 0.047218).Equal(clr), "should be true")
+}
+
+func TestWorld_shadeHit_Transparent(t *testing.T) {
+	w := NewDefaultTestWorld()
+
+	floor := NewPlane()
+	floor.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	floor.Material().Transparency = 0.5
+	floor.Material().RefractiveIndex = 1.5
+	w.AddObject(floor)
+
+	ball := NewUnitSphere()
+	ball.Material().Color = NewColor(1, 0, 0)
+	ball.Material().Ambient = 0.5
+	ball.SetTransform(IdentityMatrix().Translate(0, -3.5, -0.5))
+	w.AddObject(ball)
+
+	r := NewRay(NewPoint(0, 0, -3), NewVector(0, -math.Sqrt2/2, math.Sqrt2/2))
+	xs := NewIntersections(NewIntersection(floor, math.Sqrt2))
+
+	state := PrepareComputations(xs[0], r, xs)
+	clr := w.shadeHit(state, 5)
+
+	assert.True(t, NewColor(0.936425, 0.686425, 0.686425).Equal(clr), "should be true")
+
+}
