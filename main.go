@@ -246,8 +246,9 @@ func sphere() {
 				ray := tracer.NewRay(camera, target.SubPoint(camera).Normalize())
 
 				if hit, err := shape.IntersectWith(ray).Hit(); err == nil {
+					xs := tracer.NewIntersections(hit)
 
-					comp := tracer.PrepareComputations(hit, ray)
+					comp := tracer.PrepareComputations(hit, ray, xs)
 					clr := tracer.ColorAtPoint(comp.Object.Material(), comp.Object, comp.Point, light, comp.EyeV, comp.NormalV, false)
 
 					c.SetFloat(x, y, clr)
@@ -651,6 +652,55 @@ func cube() {
 	canvas.ExportToPNG(f)
 }
 
+func glass() {
+
+	width, height := 500.0, 500.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 1
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(0, 10, -2), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 4, -5)
+	to := tracer.NewPoint(0, 0, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	// floor
+	floor := tracer.NewPlane()
+	floor.Material().Specular = 0
+	floor.Material().Reflective = 0
+	// floor.Material().Transparency = 1.0
+	// floor.Material().RefractiveIndex = 1.5
+	floorP := tracer.NewCheckerPattern(tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.Yellow))
+	floor.Material().SetPattern(floorP)
+	w.AddObject(floor)
+
+	ball := tracer.NewGlassSphere()
+	ball.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 0))
+	ball.Material().Color = tracer.Black()
+	ball.Material().Diffuse = 0
+	ball.Material().Ambient = 0
+	w.AddObject(ball)
+
+	canvas := w.Render()
+
+	// Export
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	canvas.ExportToPNG(f)
+}
 func main() {
 
 	flag.Parse()
@@ -674,8 +724,9 @@ func main() {
 	// scene()
 	// colors()
 	// mirrors()
-	mirror()
+	// mirror()
 	// cube()
+	glass()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
