@@ -19,6 +19,7 @@ func TestNewDefaultCylinder(t *testing.T) {
 				Radius:  1.0,
 				Minimum: math.Inf(-1),
 				Maximum: math.Inf(1),
+				Closed:  false,
 				Shape: Shape{
 					transform: IdentityMatrix(),
 					material:  NewDefaultMaterial(),
@@ -152,14 +153,64 @@ func TestCylinder_IntersectWith(t *testing.T) {
 			wantT1: 1,
 			wantT2: 3,
 		},
+		{
+			name: "closed 1",
+			args: args{
+				r: NewRay(NewPoint(0, 3, 0), NewVector(0, -1, 0).Normalize()),
+			},
+			c:      NewClosedCylinder(1, 2),
+			wantXS: 2,
+			wantT1: 2,
+			wantT2: 1,
+		},
+		{
+			name: "closed 2",
+			args: args{
+				r: NewRay(NewPoint(0, 3, -2), NewVector(0, -1, 2).Normalize()),
+			},
+			c:      NewClosedCylinder(1, 2),
+			wantXS: 2,
+			wantT1: 2.23606,
+			wantT2: 3.354101,
+		},
+		{
+			name: "closed 3",
+			args: args{
+				r: NewRay(NewPoint(0, 4, -2), NewVector(0, -1, 1).Normalize()),
+			},
+			c:      NewClosedCylinder(1, 2),
+			wantXS: 2,
+			wantT1: 2.82842,
+			wantT2: 4.24264,
+		},
+		{
+			name: "closed 4",
+			args: args{
+				r: NewRay(NewPoint(0, 0, -2), NewVector(0, 1, 2).Normalize()),
+			},
+			c:      NewClosedCylinder(1, 2),
+			wantXS: 2,
+			wantT1: 2.23606,
+			wantT2: 3.35410,
+		},
+		{
+			name: "closed 5",
+			args: args{
+				r: NewRay(NewPoint(0, -1, -2), NewVector(0, 1, 1).Normalize()),
+			},
+			c:      NewClosedCylinder(1, 2),
+			wantXS: 2,
+			wantT1: 2.82842,
+			wantT2: 4.24264,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			want := NewIntersections()
 
 			if tt.wantXS > 0 {
-				want = append(want, NewIntersection(NewDefaultCylinder(), tt.wantT1))
-				want = append(want, NewIntersection(NewDefaultCylinder(), tt.wantT2))
+				want = append(want, NewIntersection(tt.c, tt.wantT1))
+				want = append(want, NewIntersection(tt.c, tt.wantT2))
 			}
 			got := tt.c.IntersectWith(tt.args.r)
 
@@ -207,12 +258,60 @@ func TestCylinder_NormalAt(t *testing.T) {
 			want: NewVector(0, 0, 1),
 		},
 		{
-			name: "test3",
+			name: "test4",
 			c:    NewDefaultCylinder(),
 			args: args{
 				p: NewPoint(-1, 1, 0),
 			},
 			want: NewVector(-1, 0, 0),
+		},
+		{
+			name: "closed1",
+			c:    NewClosedCylinder(1, 2),
+			args: args{
+				p: NewPoint(0, 1, 0),
+			},
+			want: NewVector(0, -1, 0),
+		},
+		{
+			name: "closed2",
+			c:    NewClosedCylinder(1, 2),
+			args: args{
+				p: NewPoint(0.5, 1, 0),
+			},
+			want: NewVector(0, -1, 0),
+		},
+		{
+			name: "closed3",
+			c:    NewClosedCylinder(1, 2),
+			args: args{
+				p: NewPoint(0, 1, 0.5),
+			},
+			want: NewVector(0, -1, 0),
+		},
+		{
+			name: "closed4",
+			c:    NewClosedCylinder(1, 2),
+			args: args{
+				p: NewPoint(0, 2, 0),
+			},
+			want: NewVector(0, 1, 0),
+		},
+		{
+			name: "closed5",
+			c:    NewClosedCylinder(1, 2),
+			args: args{
+				p: NewPoint(0.5, 2, 0),
+			},
+			want: NewVector(0, 1, 0),
+		},
+		{
+			name: "closed6",
+			c:    NewClosedCylinder(1, 2),
+			args: args{
+				p: NewPoint(0, 2, 0.5),
+			},
+			want: NewVector(0, 1, 0),
 		},
 	}
 	for _, tt := range tests {
@@ -243,6 +342,7 @@ func TestNewCylinder(t *testing.T) {
 				Radius:  1,
 				Minimum: -2,
 				Maximum: 3,
+				Closed:  false,
 				Shape: Shape{
 					transform: IdentityMatrix(),
 					material:  NewDefaultMaterial(),
@@ -267,6 +367,57 @@ func TestNewCylinder(t *testing.T) {
 
 			} else {
 				assert.Equal(t, tt.want, NewCylinder(tt.args.min, tt.args.max), "should equal")
+			}
+		})
+	}
+}
+
+func TestNewClosedCylinder(t *testing.T) {
+	type args struct {
+		min float64
+		max float64
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      *Cylinder
+		wantPanic bool
+	}{
+		{
+			name: "test1",
+			args: args{
+				min: -2,
+				max: 3,
+			},
+			want: &Cylinder{
+				Radius:  1,
+				Minimum: -2,
+				Maximum: 3,
+				Closed:  true,
+				Shape: Shape{
+					transform: IdentityMatrix(),
+					material:  NewDefaultMaterial(),
+					shape:     "cylinder",
+				},
+			},
+			wantPanic: false,
+		},
+		{
+			name: "invalid",
+			args: args{
+				min: 2,
+				max: -3,
+			},
+			wantPanic: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.wantPanic {
+				assert.Panics(t, func() { NewClosedCylinder(tt.args.min, tt.args.max) }, "should panic")
+
+			} else {
+				assert.Equal(t, tt.want, NewClosedCylinder(tt.args.min, tt.args.max), "should equal")
 			}
 		})
 	}
