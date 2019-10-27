@@ -707,6 +707,7 @@ func glass() {
 
 func window() {
 
+	// width, height := 200.0, 200.0
 	width, height := 500.0, 500.0
 	// width, height := 1000.0, 1000.0
 
@@ -720,8 +721,8 @@ func window() {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 1, -6)
-	to := tracer.NewPoint(0, 0, 0)
+	from := tracer.NewPoint(3, 1, -7)
+	to := tracer.NewPoint(-1, 0, 0)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
@@ -737,11 +738,13 @@ func window() {
 	w.AddObject(floor)
 
 	cube := tracer.NewUnitCube()
-	cube.SetTransform(tracer.IdentityMatrix().Translate(-2, 0, -4))
+	cube.SetTransform(tracer.IdentityMatrix().Scale(0.2, 0.2, .2).Translate(-1.5, 0.2, -4))
 	cube.Material().Color = tracer.ColorName(colornames.Red)
+	w.AddObject(cube)
 
+	// window
 	wind := tracer.NewUnitCube()
-	wind.SetTransform(tracer.IdentityMatrix().Scale(1.5, 1.1, 0.01).Translate(0, 0, -3))
+	wind.SetTransform(tracer.IdentityMatrix().Scale(3.6, 1, 0.01).Translate(-1.5, 0, -3))
 	wind.Material().Transparency = 1
 	wind.Material().Reflective = 1
 	wind.Material().RefractiveIndex = 1.5
@@ -766,9 +769,126 @@ func window() {
 	log.Printf("Exporting canvas to %v", f.Name())
 	canvas.ExportToPNG(f)
 }
+
+func pond() {
+
+	// width, height := 100.0, 100.0
+	width, height := 400.0, 400.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(3, 20, -35), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(3, 4, -38)
+	to := tracer.NewPoint(0.7, 0, -33)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	// surface
+	surface := tracer.NewPlane()
+	surface.Material().Specular = 0.0
+	surface.Material().Diffuse = 0.1
+	surface.Material().Ambient = 0.1
+	surface.Material().Reflective = 1
+	surface.Material().Transparency = 0.6
+	surface.Material().RefractiveIndex = 1.3442
+	surface.Material().Color = tracer.ColorName(colornames.White)
+	surface.Material().ShadowCaster = false
+	surfaceRealP1 := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Lightgray), tracer.ColorName(colornames.Lightskyblue))
+	surfaceRealP2 := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Lightgray), tracer.ColorName(colornames.Lightskyblue))
+	surfaceRealP2.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi / 2))
+	surfaceBlendedP := tracer.NewBlendedPattern(surfaceRealP1, surfaceRealP2)
+	surfacePP := tracer.NewPertrubedPattern(surfaceBlendedP, 0.4)
+	surface.Material().SetPattern(surfacePP)
+	w.AddObject(surface)
+
+	// bottom
+	bottom := tracer.NewPlane()
+	bottom.Material().Specular = 0
+	bottom.Material().Color = tracer.ColorName(colornames.White)
+	bottom.SetTransform(tracer.IdentityMatrix().Translate(0, -8, 0))
+	bottomP := tracer.NewCheckerPattern(tracer.ColorName(colornames.Lightcoral),
+		tracer.ColorName(colornames.Lightgray))
+	// bottomP := tracer.NewGradientPattern(
+	// 	tracer.ColorName(colornames.Lightgray), tracer.ColorName(colornames.Darkgrey))
+	// bottomP.SetTransform(tracer.IdentityMatrix().Scale(2.5, 2.5, 2.5))
+	bottom.Material().SetPattern(bottomP)
+	w.AddObject(bottom)
+
+	leftWall := tracer.NewPlane()
+	leftWall.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-40, 0, 0))
+	leftWall.Material().Color = tracer.ColorName(colornames.Lightskyblue)
+	leftWall.Material().Specular = 0
+	leftWall.Material().Shininess = 200
+	leftWall.Material().Ambient = 0.3
+	leftWall.Material().Diffuse = 0
+	leftWallP := tracer.NewRingPattern(tracer.ColorName(colornames.Lightsteelblue), tracer.White())
+	leftWall.Material().SetPattern(leftWallP)
+	w.AddObject(leftWall)
+
+	backWall := tracer.NewPlane()
+	backWall.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).Translate(0, 0, 4))
+	backWall.Material().Color = tracer.ColorName(colornames.Lightskyblue)
+	backWall.Material().Specular = 0
+	backWall.Material().Shininess = 200
+	backWall.Material().Ambient = 0.3
+	backWall.Material().Diffuse = 0
+	backWallP := tracer.NewRingPattern(tracer.ColorName(colornames.Lightsteelblue), tracer.White())
+	// backWallP.SetTransform(tracer.IdentityMatrix().)
+	backWall.Material().SetPattern(backWallP)
+	w.AddObject(backWall)
+
+	// below water red cube
+	cube := tracer.NewUnitCube()
+	cube.SetTransform(
+		tracer.IdentityMatrix().Scale(0.4, 0.4, 0.4).RotateX(math.Pi/4).RotateY(math.Pi/4).RotateZ(math.Pi/4).Translate(1.5, -4, -34))
+	cube.Material().Color = tracer.ColorName(colornames.Red)
+	w.AddObject(cube)
+
+	// half submerged yellow cube
+	cube3 := tracer.NewUnitCube()
+	cube3.SetTransform(tracer.IdentityMatrix().Scale(0.4, 0.4, 0.4).Translate(-0.5, 0, -34))
+	cube3.Material().Color = tracer.ColorName(colornames.Yellow)
+	w.AddObject(cube3)
+
+	// below water yellow sphere
+	ball := tracer.NewUnitSphere()
+	ball.SetTransform(tracer.IdentityMatrix().Scale(0.8, 0.8, 0.8).Translate(4, -4, -30))
+	ball.Material().Color = tracer.ColorName(colornames.Yellow)
+	w.AddObject(ball)
+
+	// above water lightblue cube
+	cube2 := tracer.NewUnitCube()
+	cube2.SetTransform(tracer.IdentityMatrix().Scale(0.4, 0.4, .4).Translate(1.7, 1, -32))
+	cube2.Material().Color = tracer.ColorName(colornames.Lightblue)
+	w.AddObject(cube2)
+
+	canvas := w.Render()
+
+	// Export
+	f, err := os.Create("/Users/dant/Downloads/image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	canvas.ExportToPNG(f)
+}
 func main() {
 
 	flag.Parse()
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
@@ -792,7 +912,8 @@ func main() {
 	// mirror()
 	// cube()
 	// glass()
-	window()
+	// window()
+	pond()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

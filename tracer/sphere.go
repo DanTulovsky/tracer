@@ -3,6 +3,8 @@ package tracer
 import (
 	"math"
 	"sort"
+
+	"github.com/google/uuid"
 )
 
 // Sphere is a spherical object, implements Shaper
@@ -20,6 +22,8 @@ func NewUnitSphere() *Sphere {
 		Shape: Shape{
 			transform: IdentityMatrix(),
 			material:  NewDefaultMaterial(),
+			shape:     "sphere",
+			name:      uuid.New().String(),
 		},
 	}
 }

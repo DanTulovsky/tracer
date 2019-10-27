@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/DanTulovsky/tracer/constants"
+	"github.com/google/uuid"
 )
 
 // Cube implements an AABB cube
@@ -18,6 +19,8 @@ func NewUnitCube() *Cube {
 		Shape: Shape{
 			transform: IdentityMatrix(),
 			material:  NewDefaultMaterial(),
+			shape:     "cube",
+			name:      uuid.New().String(),
 		},
 	}
 }

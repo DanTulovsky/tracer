@@ -5,6 +5,9 @@ type Material struct {
 	Color                                                                            Color
 	Pattern                                                                          Patterner
 	Ambient, Diffuse, Specular, Shininess, Reflective, Transparency, RefractiveIndex float64
+
+	// Some objects should not cast shadows (e.g. water in a pond)
+	ShadowCaster bool
 }
 
 // NewMaterial returns a new material
@@ -19,6 +22,7 @@ func NewMaterial(clr Color, a, d, sp, s, r, t, ri float64) *Material {
 		Reflective:      r,
 		Transparency:    t,
 		RefractiveIndex: ri,
+		ShadowCaster:    true,
 	}
 }
 
@@ -34,6 +38,7 @@ func NewDefaultMaterial() *Material {
 		Reflective:      0,
 		Transparency:    0,
 		RefractiveIndex: 1.0,
+		ShadowCaster:    true,
 	}
 }
 
