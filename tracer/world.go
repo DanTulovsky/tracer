@@ -210,7 +210,6 @@ func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 
 // IsShadowed returns true if p is in a shadow from the given light
 func (w *World) IsShadowed(p Point, l Light) bool {
-	var inShadow bool
 
 	v := l.Position().SubPoint(p)
 	distance := v.Magnitude()
@@ -219,16 +218,25 @@ func (w *World) IsShadowed(p Point, l Light) bool {
 	r := NewRay(p, direction)
 	intersections := w.Intersections(r)
 
-	h, err := intersections.Hit()
-	if err == nil && h.T() < distance {
-		inShadow = true
+	// Some objects do not cast shadows, so we need to look at all the objects r intersects with
+	sort.Sort(byT(intersections))
+
+	for _, it := range intersections {
+		if it.t >= 0 {
+
+			if it.t < distance && it.Object().Material().ShadowCaster {
+				return true
+			}
+		}
 	}
 
-	return inShadow
+	return false
 }
 
 // Render renders the world using the world camera
 func (w *World) Render() *Canvas {
+	w.LintWorld()
+
 	camera := w.Camera()
 	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))
 	maxRecursion := w.Config.MaxRecusions
