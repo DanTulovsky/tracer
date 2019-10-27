@@ -887,8 +887,8 @@ func pond() {
 
 func cylinder() {
 
-	width, height := 100.0, 100.0
-	// width, height := 400.0, 400.0
+	// width, height := 100.0, 100.0
+	width, height := 400.0, 400.0
 	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
@@ -897,19 +897,57 @@ func cylinder() {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(3, 20, 0), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(3, 20, -10), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 4, -8)
-	to := tracer.NewPoint(0, 0, 0)
+	from := tracer.NewPoint(0, 11, -10)
+	to := tracer.NewPoint(0, 3, 0)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
 
-	c := tracer.NewCylinder()
-	c.Material().Color = tracer.ColorName(colornames.Yellow)
+	// floor
+	floor := tracer.NewPlane()
+	floor.Material().Specular = 0
+	floor.Material().Reflective = 0
+	// floor.Material().Transparency = 1.0
+	// floor.Material().RefractiveIndex = 1.5
+	floorP := tracer.NewCheckerPattern(
+		tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.Yellow))
+	floor.Material().SetPattern(floorP)
+	w.AddObject(floor)
+
+	// closed
+	c := tracer.NewClosedCylinder(0, 8)
+	c.Material().Color = tracer.ColorName(colornames.Lightgreen)
+	c.SetTransform(tracer.IdentityMatrix().Translate(0, 0, 0))
 	w.AddObject(c)
+
+	// open
+	c2 := tracer.NewCylinder(0, 8)
+	c2.Material().Color = tracer.ColorName(colornames.Lightblue)
+	c2.SetTransform(tracer.IdentityMatrix().Translate(-3, 0, 0))
+	w.AddObject(c2)
+
+	// infinite
+	c3 := tracer.NewDefaultCylinder()
+	c3.Material().Color = tracer.ColorName(colornames.Lightcoral)
+	c3.SetTransform(tracer.IdentityMatrix().Translate(3, 0, 0))
+	w.AddObject(c3)
+
+	// flipped & glass
+	c4 := tracer.NewClosedCylinder(-4, 4)
+	c4.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(0, 5.7, -4))
+	c4.Material().Color = tracer.ColorName(colornames.White)
+	c4.Material().Transparency = 0.8
+	c4.Material().Reflective = 0.5
+	c4.Material().RefractiveIndex = 4 / 3
+	c4.Material().Ambient = 0.1
+	c4.Material().Diffuse = 0.1
+	c4.Material().ShadowCaster = false
+	w.AddObject(c4)
 
 	canvas := w.Render()
 
