@@ -116,7 +116,6 @@ func TestNewUnitSphere(t *testing.T) {
 	}
 	for _, tt := range tests {
 		got := NewUnitSphere()
-		tt.want.Shape.name = got.name // random uuid
 
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.want, got, "should equal")
