@@ -1,7 +1,5 @@
 package tracer
 
-import "fmt"
-
 // Shaper represents an physical object
 type Shaper interface {
 	IntersectWith(Ray) Intersections
@@ -12,6 +10,7 @@ type Shaper interface {
 	SetMaterial(*Material)
 
 	Name() string
+	SetName(string)
 
 	SetTransform(Matrix)
 	Transform() Matrix
@@ -57,5 +56,11 @@ func (s *Shape) SetTransform(m Matrix) {
 
 // Name returns the name of the shape
 func (s *Shape) Name() string {
-	return fmt.Sprintf("%s (%s)", s.name, s.shape)
+	// return fmt.Sprintf("%s (%s)", s.name, s.shape)
+	return s.name
+}
+
+// SetName sets the name
+func (s *Shape) SetName(n string) {
+	s.name = n
 }

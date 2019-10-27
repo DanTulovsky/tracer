@@ -54,6 +54,7 @@ func NewDefaultGlassMaterial() *Material {
 		Reflective:      0.0,
 		Transparency:    1.0,
 		RefractiveIndex: 1.5,
+		ShadowCaster:    false,
 	}
 }
 

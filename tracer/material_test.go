@@ -1,7 +1,6 @@
 package tracer
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,16 +44,19 @@ func TestNewMaterial(t *testing.T) {
 				Reflective:      0.5,
 				Transparency:    0.6,
 				RefractiveIndex: 0.7,
+				ShadowCaster:    true,
 			},
 		},
 	}
 	for _, tt := range tests {
-		assert.Equal(
-			t,
-			tt.want,
-			NewMaterial(
-				tt.args.clr, tt.args.ambient, tt.args.diffuse,
-				tt.args.specular, tt.args.shininess, tt.args.reflective, tt.args.transparency, tt.args.refractiveIndex))
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(
+				t,
+				tt.want,
+				NewMaterial(
+					tt.args.clr, tt.args.ambient, tt.args.diffuse,
+					tt.args.specular, tt.args.shininess, tt.args.reflective, tt.args.transparency, tt.args.refractiveIndex))
+		})
 	}
 }
 
@@ -78,10 +80,10 @@ func TestMaterial_HasPattern(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		if tt.p != nil {
-			tt.m.SetPattern(tt.p)
-		}
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.p != nil {
+				tt.m.SetPattern(tt.p)
+			}
 			assert.Equal(t, tt.want, tt.m.HasPattern(), "should equal")
 		})
 	}
@@ -103,14 +105,14 @@ func TestNewDefaultMaterial(t *testing.T) {
 				Reflective:      0,
 				Transparency:    0,
 				RefractiveIndex: 1.0,
+				ShadowCaster:    true,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewDefaultMaterial(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewDefaultMaterial() = %v, want %v", got, tt.want)
-			}
+			got := NewDefaultMaterial()
+			assert.Equal(t, tt.want, got, "should equal")
 		})
 	}
 }

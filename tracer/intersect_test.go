@@ -32,7 +32,9 @@ func TestNewIntersection(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, NewIntersection(tt.args.o, tt.args.t), "should be equal")
+			got := NewIntersection(tt.args.o, tt.args.t)
+			got.Object().SetName(tt.want.Object().Name())
+			assert.Equal(t, tt.want, got, "should be equal")
 		})
 	}
 }
@@ -89,6 +91,8 @@ func TestIntersections_Hit(t *testing.T) {
 			if tt.wantErr {
 				assert.Error(t, err, "should error")
 			} else {
+				// fix for random names
+				got.Object().SetName(tt.want.Object().Name())
 				assert.Equal(t, tt.want, got, "should equal")
 			}
 		})

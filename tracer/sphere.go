@@ -40,18 +40,6 @@ func NewGlassSphere() *Sphere {
 	}
 }
 
-// NewSphere returns a new Sphere; not actually used anywhere yet
-func NewSphere(c Point, r float64) *Sphere {
-	return &Sphere{
-		Center: c,
-		Radius: r,
-		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultMaterial(),
-		},
-	}
-}
-
 // IntersectWith returns the 't' values of Ray r intersecting with the Sphere in sorted order
 func (s *Sphere) IntersectWith(r Ray) Intersections {
 

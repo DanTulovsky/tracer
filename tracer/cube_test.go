@@ -17,13 +17,16 @@ func TestNewUnitCube(t *testing.T) {
 				Shape: Shape{
 					transform: IdentityMatrix(),
 					material:  NewDefaultMaterial(),
+					shape:     "cube",
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, NewUnitCube(), "should equal")
+			got := NewUnitCube()
+			tt.want.Shape.name = got.name // random uuid
+			assert.Equal(t, tt.want, got, "should equal")
 		})
 	}
 }
@@ -166,6 +169,11 @@ func TestCube_IntersectWith(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// fix uuids
+			for _, i := range tt.want {
+				i.Object().SetName(tt.cube.Name())
+			}
+
 			assert.Equal(t, tt.want, tt.cube.IntersectWith(tt.args.r))
 		})
 	}
