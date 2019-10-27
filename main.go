@@ -884,6 +884,45 @@ func pond() {
 	log.Printf("Exporting canvas to %v", f.Name())
 	canvas.ExportToPNG(f)
 }
+
+func cylinder() {
+
+	width, height := 100.0, 100.0
+	// width, height := 400.0, 400.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(3, 20, 0), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 4, -8)
+	to := tracer.NewPoint(0, 0, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	c := tracer.NewCylinder()
+	c.Material().Color = tracer.ColorName(colornames.Yellow)
+	w.AddObject(c)
+
+	canvas := w.Render()
+
+	// Export
+	f, err := os.Create("/Users/dant/Downloads/image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	canvas.ExportToPNG(f)
+}
+
 func main() {
 
 	flag.Parse()
@@ -913,7 +952,8 @@ func main() {
 	// cube()
 	// glass()
 	// window()
-	pond()
+	// pond()
+	cylinder()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

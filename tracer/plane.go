@@ -4,8 +4,6 @@ import (
 	"math"
 	"sort"
 
-	"github.com/google/uuid"
-
 	"github.com/DanTulovsky/tracer/constants"
 )
 
@@ -22,7 +20,7 @@ func NewPlane() *Plane {
 			transform: IdentityMatrix(),
 			material:  NewDefaultMaterial(),
 			shape:     "plane",
-			name:      uuid.New().String(),
+			// name:      uuid.New().String(),
 		},
 	}
 }

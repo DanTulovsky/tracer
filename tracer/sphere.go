@@ -3,8 +3,6 @@ package tracer
 import (
 	"math"
 	"sort"
-
-	"github.com/google/uuid"
 )
 
 // Sphere is a spherical object, implements Shaper
@@ -23,7 +21,7 @@ func NewUnitSphere() *Sphere {
 			transform: IdentityMatrix(),
 			material:  NewDefaultMaterial(),
 			shape:     "sphere",
-			name:      uuid.New().String(),
+			// name:      uuid.New().String(),
 		},
 	}
 }
@@ -48,7 +46,6 @@ func (s *Sphere) IntersectWith(r Ray) Intersections {
 	// transform the ray by the inverse of the sphere transfrom matrix
 	// instead of changing the sphere, we change the ray coming from the camera
 	// by the inverse, which achieves the same thing
-
 	r = r.Transform(s.transform.Inverse())
 
 	// vector from sphere's center to ray origin
