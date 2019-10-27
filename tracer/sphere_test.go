@@ -7,32 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewSphere(t *testing.T) {
-	type args struct {
-		c Point
-		r float64
-	}
-	tests := []struct {
-		name string
-		args args
-		want Sphere
-	}{
-		{
-			name: "test1",
-			args: args{
-				c: NewPoint(0, 0, 0),
-				r: 1.0,
-			},
-			want: Sphere{NewPoint(0, 0, 0), 1.0, Shape{transform: IdentityMatrix(), material: NewDefaultMaterial()}},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, &tt.want, NewSphere(tt.args.c, tt.args.r), "should equal")
-		})
-	}
-}
-
 func TestSphere_IntersectWith(t *testing.T) {
 	type args struct {
 		r Ray
@@ -135,13 +109,17 @@ func TestNewUnitSphere(t *testing.T) {
 				Shape: Shape{
 					transform: IdentityMatrix(),
 					material:  NewDefaultMaterial(),
+					shape:     "sphere",
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
+		got := NewUnitSphere()
+		tt.want.Shape.name = got.name // random uuid
+
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, NewUnitSphere())
+			assert.Equal(t, tt.want, got, "should equal")
 		})
 	}
 }

@@ -17,13 +17,16 @@ func TestNewPlane(t *testing.T) {
 				Shape: Shape{
 					transform: IdentityMatrix(),
 					material:  NewDefaultMaterial(),
+					shape:     "plane",
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, NewPlane(), "should equal")
+			got := NewPlane()
+			tt.want.Shape.name = got.name // random uuid
+			assert.Equal(t, tt.want, got, "should equal")
 		})
 	}
 }
@@ -119,6 +122,12 @@ func TestPlane_IntersectWith(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
+			// fix random uuids
+			for _, i := range tt.want {
+				i.Object().SetName(tt.plane.Name())
+			}
+
 			assert.Equal(t, tt.want, tt.plane.IntersectWith(tt.args.r))
 		})
 	}
