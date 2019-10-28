@@ -965,7 +965,7 @@ func cone() {
 	// override light here
 	w.SetLights([]tracer.Light{
 		// tracer.NewPointLight(tracer.NewPoint(2, 10, -1), tracer.NewColor(1, 1, 1)),
-		tracer.NewPointLight(tracer.NewPoint(-9, 1, 10), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(-9, 15, -3), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -1016,7 +1016,7 @@ func cone() {
 	sp.SetTransform(tracer.IdentityMatrix().Scale(0.3, 0.3, 0.3).RotateZ(math.Pi / 2))
 	spp := tracer.NewPertrubedPattern(sp, 0.4)
 	s.Material().SetPattern(spp)
-	s.Material().Transparency = 1
+	s.Material().Transparency = 0.8
 	s.Material().Ambient = 0.1
 	s.Material().Diffuse = 0.1
 	s.Material().ShadowCaster = false
