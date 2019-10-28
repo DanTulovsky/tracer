@@ -17,6 +17,7 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
+	"github.com/DanTulovsky/tracer/utils"
 )
 
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
@@ -375,17 +376,7 @@ func scene() {
 	// material.SetPattern(p4)
 	w.AddObject(left)
 
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create("image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
-
+	render(w)
 }
 
 func colors() {
@@ -475,16 +466,7 @@ func mirrors() {
 	sphere1.Material().SetPattern(sphere1pattern)
 	w.AddObject(sphere1)
 
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create("image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
+	render(w)
 }
 
 func mirror() {
@@ -591,16 +573,7 @@ func mirror() {
 	sphere1.Material().SetPattern(sphere1pattern)
 	w.AddObject(sphere1)
 
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create("image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
+	render(w)
 }
 
 func cube() {
@@ -640,16 +613,7 @@ func cube() {
 	cube.SetTransform(tracer.IdentityMatrix().Scale(1, .5, 1).Translate(0, 1, 0))
 	w.AddObject(cube)
 
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create("image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
+	render(w)
 }
 
 func glass() {
@@ -693,16 +657,7 @@ func glass() {
 	ball.Material().Transparency = 1
 	w.AddObject(ball)
 
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create("image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
+	render(w)
 }
 
 func window() {
@@ -758,16 +713,7 @@ func window() {
 	ball.Material().Color = tracer.ColorName(colornames.Burlywood)
 	w.AddObject(ball)
 
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create("/Users/dant/Downloads/image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
+	render(w)
 }
 
 func pond() {
@@ -873,16 +819,7 @@ func pond() {
 	cube2.Material().Color = tracer.ColorName(colornames.Lightblue)
 	w.AddObject(cube2)
 
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create("/Users/dant/Downloads/image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
+	render(w)
 }
 
 func cylinder() {
@@ -962,16 +899,7 @@ func cylinder() {
 	// s.Material().ShadowCaster = false
 	// w.AddObject(s)
 
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create("/Users/dant/Downloads/image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
+	render(w)
 }
 
 func spherewarp() {
@@ -1021,16 +949,7 @@ func spherewarp() {
 	s.Material().ShadowCaster = false
 	w.AddObject(s)
 
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create("/Users/dant/Downloads/image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
+	render(w)
 }
 
 func cone() {
@@ -1099,10 +1018,14 @@ func cone() {
 	s.Material().SetPattern(spp)
 	w.AddObject(s)
 
+	render(w)
+}
+
+func render(w *tracer.World) {
 	canvas := w.Render()
 
 	// Export
-	f, err := os.Create("/Users/dant/Downloads/image.png")
+	f, err := os.Create(fmt.Sprintf("%s/Downloads/image.png", utils.Homedir()))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -1110,6 +1033,7 @@ func cone() {
 	log.Printf("Exporting canvas to %v", f.Name())
 	canvas.ExportToPNG(f)
 }
+
 func main() {
 
 	flag.Parse()
