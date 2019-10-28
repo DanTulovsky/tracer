@@ -1046,14 +1046,14 @@ func cone() {
 	// override light here
 	w.SetLights([]tracer.Light{
 		tracer.NewPointLight(tracer.NewPoint(2, 10, -1), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(-9, 1, 10), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 4.5, -4)
-	to := tracer.NewPoint(0, 1, 0)
+	from := tracer.NewPoint(0, 4.0, -4)
+	to := tracer.NewPoint(0, 2.0, 0)
 	up := tracer.NewVector(0, 1, 0)
-	fov := math.Pi / 3.5
+	fov := math.Pi / 3.0
 
 	camera := tracer.NewCamera(width, height, fov)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -1072,9 +1072,32 @@ func cone() {
 	floor.Material().SetPattern(floorP)
 	w.AddObject(floor)
 
+	// mirror
+	mirror := tracer.NewPlane()
+	mirror.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateY(math.Pi/4).Translate(0, 0, 4))
+	mirror.Material().Reflective = 1
+	mirror.Material().Diffuse = 0.01
+	mirror.Material().Specular = 1
+	mirror.Material().Ambient = 0.01
+	mirror.Material().Color = tracer.Black()
+	w.AddObject(mirror)
+
 	c := tracer.NewClosedCone(-1, 1)
-	c.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 0))
+	c.SetTransform(tracer.IdentityMatrix().Translate(-1, 1, 0))
+	cp := tracer.NewStripedPattern(tracer.ColorName(colornames.Red), tracer.ColorName(colornames.White))
+	cp.SetTransform(tracer.IdentityMatrix().Scale(0.1, 0.1, 0.1))
+	cpp := tracer.NewPertrubedPattern(cp, 0.4)
+	c.Material().SetPattern(cpp)
 	w.AddObject(c)
+
+	// orb
+	s := tracer.NewUnitSphere()
+	s.SetTransform(tracer.IdentityMatrix().Translate(-1, 3, 0))
+	sp := tracer.NewStripedPattern(tracer.ColorName(colornames.Red), tracer.ColorName(colornames.Blue))
+	sp.SetTransform(tracer.IdentityMatrix().Scale(0.3, 0.3, 0.3).RotateZ(math.Pi / 2))
+	spp := tracer.NewPertrubedPattern(sp, 0.4)
+	s.Material().SetPattern(spp)
+	w.AddObject(s)
 
 	canvas := w.Render()
 
