@@ -965,7 +965,7 @@ func cone() {
 	// override light here
 	w.SetLights([]tracer.Light{
 		// tracer.NewPointLight(tracer.NewPoint(2, 10, -1), tracer.NewColor(1, 1, 1)),
-		tracer.NewPointLight(tracer.NewPoint(-9, 15, -3), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(-0.5, 1, 0), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -1001,6 +1001,7 @@ func cone() {
 	mirror.Material().Color = tracer.Black()
 	w.AddObject(mirror)
 
+	// cone
 	c := tracer.NewClosedCone(-1, 1)
 	c.SetTransform(tracer.IdentityMatrix().Translate(-1, 1, 0))
 	cp := tracer.NewStripedPattern(tracer.ColorName(colornames.Red), tracer.ColorName(colornames.White))
