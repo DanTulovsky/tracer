@@ -939,15 +939,28 @@ func cylinder() {
 
 	// flipped & glass
 	c4 := tracer.NewClosedCylinder(-4, 4)
-	c4.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(0, 5.7, -4))
-	c4.Material().Color = tracer.ColorName(colornames.White)
+	c4.SetTransform(
+		tracer.IdentityMatrix().RotateZ(math.Pi/3).RotateY(-math.Pi/4).Translate(0, 5.7, -4))
+	c4.Material().Color = tracer.ColorName(colornames.Darkolivegreen)
 	c4.Material().Transparency = 0.8
 	c4.Material().Reflective = 0.5
-	c4.Material().RefractiveIndex = 4 / 3
+	c4.Material().RefractiveIndex = 1.75
 	c4.Material().Ambient = 0.1
 	c4.Material().Diffuse = 0.1
 	c4.Material().ShadowCaster = false
 	w.AddObject(c4)
+
+	// flipped & glass sphere
+	// s := tracer.NewUnitSphere()
+	// s.SetTransform(tracer.IdentityMatrix().Scale(2, 2, 2).Translate(0, 5.7, -4))
+	// s.Material().Color = tracer.ColorName(colornames.Darkolivegreen)
+	// s.Material().Transparency = 0.8
+	// s.Material().Reflective = 0.5
+	// s.Material().RefractiveIndex = 1.7 // force fish-eye affect
+	// s.Material().Ambient = 0.1
+	// s.Material().Diffuse = 0.1
+	// s.Material().ShadowCaster = false
+	// w.AddObject(s)
 
 	canvas := w.Render()
 
@@ -961,6 +974,114 @@ func cylinder() {
 	canvas.ExportToPNG(f)
 }
 
+func spherewarp() {
+
+	// width, height := 100.0, 100.0
+	width, height := 200.0, 200.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(0, 10, 0), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 12, 0)
+	to := tracer.NewPoint(0, 0, 0)
+	up := tracer.NewVector(0, 0, 1) // note up vector change when looking straight down!
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	// floor
+	floor := tracer.NewPlane()
+	floor.Material().Specular = 0
+	floor.Material().Reflective = 0
+	// floor.Material().Transparency = 1.0
+	// floor.Material().RefractiveIndex = 1.5
+	floorP := tracer.NewCheckerPattern(
+		tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.Yellow))
+	floor.Material().SetPattern(floorP)
+	w.AddObject(floor)
+
+	// glass sphere
+	s := tracer.NewUnitSphere()
+	s.SetTransform(tracer.IdentityMatrix().Scale(2.5, 2.5, 2.5).Translate(0, 4, 0))
+	s.Material().Color = tracer.ColorName(colornames.White)
+	s.Material().Transparency = 1.0
+	s.Material().Reflective = 1.0
+	s.Material().RefractiveIndex = 3
+	// s.Material().Ambient = 0.1
+	s.Material().Diffuse = 0
+	s.Material().Specular = 0
+	s.Material().ShadowCaster = false
+	w.AddObject(s)
+
+	canvas := w.Render()
+
+	// Export
+	f, err := os.Create("/Users/dant/Downloads/image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	canvas.ExportToPNG(f)
+}
+
+func cone() {
+
+	// width, height := 100.0, 100.0
+	width, height := 200.0, 200.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(2, 10, -1), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 0, -3.25)
+	to := tracer.NewPoint(0, 1, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	// floor
+	// floor := tracer.NewPlane()
+	// floor.Material().Specular = 0
+	// floor.Material().Reflective = 0
+	// // floor.Material().Transparency = 1.0
+	// // floor.Material().RefractiveIndex = 1.5
+	// floorP := tracer.NewCheckerPattern(
+	// 	tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.Yellow))
+	// floor.Material().SetPattern(floorP)
+	// w.AddObject(floor)
+
+	c := tracer.NewClosedCone(-1, 1)
+	c.SetTransform(tracer.IdentityMatrix())
+	w.AddObject(c)
+
+	canvas := w.Render()
+
+	// Export
+	f, err := os.Create("/Users/dant/Downloads/image.png")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Exporting canvas to %v", f.Name())
+	canvas.ExportToPNG(f)
+}
 func main() {
 
 	flag.Parse()
@@ -991,7 +1112,9 @@ func main() {
 	// glass()
 	// window()
 	// pond()
-	cylinder()
+	// spherewarp()
+	// cylinder()
+	cone()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
