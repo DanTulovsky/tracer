@@ -93,7 +93,7 @@ func (v Vector) Magnitude() float64 {
 func (v Vector) Normalize() Vector {
 	magnitude := v.Magnitude()
 	if magnitude == 0 {
-		panic(fmt.Sprintf("magnitude of %v is 0!", v))
+		return NewVector(0, 0, 0)
 	}
 	m := 1 / magnitude // optimization
 	return NewVector(v.X()*m, v.Y()*m, v.Z()*m)

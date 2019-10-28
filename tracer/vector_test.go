@@ -233,26 +233,16 @@ func TestVector_Normalize(t *testing.T) {
 			v:    NewVector(1, 2, 3),
 			want: NewVector(1/math.Sqrt(14), 2/math.Sqrt(14), 3/math.Sqrt(14)),
 		},
+		// {
+		// 	name: "test3",
+		// 	v:    NewVector(0, 0, 0),
+		// 	want: NewVector(0, 0, 0),
+		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.want, tt.v.Normalize(), "should be equal")
 			assert.Equal(t, 1.0, tt.v.Normalize().Magnitude(), "should be equal")
-		})
-	}
-
-	panicTests := []struct {
-		name string
-		v    Vector
-	}{
-		{
-			name: "test1",
-			v:    NewVector(0, 0, 0),
-		},
-	}
-	for _, tt := range panicTests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Panics(t, func() { tt.v.Normalize() }, "should panic")
 		})
 	}
 }

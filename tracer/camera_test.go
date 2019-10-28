@@ -62,7 +62,8 @@ func TestViewTransform(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equals(ViewTransform(tt.args.from, tt.args.to, tt.args.up)))
+			got := ViewTransform(tt.args.from, tt.args.to, tt.args.up)
+			assert.True(t, tt.want.Equals(got))
 		})
 	}
 }

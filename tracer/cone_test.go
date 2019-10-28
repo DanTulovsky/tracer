@@ -1,0 +1,226 @@
+package tracer
+
+import (
+	"math"
+	"testing"
+
+	"github.com/DanTulovsky/tracer/constants"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestNewDefaultCone(t *testing.T) {
+	tests := []struct {
+		name string
+		want *Cone
+	}{
+		{
+			name: "test1",
+			want: &Cone{
+				Minimum: math.Inf(-1),
+				Maximum: math.Inf(1),
+				Closed:  false,
+				Shape: Shape{
+					transform: IdentityMatrix(),
+					material:  NewDefaultMaterial(),
+					shape:     "cone",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, NewDefaultCone())
+		})
+	}
+}
+
+func TestNewCone(t *testing.T) {
+	type args struct {
+		min float64
+		max float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Cone
+	}{
+		{
+			name: "test1",
+			want: &Cone{
+				Minimum: -5,
+				Maximum: 4,
+				Closed:  false,
+				Shape: Shape{
+					transform: IdentityMatrix(),
+					material:  NewDefaultMaterial(),
+					shape:     "cone",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, NewCone(-5, 4))
+		})
+	}
+}
+
+func TestNewClosedCone(t *testing.T) {
+	type args struct {
+		min float64
+		max float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Cone
+	}{
+		{
+			name: "test1",
+			want: &Cone{
+				Minimum: -5,
+				Maximum: 4,
+				Closed:  true,
+				Shape: Shape{
+					transform: IdentityMatrix(),
+					material:  NewDefaultMaterial(),
+					shape:     "cone",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, NewClosedCone(-5, 4))
+		})
+	}
+}
+
+func TestCone_IntersectWith(t *testing.T) {
+	type args struct {
+		r Ray
+	}
+	tests := []struct {
+		name   string
+		c      *Cone
+		args   args
+		wantXS int // how many intersections
+		wantT  []float64
+	}{
+		{
+			name: "test1",
+			args: args{
+				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1).Normalize()),
+			},
+			c:     NewDefaultCone(),
+			wantT: []float64{5, 5},
+		},
+		{
+			name: "test2",
+			args: args{
+				r: NewRay(NewPoint(0, 0, -5), NewVector(1, 1, 1).Normalize()),
+			},
+			c:     NewDefaultCone(),
+			wantT: []float64{8.66025, 8.66025},
+		},
+		{
+			name: "test3",
+			args: args{
+				r: NewRay(NewPoint(1, 1, -5), NewVector(-0.5, -1, 1).Normalize()),
+			},
+			c:     NewDefaultCone(),
+			wantT: []float64{4.55006, 49.44994},
+		},
+		{
+			name: "test4",
+			args: args{
+				r: NewRay(NewPoint(0, 0, -1), NewVector(0, 1, 1).Normalize()),
+			},
+			c:     NewDefaultCone(),
+			wantT: []float64{0.35355},
+		},
+		{
+			name: "end cap1",
+			args: args{
+				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 1, 0).Normalize()),
+			},
+			c:     NewClosedCone(-0.5, 0.5),
+			wantT: []float64{},
+		},
+		{
+			name: "end cap2",
+			args: args{
+				r: NewRay(NewPoint(0, 0, -0.25), NewVector(0, 1, 1).Normalize()),
+			},
+			c:     NewClosedCone(-0.5, 0.5),
+			wantT: []float64{0.707106, 0.088388},
+		},
+		{
+			name: "end cap3",
+			args: args{
+				r: NewRay(NewPoint(0, 0, -0.25), NewVector(0, 1, 0).Normalize()),
+			},
+			c:     NewClosedCone(-0.5, 0.5),
+			wantT: []float64{-0.5, -0.25, 0.25, 0.5},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			want := NewIntersections()
+
+			for _, tvalue := range tt.wantT {
+				want = append(want, NewIntersection(tt.c, tvalue))
+			}
+
+			got := tt.c.IntersectWith(tt.args.r)
+
+			assert.Equal(t, len(want), len(got), "should equal")
+
+			for i, tvalue := range tt.wantT {
+				assert.InDelta(t, tvalue, got[i].T(), constants.Epsilon, "within epsilon")
+			}
+		})
+	}
+}
+
+func TestCone_NormalAt(t *testing.T) {
+	type args struct {
+		p Point
+	}
+	tests := []struct {
+		name string
+		cone *Cone
+		args args
+		want Vector
+	}{
+		{
+			name: "test1",
+			cone: NewClosedCone(-0.5, 0.5),
+			args: args{
+				p: NewPoint(0, 0, 0),
+			},
+			want: NewVector(0, 0, 0),
+		},
+		{
+			name: "test2",
+			cone: NewClosedCone(-0.5, 0.5),
+			args: args{
+				p: NewPoint(1, 1, 1),
+			},
+			want: NewVector(1, -math.Sqrt2, 1),
+		},
+		{
+			name: "test3",
+			cone: NewClosedCone(-0.5, 0.5),
+			args: args{
+				p: NewPoint(-1, -1, 0),
+			},
+			want: NewVector(-1, 1, 0),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want.Normalize(), tt.cone.NormalAt(tt.args.p), "should equal")
+		})
+	}
+}
