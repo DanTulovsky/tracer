@@ -964,7 +964,7 @@ func cone() {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(2, 10, -1), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(2, 10, -1), tracer.NewColor(1, 1, 1)),
 		tracer.NewPointLight(tracer.NewPoint(-9, 1, 10), tracer.NewColor(1, 1, 1)),
 	})
 
@@ -983,7 +983,7 @@ func cone() {
 	// floor
 	floor := tracer.NewPlane()
 	floor.Material().Specular = 0
-	floor.Material().Reflective = 0
+	floor.Material().Reflective = 0.5
 	// floor.Material().Transparency = 1.0
 	// floor.Material().RefractiveIndex = 1.5
 	floorP := tracer.NewCheckerPattern(
@@ -994,7 +994,7 @@ func cone() {
 	// mirror
 	mirror := tracer.NewPlane()
 	mirror.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateY(math.Pi/4).Translate(0, 0, 4))
-	mirror.Material().Reflective = 1
+	mirror.Material().Reflective = 0.8
 	mirror.Material().Diffuse = 0.01
 	mirror.Material().Specular = 1
 	mirror.Material().Ambient = 0.01
@@ -1016,6 +1016,12 @@ func cone() {
 	sp.SetTransform(tracer.IdentityMatrix().Scale(0.3, 0.3, 0.3).RotateZ(math.Pi / 2))
 	spp := tracer.NewPertrubedPattern(sp, 0.4)
 	s.Material().SetPattern(spp)
+	s.Material().Transparency = 1
+	s.Material().Ambient = 0.1
+	s.Material().Diffuse = 0.1
+	s.Material().ShadowCaster = false
+	s.Material().RefractiveIndex = 1.53
+	s.Material().Reflective = 1
 	w.AddObject(s)
 
 	render(w)
