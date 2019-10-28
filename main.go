@@ -1050,25 +1050,30 @@ func cone() {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 0, -3.25)
+	from := tracer.NewPoint(0, 4.5, -4)
 	to := tracer.NewPoint(0, 1, 0)
 	up := tracer.NewVector(0, 1, 0)
+	fov := math.Pi / 3.5
+
+	camera := tracer.NewCamera(width, height, fov)
 	cameraTransform := tracer.ViewTransform(from, to, up)
-	w.Camera().SetTransform(cameraTransform)
+	camera.SetTransform(cameraTransform)
+
+	w.SetCamera(camera)
 
 	// floor
-	// floor := tracer.NewPlane()
-	// floor.Material().Specular = 0
-	// floor.Material().Reflective = 0
-	// // floor.Material().Transparency = 1.0
-	// // floor.Material().RefractiveIndex = 1.5
-	// floorP := tracer.NewCheckerPattern(
-	// 	tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.Yellow))
-	// floor.Material().SetPattern(floorP)
-	// w.AddObject(floor)
+	floor := tracer.NewPlane()
+	floor.Material().Specular = 0
+	floor.Material().Reflective = 0
+	// floor.Material().Transparency = 1.0
+	// floor.Material().RefractiveIndex = 1.5
+	floorP := tracer.NewCheckerPattern(
+		tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.Yellow))
+	floor.Material().SetPattern(floorP)
+	w.AddObject(floor)
 
 	c := tracer.NewClosedCone(-1, 1)
-	c.SetTransform(tracer.IdentityMatrix())
+	c.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 0))
 	w.AddObject(c)
 
 	canvas := w.Render()

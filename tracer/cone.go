@@ -67,14 +67,14 @@ func (c *Cone) intersectCaps(r Ray) Intersections {
 	}
 
 	// check for an intersection with the lower end cap by intersecting the ray
-	// with the plan a y=c.min
+	// with the plane at y=c.min
 	t := (c.Minimum - r.Origin.Y()) / r.Dir.Y()
 	if c.checkCap(r, t, math.Abs(c.Minimum)) {
 		xs = append(xs, NewIntersection(c, t))
 	}
 
 	// check for an intersection with the upper end cap by intersecting the ray
-	// with the plan a y=c.max
+	// with the plane at y=c.max
 	t = (c.Maximum - r.Origin.Y()) / r.Dir.Y()
 	if c.checkCap(r, t, math.Abs(c.Maximum)) {
 		xs = append(xs, NewIntersection(c, t))
