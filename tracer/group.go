@@ -9,7 +9,8 @@ import (
 
 // Group is a collection of other groups/objects
 type Group struct {
-	members []Shaper
+	members     []Shaper
+	boundsCache *Bound // cache the group bounding box
 	Shape
 }
 
@@ -175,6 +176,11 @@ func (g *Group) boundBoxFromBoundingBoxes(boxes []Bound) Bound {
 // Bounds returns the untransformed bounding box
 func (g *Group) Bounds() Bound {
 
+	// TODO: Check that this works
+	if g.boundsCache != nil {
+		return *g.boundsCache
+	}
+
 	// combine bounding boxes for all sub-objects into one
 
 	// convert all member bounding boxes into group space
@@ -198,6 +204,8 @@ func (g *Group) Bounds() Bound {
 	}
 
 	// not combine all bounding boxes into one
-	return g.boundBoxFromBoundingBoxes(all)
+	gbb := g.boundBoxFromBoundingBoxes(all)
+	g.boundsCache = &gbb // cache
+	return gbb
 
 }
