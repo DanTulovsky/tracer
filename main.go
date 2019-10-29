@@ -1028,6 +1028,90 @@ func cone() {
 	render(w)
 }
 
+func group() {
+
+	// width, height := 100.0, 100.0
+	width, height := 400.0, 400.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(3, 20, -10), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 11, -10)
+	to := tracer.NewPoint(0, 3, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	g := tracer.NewGroup()
+
+	// floor
+	floor := tracer.NewPlane()
+	floor.Material().Specular = 0
+	floor.Material().Reflective = 0
+	// floor.Material().Transparency = 1.0
+	// floor.Material().RefractiveIndex = 1.5
+	floorP := tracer.NewCheckerPattern(
+		tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.Yellow))
+	floor.Material().SetPattern(floorP)
+	g.AddMember(floor)
+
+	// closed
+	c := tracer.NewClosedCylinder(0, 8)
+	c.Material().Color = tracer.ColorName(colornames.Lightgreen)
+	c.SetTransform(tracer.IdentityMatrix().Translate(0, 0, 0))
+	g.AddMember(c)
+
+	// open
+	c2 := tracer.NewCylinder(0, 8)
+	c2.Material().Color = tracer.ColorName(colornames.Lightblue)
+	c2.SetTransform(tracer.IdentityMatrix().Translate(-3, 0, 0))
+	g.AddMember(c2)
+
+	// infinite
+	c3 := tracer.NewDefaultCylinder()
+	c3.Material().Color = tracer.ColorName(colornames.Lightcoral)
+	c3.SetTransform(tracer.IdentityMatrix().Translate(3, 0, 0))
+	g.AddMember(c3)
+
+	// flipped & glass
+	c4 := tracer.NewClosedCylinder(-4, 4)
+	c4.SetTransform(
+		tracer.IdentityMatrix().RotateZ(math.Pi/3).RotateY(-math.Pi/4).Translate(0, 5.7, -4))
+	c4.Material().Color = tracer.ColorName(colornames.Darkolivegreen)
+	c4.Material().Transparency = 0.8
+	c4.Material().Reflective = 0.5
+	c4.Material().RefractiveIndex = 1.75
+	c4.Material().Ambient = 0.1
+	c4.Material().Diffuse = 0.1
+	c4.Material().ShadowCaster = false
+	g.AddMember(c4)
+
+	// flipped & glass sphere
+	// s := tracer.NewUnitSphere()
+	// s.SetTransform(tracer.IdentityMatrix().Scale(2, 2, 2).Translate(0, 5.7, -4))
+	// s.Material().Color = tracer.ColorName(colornames.Darkolivegreen)
+	// s.Material().Transparency = 0.8
+	// s.Material().Reflective = 0.5
+	// s.Material().RefractiveIndex = 1.7 // force fish-eye affect
+	// s.Material().Ambient = 0.1
+	// s.Material().Diffuse = 0.1
+	// s.Material().ShadowCaster = false
+	// g.AddMember(s)
+
+	g.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi / 2))
+	w.AddObject(g)
+
+	render(w)
+}
 func render(w *tracer.World) {
 	canvas := w.Render()
 
@@ -1039,20 +1123,6 @@ func render(w *tracer.World) {
 
 	log.Printf("Exporting canvas to %v", f.Name())
 	canvas.ExportToPNG(f)
-}
-
-func point() {
-	m := tracer.IdentityMatrix()
-	p := tracer.NewPoint(math.Inf(-1), 3, math.Inf(1))
-
-	log.Println(m)
-	log.Println(p)
-	log.Println(p.Z())
-	log.Println(m[0][2])
-	log.Println(m[0][2] * p.Z())
-	log.Println(p.TimesMatrix(m))
-	log.Println(math.Inf(1) * 0)
-
 }
 
 func main() {
@@ -1088,7 +1158,8 @@ func main() {
 	// spherewarp()
 	// cylinder()
 	// cone()
-	point()
+	// point()
+	group()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
