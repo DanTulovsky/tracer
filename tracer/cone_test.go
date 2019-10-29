@@ -16,8 +16,8 @@ func TestNewDefaultCone(t *testing.T) {
 		{
 			name: "test1",
 			want: &Cone{
-				Minimum: math.Inf(-1),
-				Maximum: math.Inf(1),
+				Minimum: -math.MaxFloat64,
+				Maximum: math.MaxFloat64,
 				Closed:  false,
 				Shape: Shape{
 					transform: IdentityMatrix(),
@@ -235,8 +235,8 @@ func TestCone_Bounds(t *testing.T) {
 			name: "default inf",
 			c:    NewDefaultCone(),
 			want: Bound{
-				Min: NewPoint(math.Inf(-1), math.Inf(-1), math.Inf(-1)),
-				Max: NewPoint(math.Inf(1), math.Inf(1), math.Inf(1)),
+				Min: NewPoint(-math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64),
+				Max: NewPoint(math.MaxFloat64, math.MaxFloat64, math.MaxFloat64),
 			},
 		},
 		{

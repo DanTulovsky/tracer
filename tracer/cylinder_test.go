@@ -17,8 +17,8 @@ func TestNewDefaultCylinder(t *testing.T) {
 			name: "test1",
 			want: &Cylinder{
 				Radius:  1.0,
-				Minimum: math.Inf(-1),
-				Maximum: math.Inf(1),
+				Minimum: -math.MaxFloat64,
+				Maximum: math.MaxFloat64,
 				Closed:  false,
 				Shape: Shape{
 					transform: IdentityMatrix(),
@@ -433,8 +433,8 @@ func TestCylinder_Bounds(t *testing.T) {
 			name: "default inf",
 			c:    NewDefaultCylinder(),
 			want: Bound{
-				Min: NewPoint(-1, math.Inf(-1), -1),
-				Max: NewPoint(1, math.Inf(1), 1),
+				Min: NewPoint(-1, -math.MaxFloat64, -1),
+				Max: NewPoint(1, math.MaxFloat64, 1),
 			},
 		},
 		{

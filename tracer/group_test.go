@@ -132,7 +132,7 @@ func TestGroup_IntersectWith(t *testing.T) {
 	type args struct {
 		r Ray
 	}
-	type members struct {
+	type member struct {
 		s Shaper
 		t Matrix
 	}
@@ -140,7 +140,7 @@ func TestGroup_IntersectWith(t *testing.T) {
 	tests := []struct {
 		name        string
 		group       *Group
-		members     []members
+		members     []member
 		args        args
 		transform   Matrix
 		wantXS      int
@@ -149,7 +149,7 @@ func TestGroup_IntersectWith(t *testing.T) {
 		{
 			name:      "empty group",
 			group:     NewGroup(),
-			members:   []members{},
+			members:   []member{},
 			transform: IdentityMatrix(),
 			args: args{
 				r: NewRay(Origin(), NewVector(0, 0, 1)),
@@ -159,7 +159,7 @@ func TestGroup_IntersectWith(t *testing.T) {
 		{
 			name:  "spheres",
 			group: NewGroup(),
-			members: []members{
+			members: []member{
 				{s: NewUnitSphere(), t: IdentityMatrix()},
 				{s: NewUnitSphere(), t: IdentityMatrix().Translate(0, 0, -3)},
 				{s: NewUnitSphere(), t: IdentityMatrix().Translate(5, 0, 0)},
@@ -174,7 +174,7 @@ func TestGroup_IntersectWith(t *testing.T) {
 		{
 			name:  "group and object transform",
 			group: NewGroup(),
-			members: []members{
+			members: []member{
 				{s: NewUnitSphere(), t: IdentityMatrix().Translate(5, 0, 0)},
 			},
 			transform: IdentityMatrix().Scale(2, 2, 2),
@@ -223,7 +223,379 @@ func TestGroup_NormalAt(t *testing.T) {
 	want := NewVector(0.285703, 0.428543, -0.8571605)
 	got := s.NormalAt(point)
 
-	// assert.Equal(t, want, got, "should be true")
 	assert.True(t, want.Equals(got), "should be true")
 
+}
+
+func TestGroup_Bounds(t *testing.T) {
+	type member struct {
+		s Shaper
+		t Matrix
+	}
+	tests := []struct {
+		name      string
+		group     *Group
+		members   []member
+		transform Matrix
+		want      Bound
+	}{
+		{
+			name:      "test1",
+			group:     NewGroup(),
+			members:   []member{},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(0, 0, 0),
+				Max: NewPoint(0, 0, 0),
+			},
+		},
+		{
+			name:  "single cube",
+			group: NewGroup(),
+			members: []member{
+				{s: NewUnitCube(), t: IdentityMatrix()},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-1, -1, -1),
+				Max: NewPoint(1, 1, 1),
+			},
+		},
+		{
+			name:  "single cube moved",
+			group: NewGroup(),
+			members: []member{
+				{s: NewUnitCube(), t: IdentityMatrix().Translate(1, 0, 0)},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(0, -1, -1),
+				Max: NewPoint(2, 1, 1),
+			},
+		},
+		{
+			name:  "double cube moved",
+			group: NewGroup(),
+			members: []member{
+				{s: NewUnitCube(), t: IdentityMatrix().Translate(1, 0, 0)},
+				{s: NewUnitCube(), t: IdentityMatrix().Translate(-1, 0, 0)},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-2, -1, -1),
+				Max: NewPoint(2, 1, 1),
+			},
+		},
+		{
+			name:  "single cube moved and scaled",
+			group: NewGroup(),
+			members: []member{
+				{s: NewUnitCube(), t: IdentityMatrix().Scale(2, 2, 2).Translate(1, 1, 1)},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-1, -1, -1),
+				Max: NewPoint(3, 3, 3),
+			},
+		},
+		{
+			name:  "cube and sphere",
+			group: NewGroup(),
+			members: []member{
+				{s: NewUnitCube(), t: IdentityMatrix().Scale(2, 2, 2).Translate(1, 1, 1)},
+				{s: NewUnitSphere(), t: IdentityMatrix().Scale(2, 2, 2).Translate(-1, -1, -1)},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-3, -3, -3),
+				Max: NewPoint(3, 3, 3),
+			},
+		},
+		{
+			name:  "plane",
+			group: NewGroup(),
+			members: []member{
+				{s: NewPlane(), t: IdentityMatrix()},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-math.MaxFloat64, -0.001, -math.MaxFloat64),
+				Max: NewPoint(math.MaxFloat64, 0.001, math.MaxFloat64),
+			},
+		},
+		{
+			name:  "cube , sphere, plane",
+			group: NewGroup(),
+			members: []member{
+				{s: NewUnitCube(), t: IdentityMatrix().Scale(2, 2, 2).Translate(1, 1, 1)},
+				{s: NewUnitSphere(), t: IdentityMatrix().Scale(2, 2, 2).Translate(-1, -1, -1)},
+				{s: NewPlane(), t: IdentityMatrix()},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-math.MaxFloat64, -3, -math.MaxFloat64),
+				Max: NewPoint(math.MaxFloat64, 3, math.MaxFloat64),
+			},
+		},
+		{
+			name:  "cube , sphere, plane, cone",
+			group: NewGroup(),
+			members: []member{
+				{s: NewUnitCube(), t: IdentityMatrix().Scale(2, 2, 2).Translate(1, 1, 1)},
+				{s: NewUnitSphere(), t: IdentityMatrix().Scale(2, 2, 2).Translate(-1, -1, -1)},
+				{s: NewPlane(), t: IdentityMatrix()},
+				{s: NewDefaultCone(), t: IdentityMatrix()},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64),
+				Max: NewPoint(math.MaxFloat64, math.MaxFloat64, math.MaxFloat64),
+			},
+		},
+		{
+			name:  "cylinder",
+			group: NewGroup(),
+			members: []member{
+				{s: NewDefaultCylinder(), t: IdentityMatrix()},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-1, -math.MaxFloat64, -1),
+				Max: NewPoint(1, math.MaxFloat64, 1),
+			},
+		},
+		{
+			name:  "capped cylinder",
+			group: NewGroup(),
+			members: []member{
+				{s: NewClosedCylinder(5, 10), t: IdentityMatrix()},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-1, 5, -1),
+				Max: NewPoint(1, 10, 1),
+			},
+		},
+		{
+			name:  "capped cylinder + cone",
+			group: NewGroup(),
+			members: []member{
+				{s: NewClosedCylinder(5, 10), t: IdentityMatrix()},
+				{s: NewClosedCone(-5, 2), t: IdentityMatrix()},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-5, -5, -5),
+				Max: NewPoint(5, 10, 5),
+			},
+		},
+		{
+			name:  "cone",
+			group: NewGroup(),
+			members: []member{
+				{s: NewClosedCone(-5, 2), t: IdentityMatrix()},
+			},
+			transform: IdentityMatrix(),
+			want: Bound{
+				Min: NewPoint(-5, -5, -5),
+				Max: NewPoint(5, 2, 5),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.group.SetTransform(tt.transform)
+
+			// populate members
+			for _, m := range tt.members {
+				shape := m.s
+				shape.SetTransform(m.t)
+				tt.group.AddMember(shape)
+			}
+
+			got := tt.group.Bounds()
+			assert.Equal(t, tt.want, got, "should equal")
+		})
+	}
+}
+
+func TestGroup_boundingBoxFromPoints(t *testing.T) {
+	type args struct {
+		points []Point
+	}
+	tests := []struct {
+		name string
+		g    *Group
+		args args
+		want Bound
+	}{
+		{
+			name: "test1",
+			g:    NewGroup(), // unused
+			args: args{
+				points: []Point{
+					NewPoint(-1, -1, -1),
+					NewPoint(1, 1, 1),
+				},
+			},
+			want: Bound{
+				Min: NewPoint(-1, -1, -1),
+				Max: NewPoint(1, 1, 1),
+			},
+		},
+		{
+			name: "test2",
+			g:    NewGroup(), // unused
+			args: args{
+				points: []Point{
+					NewPoint(-1, -1, -1),
+					NewPoint(1, 1, 1),
+					NewPoint(2, 2, 2),
+				},
+			},
+			want: Bound{
+				Min: NewPoint(-1, -1, -1),
+				Max: NewPoint(2, 2, 2),
+			},
+		},
+		{
+			name: "test3",
+			g:    NewGroup(), // unused
+			args: args{
+				points: []Point{
+					NewPoint(-1, -1, -1),
+					NewPoint(1, 1, 1),
+					NewPoint(2, 2, 2),
+					NewPoint(-2, 2, 14),
+				},
+			},
+			want: Bound{
+				Min: NewPoint(-2, -1, -1),
+				Max: NewPoint(2, 2, 14),
+			},
+		},
+		{
+			name: "test4",
+			g:    NewGroup(), // unused
+			args: args{
+				points: []Point{
+					NewPoint(-1, -4, -7),
+					NewPoint(2, 6, 9),
+					NewPoint(3, 0, 2),
+					NewPoint(-2, 2, 14),
+				},
+			},
+			want: Bound{
+				Min: NewPoint(-2, -4, -7),
+				Max: NewPoint(3, 6, 14),
+			},
+		},
+		{
+			name: "inf test1",
+			g:    NewGroup(), // unused
+			args: args{
+				points: []Point{
+					NewPoint(-1, -4, -7),
+					NewPoint(2, 6, 9),
+					NewPoint(3, 0, 2),
+					NewPoint(-2, 2, 14),
+					NewPoint(math.Inf(-1), 3, math.Inf(1)),
+				},
+			},
+			want: Bound{
+				Min: NewPoint(math.Inf(-1), -4, -7),
+				Max: NewPoint(3, 6, math.Inf(1)),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.g.boundingBoxFromPoints(tt.args.points...))
+		})
+	}
+}
+
+func TestGroup_boundBoxFromBoundingBoxes(t *testing.T) {
+	type args struct {
+		boxes []Bound
+	}
+	tests := []struct {
+		name string
+		g    *Group // not used
+		args args
+		want Bound
+	}{
+		{
+			name: "zero test",
+			g:    NewGroup(),
+			args: args{
+				boxes: []Bound{},
+			},
+			want: Bound{
+				Min: Origin(),
+				Max: Origin(),
+			},
+		},
+		{
+			name: "test1",
+			g:    NewGroup(),
+			args: args{
+				boxes: []Bound{
+					Bound{Min: NewPoint(-1, -1, -1), Max: NewPoint(1, 1, 1)},
+				},
+			},
+			want: Bound{
+				Min: NewPoint(-1, -1, -1),
+				Max: NewPoint(1, 1, 1),
+			},
+		},
+		{
+			name: "test2",
+			g:    NewGroup(),
+			args: args{
+				boxes: []Bound{
+					Bound{Min: NewPoint(-1, -2, -3), Max: NewPoint(4, 5, 6)},
+				},
+			},
+			want: Bound{
+				Min: NewPoint(-1, -2, -3),
+				Max: NewPoint(4, 5, 6),
+			},
+		},
+		{
+			name: "test3",
+			g:    NewGroup(),
+			args: args{
+				boxes: []Bound{
+					Bound{Min: NewPoint(-1, -2, -3), Max: NewPoint(4, 5, 6)},
+					Bound{Min: NewPoint(-10, -2, -3), Max: NewPoint(43, 50, 6)},
+				},
+			},
+			want: Bound{
+				Min: NewPoint(-10, -2, -3),
+				Max: NewPoint(43, 50, 6),
+			},
+		},
+		{
+			name: "test4",
+			g:    NewGroup(),
+			args: args{
+				boxes: []Bound{
+					Bound{Min: NewPoint(-1, -2, -3), Max: NewPoint(4, 5, 6)},
+					Bound{Min: NewPoint(-10, -2, -3), Max: NewPoint(43, 50, 6)},
+					Bound{Min: NewPoint(-10, math.Inf(-1), -3), Max: NewPoint(43, math.Inf(1), 6)},
+				},
+			},
+			want: Bound{
+				Min: NewPoint(-10, math.Inf(-1), -3),
+				Max: NewPoint(43, math.Inf(1), 6),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.g.boundBoxFromBoundingBoxes(tt.args.boxes)
+			assert.Equal(t, tt.want, got, "should equal")
+		})
+	}
 }

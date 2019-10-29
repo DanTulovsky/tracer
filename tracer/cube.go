@@ -36,8 +36,8 @@ func (c *Cube) checkAxis(o, d float64) (float64, float64) {
 		tmin = tminNumerator / d
 		tmax = tmaxNumerator / d
 	} else {
-		tmin = tminNumerator * math.Inf(1)
-		tmax = tmaxNumerator * math.Inf(1)
+		tmin = tminNumerator * math.MaxFloat64
+		tmax = tmaxNumerator * math.MaxFloat64
 	}
 
 	if tmin > tmax {
