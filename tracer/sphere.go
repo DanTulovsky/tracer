@@ -76,13 +76,14 @@ func (s *Sphere) IntersectWith(r Ray) Intersections {
 func (s *Sphere) NormalAt(p Point) Vector {
 
 	// move point to object space
-	op := p.TimesMatrix(s.Transform().Inverse())
+	op := p.ToObjectSpace(s)
 
 	// object normal, this is different for each shape
 	on := op.SubPoint(Origin())
 
 	// world normal
-	wn := on.TimesMatrix(s.Transform().Submatrix(3, 3).Inverse().Transpose())
+	wn := on.NormalToWorldSpace(s)
 
 	return wn.Normalize()
+
 }

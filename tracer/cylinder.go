@@ -138,7 +138,7 @@ func (c *Cylinder) IntersectWith(r Ray) Intersections {
 // NormalAt returns the normal vector at the given point on the surface of the cylinder
 func (c *Cylinder) NormalAt(p Point) Vector {
 	// move point to object space
-	op := p.TimesMatrix(c.Transform().Inverse())
+	op := p.ToObjectSpace(c)
 
 	// object normal, this is different for each shape
 	var on Vector
@@ -156,7 +156,7 @@ func (c *Cylinder) NormalAt(p Point) Vector {
 	}
 
 	// world normal
-	wn := on.TimesMatrix(c.Transform().Submatrix(3, 3).Inverse().Transpose())
+	wn := on.NormalToWorldSpace(c)
 
 	return wn.Normalize()
 }

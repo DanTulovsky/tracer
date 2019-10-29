@@ -220,7 +220,7 @@ func TestCone_NormalAt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want.Normalize(), tt.cone.NormalAt(tt.args.p), "should equal")
+			assert.True(t, tt.want.Normalize().Equals(tt.cone.NormalAt(tt.args.p)), "should equal")
 		})
 	}
 }

@@ -107,3 +107,48 @@ func TestShape_SetTransform(t *testing.T) {
 		})
 	}
 }
+
+func TestShape_Parent(t *testing.T) {
+	tests := []struct {
+		name  string
+		shape *Shape
+		want  *Group
+	}{
+		{
+			name:  "default group is nil",
+			shape: &Shape{},
+			want:  nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.shape.Parent(), "should equal")
+		})
+	}
+}
+
+func TestShape_HasParent(t *testing.T) {
+	tests := []struct {
+		name  string
+		shape *Shape
+		want  bool
+	}{
+		{
+			name:  "default group is nil",
+			shape: &Shape{},
+			want:  false,
+		},
+		{
+			name: "has parent",
+			shape: &Shape{
+				parent: NewGroup(),
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.shape.HasParent(), "should equal")
+		})
+	}
+}

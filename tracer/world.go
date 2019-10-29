@@ -209,6 +209,7 @@ func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 }
 
 // IsShadowed returns true if p is in a shadow from the given light
+// TODO: Change this to be a range rather than a bool
 func (w *World) IsShadowed(p Point, l Light) bool {
 
 	v := l.Position().SubPoint(p)
