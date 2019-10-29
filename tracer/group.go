@@ -176,7 +176,7 @@ func (g *Group) boundBoxFromBoundingBoxes(boxes []Bound) Bound {
 // Bounds returns the untransformed bounding box
 func (g *Group) Bounds() Bound {
 
-	// TODO: Check that this works
+	// TODO: Not thread safe, redo as Precompute stage before doing a render
 	if g.boundsCache != nil {
 		return *g.boundsCache
 	}
