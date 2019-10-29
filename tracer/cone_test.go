@@ -224,3 +224,33 @@ func TestCone_NormalAt(t *testing.T) {
 		})
 	}
 }
+
+func TestCone_Bounds(t *testing.T) {
+	tests := []struct {
+		name string
+		c    *Cone
+		want Bound
+	}{
+		{
+			name: "default inf",
+			c:    NewDefaultCone(),
+			want: Bound{
+				Min: NewPoint(math.Inf(-1), math.Inf(-1), math.Inf(-1)),
+				Max: NewPoint(math.Inf(1), math.Inf(1), math.Inf(1)),
+			},
+		},
+		{
+			name: "capped",
+			c:    NewCone(-5, 5),
+			want: Bound{
+				Min: NewPoint(-5, -5, -5),
+				Max: NewPoint(5, 5, 5),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.c.Bounds(), "should equal")
+		})
+	}
+}

@@ -63,3 +63,11 @@ func (g *Group) IntersectWith(r Ray) Intersections {
 func (g *Group) NormalAt(p Point) Vector {
 	panic("called NormalAt on a group")
 }
+
+// Bounds returns the untransformed bounding box
+func (g *Group) Bounds() Bound {
+	return Bound{
+		Min: NewPoint(-1, -1, -1),
+		Max: NewPoint(1, 1, 1),
+	}
+}

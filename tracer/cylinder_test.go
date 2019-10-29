@@ -422,3 +422,33 @@ func TestNewClosedCylinder(t *testing.T) {
 		})
 	}
 }
+
+func TestCylinder_Bounds(t *testing.T) {
+	tests := []struct {
+		name string
+		c    *Cylinder
+		want Bound
+	}{
+		{
+			name: "default inf",
+			c:    NewDefaultCylinder(),
+			want: Bound{
+				Min: NewPoint(-1, math.Inf(-1), -1),
+				Max: NewPoint(1, math.Inf(1), 1),
+			},
+		},
+		{
+			name: "capped",
+			c:    NewCylinder(-5, 5),
+			want: Bound{
+				Min: NewPoint(-1, -5, -1),
+				Max: NewPoint(1, 5, 1),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.c.Bounds(), "should equal")
+		})
+	}
+}

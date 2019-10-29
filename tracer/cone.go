@@ -171,3 +171,11 @@ func (c *Cone) NormalAt(p Point) Vector {
 
 	return wn.Normalize()
 }
+
+// Bounds returns the untransformed bounding box
+func (c *Cone) Bounds() Bound {
+	return Bound{
+		Min: NewPoint(c.Minimum, c.Minimum, c.Minimum),
+		Max: NewPoint(c.Maximum, c.Maximum, c.Maximum),
+	}
+}
