@@ -31,7 +31,7 @@ func (pl *Plane) NormalAt(p Point) Vector {
 
 	// common calculation to all shapes
 	// world normal
-	wn := on.TimesMatrix(pl.Transform().Submatrix(3, 3).Inverse().Transpose())
+	wn := on.NormalToWorldSpace(pl)
 
 	return wn.Normalize()
 }

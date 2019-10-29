@@ -395,3 +395,23 @@ func TestVector_Reflect(t *testing.T) {
 		})
 	}
 }
+
+func TestVector_NormalToWorldSpace(t *testing.T) {
+	g1 := NewGroup()
+	g1.SetTransform(IdentityMatrix().RotateY(math.Pi / 2))
+
+	g2 := NewGroup()
+	g2.SetTransform(IdentityMatrix().Scale(1, 2, 3))
+
+	g1.AddMember(g2)
+
+	s := NewUnitSphere()
+	s.SetTransform(IdentityMatrix().Translate(5, 0, 0))
+	g2.AddMember(s)
+
+	vector := NewVector(math.Sqrt(3)/3, math.Sqrt(3)/3, math.Sqrt(3)/3)
+	want := NewVector(0.285714, 0.428571, -0.857142)
+	got := vector.NormalToWorldSpace(s)
+
+	assert.True(t, want.Equals(got), "should equal")
+}

@@ -154,3 +154,16 @@ func (v Vector) Equals(s Vector) bool {
 func (v Vector) Reflect(n Vector) Vector {
 	return v.SubVector(n.Scale(2).Scale(v.Dot(n)))
 }
+
+// NormalToWorldSpace converts the given vector from object space to world space
+func (v Vector) NormalToWorldSpace(s Shaper) Vector {
+	n := v.TimesMatrix(s.Transform().Inverse().Transpose())
+	n.SetW(0)
+	n = n.Normalize()
+
+	if s.HasParent() {
+		n = n.NormalToWorldSpace(s.Parent())
+	}
+
+	return n
+}

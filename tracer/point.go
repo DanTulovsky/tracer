@@ -86,3 +86,14 @@ func (p Point) Equals(s Point) bool {
 	}
 	return false
 }
+
+// ToObjectSpace converts the given point from world space to object space
+func (p Point) ToObjectSpace(s Shaper) Point {
+	res := p
+
+	if s.HasParent() {
+		res = p.ToObjectSpace(s.Parent())
+	}
+
+	return res.TimesMatrix(s.Transform().Inverse())
+}

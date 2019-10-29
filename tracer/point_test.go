@@ -360,3 +360,23 @@ func TestPoint_Scale(t *testing.T) {
 		})
 	}
 }
+
+func TestPoint_ToObjectSpace(t *testing.T) {
+	g1 := NewGroup()
+	g1.SetTransform(IdentityMatrix().RotateY(math.Pi / 2))
+
+	g2 := NewGroup()
+	g2.SetTransform(IdentityMatrix().Scale(2, 2, 2))
+
+	g1.AddMember(g2)
+
+	s := NewUnitSphere()
+	s.SetTransform(IdentityMatrix().Translate(5, 0, 0))
+	g2.AddMember(s)
+
+	point := NewPoint(-2, 0, -10)
+	want := NewPoint(0, 0, -1)
+	got := point.ToObjectSpace(s)
+
+	assert.True(t, want.Equals(got), "should equal")
+}

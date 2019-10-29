@@ -92,10 +92,11 @@ func (c *Cone) IntersectWith(r Ray) Intersections {
 	// by the inverse, which achieves the same thing
 	r = r.Transform(c.transform.Inverse())
 
+	// cylinder custom
+
 	// check for intersections with the caps
 	t = append(t, c.intersectCaps(r)...)
 
-	// cylinder custom
 	a := math.Pow(r.Dir.X(), 2) - math.Pow(r.Dir.Y(), 2) + math.Pow(r.Dir.Z(), 2)
 	b := 2*r.Origin.X()*r.Dir.X() - 2*r.Origin.Y()*r.Dir.Y() + 2*r.Origin.Z()*r.Dir.Z()
 	cc := math.Pow(r.Origin.X(), 2) - math.Pow(r.Origin.Y(), 2) + math.Pow(r.Origin.Z(), 2)
@@ -144,7 +145,7 @@ func (c *Cone) IntersectWith(r Ray) Intersections {
 // NormalAt returns the normal vector at the given point on the surface of the cone
 func (c *Cone) NormalAt(p Point) Vector {
 	// move point to object space
-	op := p.TimesMatrix(c.Transform().Inverse())
+	op := p.ToObjectSpace(c)
 
 	// object normal, this is different for each shape
 	var on Vector
@@ -166,7 +167,7 @@ func (c *Cone) NormalAt(p Point) Vector {
 	}
 
 	// world normal
-	wn := on.TimesMatrix(c.Transform().Submatrix(3, 3).Inverse().Transpose())
+	wn := on.NormalToWorldSpace(c)
 
 	return wn.Normalize()
 }

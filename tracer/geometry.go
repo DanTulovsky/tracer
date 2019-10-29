@@ -2,6 +2,10 @@ package tracer
 
 // Shaper represents an physical object
 type Shaper interface {
+	Parent() *Group
+	HasParent() bool
+	SetParent(*Group)
+
 	IntersectWith(Ray) Intersections
 
 	NormalAt(Point) Vector
@@ -22,6 +26,24 @@ type Shape struct {
 	shape     string
 	transform Matrix
 	material  *Material
+
+	// TODO: Consider if non-group shapes can be parents as well
+	parent *Group
+}
+
+// Parent returns the parent group this shape is part of
+func (s *Shape) Parent() *Group {
+	return s.parent
+}
+
+// HasParent returns True if this shape has a parent
+func (s *Shape) HasParent() bool {
+	return s.parent != nil
+}
+
+// SetParent sets the parents of the object
+func (s *Shape) SetParent(p *Group) {
+	s.parent = p
 }
 
 // IntersectWith implements Shaper interface
