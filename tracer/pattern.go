@@ -39,7 +39,7 @@ func (bp *basePattern) ColorAtObject(o Shaper, p Point) Color {
 
 // objectSpacePoint returns the world point as object point
 func (bp *basePattern) objectSpacePoint(o Shaper, p Point) Point {
-	op := p.TimesMatrix(o.Transform().Inverse())
+	op := p.ToObjectSpace(o)
 	return op.TimesMatrix(bp.Transform().Inverse())
 }
 
