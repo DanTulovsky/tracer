@@ -160,3 +160,11 @@ func (c *Cylinder) NormalAt(p Point) Vector {
 
 	return wn.Normalize()
 }
+
+// Bounds returns the untransformed bounding box
+func (c *Cylinder) Bounds() Bound {
+	return Bound{
+		Min: NewPoint(-1, c.Minimum, -1),
+		Max: NewPoint(1, c.Maximum, 1),
+	}
+}

@@ -102,3 +102,11 @@ func (c *Cube) NormalAt(p Point) Vector {
 
 	return wn.Normalize()
 }
+
+// Bounds returns the untransformed bounding box
+func (c *Cube) Bounds() Bound {
+	return Bound{
+		Min: NewPoint(-1, -1, -1),
+		Max: NewPoint(1, 1, 1),
+	}
+}
