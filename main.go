@@ -1041,6 +1041,20 @@ func render(w *tracer.World) {
 	canvas.ExportToPNG(f)
 }
 
+func point() {
+	m := tracer.IdentityMatrix()
+	p := tracer.NewPoint(math.Inf(-1), 3, math.Inf(1))
+
+	log.Println(m)
+	log.Println(p)
+	log.Println(p.Z())
+	log.Println(m[0][2])
+	log.Println(m[0][2] * p.Z())
+	log.Println(p.TimesMatrix(m))
+	log.Println(math.Inf(1) * 0)
+
+}
+
 func main() {
 
 	flag.Parse()
@@ -1073,7 +1087,8 @@ func main() {
 	// pond()
 	// spherewarp()
 	// cylinder()
-	cone()
+	// cone()
+	point()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

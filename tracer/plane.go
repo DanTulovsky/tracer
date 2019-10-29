@@ -58,7 +58,7 @@ func (pl *Plane) IntersectWith(r Ray) Intersections {
 // Bounds returns the untransformed bounding box
 func (pl *Plane) Bounds() Bound {
 	return Bound{
-		Min: NewPoint(math.Inf(-1), math.Inf(-1), -0.001),
-		Max: NewPoint(math.Inf(1), math.Inf(1), 0.001),
+		Min: NewPoint(-math.MaxFloat64, -0.001, -math.MaxFloat64),
+		Max: NewPoint(math.MaxFloat64, 0.001, math.MaxFloat64),
 	}
 }

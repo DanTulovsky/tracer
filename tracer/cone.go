@@ -19,8 +19,8 @@ type Cone struct {
 // NewDefaultCone returns a new default cone
 func NewDefaultCone() *Cone {
 	return &Cone{
-		Minimum: math.Inf(-1),
-		Maximum: math.Inf(1),
+		Minimum: -math.MaxFloat64,
+		Maximum: math.MaxFloat64,
 		Closed:  false,
 		Shape: Shape{
 			transform: IdentityMatrix(),
@@ -174,8 +174,10 @@ func (c *Cone) NormalAt(p Point) Vector {
 
 // Bounds returns the untransformed bounding box
 func (c *Cone) Bounds() Bound {
+	min := -math.Max(math.Abs(c.Maximum), math.Abs(c.Minimum))
+
 	return Bound{
-		Min: NewPoint(c.Minimum, c.Minimum, c.Minimum),
-		Max: NewPoint(c.Maximum, c.Maximum, c.Maximum),
+		Min: NewPoint(min, c.Minimum, min),
+		Max: NewPoint(-min, c.Maximum, -min),
 	}
 }

@@ -21,8 +21,8 @@ type Cylinder struct {
 func NewDefaultCylinder() *Cylinder {
 	return &Cylinder{
 		Radius:  1.0,
-		Minimum: math.Inf(-1),
-		Maximum: math.Inf(1),
+		Minimum: -math.MaxFloat64,
+		Maximum: math.MaxFloat64,
 		Closed:  false,
 		Shape: Shape{
 			transform: IdentityMatrix(),
