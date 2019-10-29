@@ -1107,7 +1107,7 @@ func group() {
 	// s.Material().ShadowCaster = false
 	// g.AddMember(s)
 
-	g.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi / 2))
+	// g.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi / 2))
 	w.AddObject(g)
 
 	render(w)
