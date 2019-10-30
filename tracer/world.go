@@ -246,14 +246,9 @@ func (w *World) PrecomputeValues() {
 	}
 }
 
-// Render renders the world using the world camera
-func (w *World) Render() *Canvas {
-	w.LintWorld()
-	w.PrecomputeValues()
+func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 
-	camera := w.Camera()
-	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))
-	maxRecursion := w.Config.MaxRecusions
+	log.Println("Running render...")
 
 	var wg sync.WaitGroup
 
@@ -262,7 +257,7 @@ func (w *World) Render() *Canvas {
 			wg.Add(1)
 			go func(x, y float64) {
 				ray := camera.RayForPixel(x, y)
-				clr := w.ColorAt(ray, maxRecursion)
+				clr := w.ColorAt(ray, w.Config.MaxRecusions)
 				canvas.SetFloat(x, y, clr)
 				wg.Done()
 			}(x, y)
@@ -270,6 +265,23 @@ func (w *World) Render() *Canvas {
 	}
 
 	wg.Wait()
-
 	return canvas
+}
+
+// ShowInfo dumps info about the world
+func (w *World) ShowInfo() {
+	log.Printf("Camera: %#v", w.Camera())
+}
+
+// Render renders the world using the world camera
+func (w *World) Render() *Canvas {
+	w.LintWorld()
+	w.PrecomputeValues()
+
+	camera := w.Camera()
+	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))
+
+	w.ShowInfo()
+
+	return w.doRender(camera, canvas)
 }
