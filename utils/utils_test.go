@@ -41,3 +41,42 @@ func TestEquals(t *testing.T) {
 		})
 	}
 }
+
+func TestRandomFloat(t *testing.T) {
+	type args struct {
+		min float64
+		max float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want float64
+	}{
+		{
+			args: args{
+				min: 0.2,
+				max: 30.0,
+			},
+		},
+		{
+			args: args{
+				min: 0,
+				max: 0.3,
+			},
+		},
+		{
+			args: args{
+				min: 100.45,
+				max: 100.46,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := RandomFloat(tt.args.min, tt.args.max)
+
+			assert.GreaterOrEqual(t, got, tt.args.min, "should be >=")
+			assert.Less(t, got, tt.args.max, "should be >=")
+		})
+	}
+}
