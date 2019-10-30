@@ -4,6 +4,7 @@ import "log"
 
 // LintWorld runs some common checks and prints out log messages to stdout
 func (w *World) LintWorld() {
+	log.Println("Linting the world...")
 
 	for _, o := range w.Objects {
 		LintObject(o)
