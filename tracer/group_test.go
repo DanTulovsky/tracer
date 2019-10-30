@@ -195,6 +195,8 @@ func TestGroup_IntersectWith(t *testing.T) {
 				shape.SetTransform(m.t)
 				tt.group.AddMember(shape)
 			}
+			tt.group.PrecomputeValues()
+
 			got := tt.group.IntersectWith(tt.args.r)
 
 			assert.Equal(t, tt.wantXS, len(got), "should be equal")
@@ -412,6 +414,7 @@ func TestGroup_Bounds(t *testing.T) {
 				shape.SetTransform(m.t)
 				tt.group.AddMember(shape)
 			}
+			tt.group.PrecomputeValues()
 
 			got := tt.group.Bounds()
 			assert.Equal(t, tt.want, got, "should equal")
@@ -596,6 +599,38 @@ func TestGroup_boundBoxFromBoundingBoxes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.g.boundBoxFromBoundingBoxes(tt.args.boxes)
 			assert.Equal(t, tt.want, got, "should equal")
+		})
+	}
+}
+
+func TestGroup_HasMembers(t *testing.T) {
+	tests := []struct {
+		name    string
+		group   *Group
+		members []Shaper
+		want    bool
+	}{
+		{
+			name:    "has members",
+			group:   NewGroup(),
+			members: []Shaper{NewUnitSphere()},
+			want:    true,
+		},
+		{
+			name:    "no members",
+			group:   NewGroup(),
+			members: []Shaper{},
+			want:    false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// populate members
+			for _, m := range tt.members {
+				tt.group.AddMember(m)
+			}
+
+			assert.Equal(t, tt.want, tt.group.HasMembers())
 		})
 	}
 }

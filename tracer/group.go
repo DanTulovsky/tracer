@@ -9,8 +9,8 @@ import (
 
 // Group is a collection of other groups/objects
 type Group struct {
-	members     []Shaper
-	boundsCache *Bound // cache the group bounding box
+	members []Shaper
+	bound   Bound // cache the group bounding box
 	Shape
 }
 
@@ -35,6 +35,11 @@ func (g *Group) AddMember(m Shaper) {
 // Members returns all the direct members of this group
 func (g *Group) Members() []Shaper {
 	return g.members
+}
+
+// HasMembers returns true if this is a group that has members
+func (g *Group) HasMembers() bool {
+	return len(g.members) > 0
 }
 
 // Includes returns true if the Shaper is part of this group
@@ -173,13 +178,14 @@ func (g *Group) boundBoxFromBoundingBoxes(boxes []Bound) Bound {
 	}
 }
 
-// Bounds returns the untransformed bounding box
-func (g *Group) Bounds() Bound {
+// PrecomputeValues precomputes some values for render speedup
+func (g *Group) PrecomputeValues() {
+	// calculate group bounding box
+	g.calculateBounds()
+}
 
-	// TODO: Not thread safe, redo as Precompute stage before doing a render
-	if g.boundsCache != nil {
-		return *g.boundsCache
-	}
+// calculateBounds sets the g.bound variable
+func (g *Group) calculateBounds() {
 
 	// combine bounding boxes for all sub-objects into one
 
@@ -204,8 +210,11 @@ func (g *Group) Bounds() Bound {
 	}
 
 	// not combine all bounding boxes into one
-	gbb := g.boundBoxFromBoundingBoxes(all)
-	g.boundsCache = &gbb // cache
-	return gbb
+	g.bound = g.boundBoxFromBoundingBoxes(all)
+}
 
+// Bounds returns the untransformed bounding box
+func (g *Group) Bounds() Bound {
+
+	return g.bound
 }

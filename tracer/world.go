@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"log"
 	"math"
 	"sort"
 	"sync"
@@ -234,9 +235,21 @@ func (w *World) IsShadowed(p Point, l Light) bool {
 	return false
 }
 
+// PrecomputeValues does some initial promcomputations to speed up render speed
+func (w *World) PrecomputeValues() {
+	log.Println("Precomputing values for the world...")
+
+	for _, o := range w.Objects {
+		if o.HasMembers() {
+			o.PrecomputeValues()
+		}
+	}
+}
+
 // Render renders the world using the world camera
 func (w *World) Render() *Canvas {
 	w.LintWorld()
+	w.PrecomputeValues()
 
 	camera := w.Camera()
 	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))

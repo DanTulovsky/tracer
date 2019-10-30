@@ -4,13 +4,15 @@ package tracer
 type Shaper interface {
 	Bounds() Bound
 
+	HasMembers() bool
+
 	Parent() *Group
 	HasParent() bool
 	SetParent(*Group)
 
 	IntersectWith(Ray) Intersections
-
 	NormalAt(Point) Vector
+	PrecomputeValues()
 
 	Material() *Material
 	SetMaterial(*Material)
@@ -31,6 +33,16 @@ type Shape struct {
 
 	// TODO: Consider if non-group shapes can be parents as well
 	parent *Group
+}
+
+// HasMembers returns true if this is a group that has members
+func (s *Shape) HasMembers() bool {
+	return false
+}
+
+// PrecomputeValues precomputes some values for render speedup
+func (s *Shape) PrecomputeValues() {
+	// nothing by default, each shape can override
 }
 
 // Parent returns the parent group this shape is part of
