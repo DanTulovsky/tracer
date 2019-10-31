@@ -32,7 +32,7 @@ func sphere(p tracer.Point, size float64) *tracer.Sphere {
 
 // return a glass sphere at this point, scaled by size
 func glassSphere(p tracer.Point, size float64) *tracer.Sphere {
-	randomT := float64(utils.Random(50, 70)) / 100 // [0.5 - 0.7)]
+	randomT := float64(utils.Random(80, 90)) / 100 // [0.5 - 0.7)]
 	randomR := float64(utils.Random(60, 80)) / 100
 
 	transform := tracer.IdentityMatrix().Scale(size, size, size).Translate(p.X(), p.Y(), p.Z())
@@ -61,7 +61,7 @@ func scene() {
 	// override light here
 	w.SetLights([]tracer.Light{
 		// tracer.NewPointLight(tracer.NewPoint(2, 10, -1), tracer.NewColor(1, 1, 1)),
-		tracer.NewPointLight(tracer.NewPoint(0, 20, -1), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 4, 20), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -76,20 +76,45 @@ func scene() {
 
 	w.SetCamera(camera)
 
-	// plane
+	// floor
 	plane := tracer.NewPlane()
-	pp := tracer.NewCheckerPattern(tracer.ColorName(colornames.White), tracer.ColorName(colornames.Red))
-	plane.Material().SetPattern(pp)
+	// pp := tracer.NewCheckerPattern(tracer.ColorName(colornames.White), tracer.ColorName(colornames.Red))
+	// plane.Material().SetPattern(pp)
+	plane.Material().Specular = 0
+	plane.Material().Reflective = 1
+	plane.Material().Diffuse = 0
 	w.AddObject(plane)
+
+	// back wall
+	backWall := tracer.NewPlane()
+	pbw := tracer.NewCheckerPattern(tracer.ColorName(colornames.Lightgray), tracer.ColorName(colornames.Gray))
+	backWall.Material().SetPattern(pbw)
+	backWall.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).Translate(0, 0, 30))
+	backWall.Material().Specular = 0
+	backWall.Material().Diffuse = 1
+	w.AddObject(backWall)
+
+	// ceiling wall
+	ceiling := tracer.NewPlane()
+	pc := tracer.NewCheckerPattern(tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Yellow))
+	pc.SetTransform(tracer.IdentityMatrix().Scale(3, 3, 3))
+	ceiling.Material().SetPattern(pc)
+	ceiling.SetTransform(tracer.IdentityMatrix().Translate(0, 5, 0))
+	ceiling.Material().Specular = 0
+	ceiling.Material().Diffuse = 1
+	w.AddObject(ceiling)
 
 	// groups
 	g1 := tracer.NewGroup()
 
-	for i := 0; i < 30; i++ {
+	numSpheres := 4
+
+	// spheres
+	for i := 0; i < numSpheres; i++ {
 		x := utils.RandomFloat(-4, 4)
 		z := utils.RandomFloat(1, 15)
 
-		size := utils.RandomFloat(0.1, 0.7)
+		size := utils.RandomFloat(0.5, 0.9)
 		center := tracer.NewPoint(x, size, z)
 		var s *tracer.Sphere
 
