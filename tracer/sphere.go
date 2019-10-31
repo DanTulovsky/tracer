@@ -88,10 +88,16 @@ func (s *Sphere) NormalAt(p Point) Vector {
 
 }
 
-// Bounds returns the untransformed bounding box
-func (s *Sphere) Bounds() Bound {
-	return Bound{
+// calculateBounds calculates the bounding box of the shape
+func (s *Sphere) calculateBounds() {
+	s.bound = Bound{
 		Min: NewPoint(-1, -1, -1),
 		Max: NewPoint(1, 1, 1),
 	}
+}
+
+// PrecomputeValues precomputes some values for render speedup
+func (s *Sphere) PrecomputeValues() {
+	// calculate group bounding box
+	s.calculateBounds()
 }

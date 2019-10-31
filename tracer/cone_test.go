@@ -250,6 +250,7 @@ func TestCone_Bounds(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.c.PrecomputeValues()
 			assert.Equal(t, tt.want, tt.c.Bounds(), "should equal")
 		})
 	}

@@ -30,8 +30,8 @@ type Shape struct {
 	shape     string
 	transform Matrix
 	material  *Material
+	bound     Bound // cache the group bounding box
 
-	// TODO: Consider if non-group shapes can be parents as well
 	parent *Group
 }
 
@@ -43,6 +43,7 @@ func (s *Shape) HasMembers() bool {
 // PrecomputeValues precomputes some values for render speedup
 func (s *Shape) PrecomputeValues() {
 	// nothing by default, each shape can override
+	panic("please implement PrecomputeValues")
 }
 
 // Parent returns the parent group this shape is part of
@@ -98,6 +99,16 @@ func (s *Shape) Name() string {
 // SetName sets the name
 func (s *Shape) SetName(n string) {
 	s.name = n
+}
+
+// calculateBounds calculates the bounding box of the shape
+func (s *Shape) calculateBounds() {
+	panic("please implement calculateBounds!")
+}
+
+// Bounds returns the untransformed bounding box
+func (s *Shape) Bounds() Bound {
+	return s.bound
 }
 
 // Bound describes the bounding box for a shape

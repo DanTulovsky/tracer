@@ -195,6 +195,9 @@ func TestGroup_IntersectWith(t *testing.T) {
 				shape.SetTransform(m.t)
 				tt.group.AddMember(shape)
 			}
+			for _, o := range tt.group.Members() {
+				o.PrecomputeValues()
+			}
 			tt.group.PrecomputeValues()
 
 			got := tt.group.IntersectWith(tt.args.r)
@@ -413,6 +416,9 @@ func TestGroup_Bounds(t *testing.T) {
 				shape := m.s
 				shape.SetTransform(m.t)
 				tt.group.AddMember(shape)
+			}
+			for _, o := range tt.group.Members() {
+				o.PrecomputeValues()
 			}
 			tt.group.PrecomputeValues()
 
