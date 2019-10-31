@@ -103,10 +103,16 @@ func (c *Cube) NormalAt(p Point) Vector {
 	return wn.Normalize()
 }
 
-// Bounds returns the untransformed bounding box
-func (c *Cube) Bounds() Bound {
-	return Bound{
+// calculateBounds calculates the bounding box of the shape
+func (c *Cube) calculateBounds() {
+	c.bound = Bound{
 		Min: NewPoint(-1, -1, -1),
 		Max: NewPoint(1, 1, 1),
 	}
+}
+
+// PrecomputeValues precomputes some values for render speedup
+func (c *Cube) PrecomputeValues() {
+	// calculate group bounding box
+	c.calculateBounds()
 }

@@ -10,7 +10,6 @@ import (
 // Group is a collection of other groups/objects
 type Group struct {
 	members []Shaper
-	bound   Bound // cache the group bounding box
 	Shape
 }
 
@@ -211,10 +210,4 @@ func (g *Group) calculateBounds() {
 
 	// not combine all bounding boxes into one
 	g.bound = g.boundBoxFromBoundingBoxes(all)
-}
-
-// Bounds returns the untransformed bounding box
-func (g *Group) Bounds() Bound {
-
-	return g.bound
 }

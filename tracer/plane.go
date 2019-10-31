@@ -55,10 +55,16 @@ func (pl *Plane) IntersectWith(r Ray) Intersections {
 	return t
 }
 
-// Bounds returns the untransformed bounding box
-func (pl *Plane) Bounds() Bound {
-	return Bound{
+// calculateBounds calculates the bounding box of the shape
+func (pl *Plane) calculateBounds() {
+	pl.bound = Bound{
 		Min: NewPoint(-math.MaxFloat64, -0.001, -math.MaxFloat64),
 		Max: NewPoint(math.MaxFloat64, 0.001, math.MaxFloat64),
 	}
+}
+
+// PrecomputeValues precomputes some values for render speedup
+func (pl *Plane) PrecomputeValues() {
+	// calculate group bounding box
+	pl.calculateBounds()
 }

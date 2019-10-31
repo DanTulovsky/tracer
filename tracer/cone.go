@@ -172,12 +172,18 @@ func (c *Cone) NormalAt(p Point) Vector {
 	return wn.Normalize()
 }
 
-// Bounds returns the untransformed bounding box
-func (c *Cone) Bounds() Bound {
+// calculateBounds calculates the bounding box of the shape
+func (c *Cone) calculateBounds() {
 	min := -math.Max(math.Abs(c.Maximum), math.Abs(c.Minimum))
 
-	return Bound{
+	c.bound = Bound{
 		Min: NewPoint(min, c.Minimum, min),
 		Max: NewPoint(-min, c.Maximum, -min),
 	}
+}
+
+// PrecomputeValues precomputes some values for render speedup
+func (c *Cone) PrecomputeValues() {
+	// calculate group bounding box
+	c.calculateBounds()
 }

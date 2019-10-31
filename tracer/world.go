@@ -240,9 +240,7 @@ func (w *World) PrecomputeValues() {
 	log.Println("Precomputing values for the world...")
 
 	for _, o := range w.Objects {
-		if o.HasMembers() {
-			o.PrecomputeValues()
-		}
+		o.PrecomputeValues()
 	}
 }
 
