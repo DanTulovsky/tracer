@@ -14,9 +14,13 @@ func (w *World) LintWorld() {
 
 // LintObject runs linter checks for objects
 func LintObject(o Shaper) {
+	if o.HasMembers() {
+		for _, m := range o.(*Group).Members() {
 
+			LintMaterial(m.Material(), m)
+		}
+	}
 	LintMaterial(o.Material(), o)
-
 }
 
 // LintMaterial runs linter checks for material
