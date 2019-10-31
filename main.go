@@ -1114,19 +1114,16 @@ func group() {
 }
 
 func triangle() {
-
-	// width, height := 100.0, 100.0
 	width, height := 400.0, 300.0
 	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
-	w.Config.MaxRecusions = 5
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(0, 4, -1), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(3, 4, -30), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-5, 4, -1), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -1136,28 +1133,47 @@ func triangle() {
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
 
+	floor := tracer.NewPlane()
+	floor.SetTransform(tracer.IdentityMatrix().Translate(0, -3, 0))
+	w.AddObject(floor)
+
+	backWall := tracer.NewPlane()
+	backWall.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).Translate(0, 0, 40))
+	w.AddObject(backWall)
+
 	s1 := tracer.NewUnitSphere()
-	s1.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 3))
-	s1.Material().Color = tracer.ColorName(colornames.Yellow)
+	s1.SetTransform(tracer.IdentityMatrix().Scale(2, 2, 2).Translate(0, 1, 3))
+	// s1.Material().Color = tracer.ColorName(colornames.Black)
+	s1.Material().Reflective = 1
+	// s1.Material().ShadowCaster = false
 	w.AddObject(s1)
 
 	g1 := tracer.NewGroup()
-	g1.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi / 8))
+	g1.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/8).Translate(0.7, 0.4, 0))
 	w.AddObject(g1)
 
 	t1 := tracer.NewTriangle(tracer.NewPoint(0, 0, 0), tracer.NewPoint(2, 0, 0), tracer.NewPoint(1, 2, 0))
-	t1.Material().Color = tracer.ColorName(colornames.Red)
+	t1.Material().Color = tracer.ColorName(colornames.Darkred)
+	t1.Material().Transparency = 0.4
+	t1.Material().Diffuse = 0.1
+	t1.Material().Ambient = 0.1
+	t1.Material().ShadowCaster = false
 	g1.AddMember(t1)
 
 	t2 := tracer.NewTriangle(tracer.NewPoint(0, 0, 0), tracer.NewPoint(-2, 0, 0), tracer.NewPoint(-1, 2, 0))
-	t2.Material().Color = tracer.ColorName(colornames.Blue)
+	t2.Material().Color = tracer.ColorName(colornames.Darkblue)
+	t2.Material().Transparency = 1
+	t2.Material().Diffuse = 0.1
+	t2.Material().Ambient = 0.1
+	t2.Material().ShadowCaster = false
 	g1.AddMember(t2)
 
 	t3 := tracer.NewTriangle(tracer.NewPoint(0, 0, 0), tracer.NewPoint(-1, 2, 0), tracer.NewPoint(1, 2, 0))
-	// t3.Material().Color = tracer.ColorName(colornames.Green)
+	t3.Material().Color = tracer.ColorName(colornames.Darkgreen)
 	t3.Material().Transparency = 1
 	t3.Material().Diffuse = 0.1
 	t3.Material().Ambient = 0.1
+	t3.Material().ShadowCaster = false
 	g1.AddMember(t3)
 
 	render(w)
