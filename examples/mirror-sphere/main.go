@@ -29,7 +29,7 @@ func env() *tracer.World {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 2.5, -4)
+	from := tracer.NewPoint(0, 3, -4)
 	to := tracer.NewPoint(0, -1, 10)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -65,16 +65,6 @@ func backWall() *tracer.Plane {
 	return p
 }
 
-func frontWall() *tracer.Plane {
-	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, -10))
-	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
-	p.Material().SetPattern(pp)
-	p.Material().Specular = 0
-
-	return p
-}
-
 func rightWall() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(4, 0, 0))
@@ -84,7 +74,6 @@ func rightWall() *tracer.Plane {
 
 	return p
 }
-
 func leftWall() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-4, 0, 0))
@@ -94,46 +83,24 @@ func leftWall() *tracer.Plane {
 
 	return p
 }
-
 func sphere() *tracer.Sphere {
 	s := tracer.NewUnitSphere()
 	s.SetTransform(tracer.IdentityMatrix().Translate(0, 1.5, 0))
 	s.Material().Ambient = 0
 	s.Material().Diffuse = 0
-	s.Material().Reflective = 0
-	s.Material().Transparency = 0.7
-	s.Material().ShadowCaster = false
-
+	s.Material().Reflective = 1
 	return s
-}
-
-func pedestal() *tracer.Cube {
-	s := tracer.NewUnitCube()
-	s.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(0, 0.5, 0))
-
-	return s
-}
-
-func group(s ...tracer.Shaper) *tracer.Group {
-	g := tracer.NewGroup()
-
-	for _, s := range s {
-		g.AddMember(s)
-	}
-
-	return g
 }
 
 func scene() {
 	w := env()
 
+	w.AddObject(sphere())
+	w.AddObject(floor())
+	w.AddObject(ceiling())
 	w.AddObject(backWall())
 	w.AddObject(rightWall())
 	w.AddObject(leftWall())
-	w.AddObject(ceiling())
-	w.AddObject(floor())
-
-	w.AddObject(group())
 
 	render(w)
 }
