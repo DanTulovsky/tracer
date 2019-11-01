@@ -1139,8 +1139,16 @@ func triangle() {
 	floor.Material().SetPattern(floorp)
 	w.AddObject(floor)
 
+	ceiling := tracer.NewPlane()
+	ceiling.SetTransform(tracer.IdentityMatrix().Translate(0, 8, 0))
+	ceiling.Material().Color = tracer.ColorName(colornames.Lightskyblue)
+	w.AddObject(ceiling)
+
 	backWall := tracer.NewPlane()
 	backWall.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).Translate(0, 0, 40))
+	backWallp := tracer.NewStripedPattern(tracer.ColorName(colornames.Blue), tracer.White())
+	backWall.Material().SetPattern(backWallp)
+	backWall.Material().Specular = 0.2
 	w.AddObject(backWall)
 
 	s1 := tracer.NewUnitSphere()
