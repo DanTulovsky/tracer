@@ -75,18 +75,7 @@ func (t *Triangle) NormalAt(p Point) Vector {
 
 // Bounds returns the untransformed bounding box
 func (t *Triangle) Bounds() Bound {
-	minX := math.Min(t.P1.X(), math.Min(t.P2.X(), t.P3.X()))
-	minY := math.Min(t.P1.Y(), math.Min(t.P2.Y(), t.P3.Y()))
-	minZ := math.Min(t.P1.Z(), math.Min(t.P2.Z(), t.P3.Z()))
-
-	maxX := math.Max(t.P1.X(), math.Max(t.P2.X(), t.P3.X()))
-	maxY := math.Max(t.P1.Y(), math.Max(t.P2.Y(), t.P3.Y()))
-	maxZ := math.Max(t.P1.Z(), math.Max(t.P2.Z(), t.P3.Z()))
-
-	return Bound{
-		Min: NewPoint(minX, minY, minZ),
-		Max: NewPoint(maxX, maxY, maxZ),
-	}
+	return t.bound
 }
 
 // calculateBounds calculates the bounding box of the shape
