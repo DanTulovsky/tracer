@@ -1135,6 +1135,8 @@ func triangle() {
 
 	floor := tracer.NewPlane()
 	floor.SetTransform(tracer.IdentityMatrix().Translate(0, -3, 0))
+	floorp := tracer.NewRingPattern(tracer.ColorName(colornames.Red), tracer.White())
+	floor.Material().SetPattern(floorp)
 	w.AddObject(floor)
 
 	backWall := tracer.NewPlane()
@@ -1143,9 +1145,8 @@ func triangle() {
 
 	s1 := tracer.NewUnitSphere()
 	s1.SetTransform(tracer.IdentityMatrix().Scale(2, 2, 2).Translate(0, 1, 3))
-	// s1.Material().Color = tracer.ColorName(colornames.Black)
+	s1.Material().Color = tracer.ColorName(colornames.Black)
 	s1.Material().Reflective = 1
-	// s1.Material().ShadowCaster = false
 	w.AddObject(s1)
 
 	g1 := tracer.NewGroup()
