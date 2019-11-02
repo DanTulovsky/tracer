@@ -1262,6 +1262,7 @@ func main() {
 	// point()
 	// group()
 	// triangle()
+	// https://octolinker-demo.now.sh/mokiat/go-data-front
 	obj()
 
 	if *memprofile != "" {
