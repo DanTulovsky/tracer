@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"path"
 	"runtime"
 	"runtime/pprof"
 	"sync"
@@ -13,6 +14,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/lucasb-eyer/go-colorful"
+	"github.com/udhos/gwob"
 
 	"golang.org/x/image/colornames"
 
@@ -1171,7 +1173,7 @@ func triangle() {
 
 	t2 := tracer.NewTriangle(tracer.NewPoint(0, 0, 0), tracer.NewPoint(-2, 0, 0), tracer.NewPoint(-1, 2, 0))
 	t2.Material().Color = tracer.ColorName(colornames.Darkblue)
-	t2.Material().Transparency = 1
+	t2.Material().Transparency = 0.5
 	t2.Material().Diffuse = 0.1
 	t2.Material().Ambient = 0.1
 	t2.Material().ShadowCaster = false
@@ -1188,6 +1190,42 @@ func triangle() {
 	render(w)
 }
 
+func obj() {
+	options := &gwob.ObjParserOptions{
+		LogStats: true,
+		Logger:   func(msg string) { fmt.Fprintln(os.Stderr, msg) },
+	}
+	dir := "/Users/dant/Downloads/"
+	fileObj := path.Join(dir, "test1.obj")
+	o, err := gwob.NewObjFromFile(fileObj, options) // parse/load OBJ
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fileMtl := path.Join(dir, o.Mtllib)
+
+	lib, err := gwob.ReadMaterialLibFromFile(fileMtl, options)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// Scan OBJ groups
+	for _, g := range o.Groups {
+
+		mtl, found := lib.Lib[g.Usemtl]
+		if found {
+			log.Printf("obj=%s lib=%s group=%s material=%s MapKd=%s Kd=%v", fileObj, fileMtl, g.Name, g.Usemtl, mtl.MapKd, mtl.Kd)
+			continue
+		}
+
+		log.Printf("obj=%s lib=%s group=%s material=%s NOT FOUND", fileObj, fileMtl, g.Name, g.Usemtl)
+	}
+
+	log.Println(len(o.Coord))
+	log.Println(o.Coord)
+	log.Println(o.Coord64(0))
+
+}
 func main() {
 
 	flag.Parse()
@@ -1223,7 +1261,8 @@ func main() {
 	// cone()
 	// point()
 	// group()
-	triangle()
+	// triangle()
+	obj()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
