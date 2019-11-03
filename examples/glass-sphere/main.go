@@ -162,6 +162,10 @@ func scene() {
 	w.AddObject(group(sphere(), pedestal()))
 	w.AddObject(background())
 
+	render(w)
+}
+
+func render(w *tracer.World) {
 	if *output != "" {
 		tracer.Render(w, *output)
 	} else {
