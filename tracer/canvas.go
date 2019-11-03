@@ -31,6 +31,7 @@ func NewCanvas(w, h int) *Canvas {
 	oglColors := make([]float32, w*h*3)
 
 	var i int
+	// column major order
 	for c := 0; c < w; c++ {
 		colors[c] = make([]Color, h)
 		for r := 0; r < h; r++ {
@@ -39,7 +40,7 @@ func NewCanvas(w, h int) *Canvas {
 			// normalize c, r to be in [-1, 1]
 			// canvas [0, 0] is top left
 			points[i] = float32(utils.AT(float64(c), 0.0, float64(w), -1, 1))
-			points[i+1] = float32(utils.AT(float64(r), 0.0, float64(h), -1, 1))
+			points[i+1] = -1 * float32(utils.AT(float64(r), 0.0, float64(h), -1, 1))
 			points[i+2] = 0 // z is always 0
 
 			oglColors[i] = 0   // R
@@ -76,9 +77,12 @@ func (c *Canvas) Set(x, y int, clr Color) error {
 	}
 
 	c.colors[x][y] = clr
-	c.oglColors[x*y] = float32(clr.R)
-	c.oglColors[x*y+1] = float32(clr.G)
-	c.oglColors[x*y+2] = float32(clr.B)
+
+	// colum major order; (height*c+r)*3
+	i := ((c.Height * x) + y) * 3
+	c.oglColors[i] = float32(clr.R)
+	c.oglColors[i+1] = float32(clr.G)
+	c.oglColors[i+2] = float32(clr.B)
 	return nil
 }
 
@@ -92,9 +96,12 @@ func (c *Canvas) SetFloat(x, y float64, clr Color) error {
 	inty := int(y)
 
 	c.colors[intx][inty] = clr
-	c.oglColors[intx*inty] = float32(clr.R)
-	c.oglColors[intx*inty+1] = float32(clr.G)
-	c.oglColors[intx*inty+2] = float32(clr.B)
+
+	// colum major order; (height*c+r)*3
+	i := ((c.Height * intx) + inty) * 3
+	c.oglColors[i] = float32(clr.R)
+	c.oglColors[i+1] = float32(clr.G)
+	c.oglColors[i+2] = float32(clr.B)
 	return nil
 }
 

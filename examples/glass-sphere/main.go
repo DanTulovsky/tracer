@@ -63,8 +63,8 @@ func init() {
 }
 
 func env() *tracer.World {
-	// width, height := 100.0, 100.0
-	width, height := 400.0, 300.0
+	width, height := 150.0, 100.0
+	// width, height := 400.0, 300.0
 	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
@@ -215,7 +215,7 @@ func initGlfw(width, height int) *glfw.Window {
 	if err := glfw.Init(); err != nil {
 		panic(err)
 	}
-	glfw.WindowHint(glfw.Resizable, glfw.False)
+	glfw.WindowHint(glfw.Resizable, glfw.True)
 	glfw.WindowHint(glfw.ContextVersionMajor, 4)
 	glfw.WindowHint(glfw.ContextVersionMinor, 1)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
@@ -284,7 +284,8 @@ func initOpenGL() uint32 {
 }
 
 // makeVbo gives our data to OpenGL
-func makeVbo(canvas *tracer.Canvas) {
+// return the color buffer to update it later
+func makeVbo(canvas *tracer.Canvas) uint32 {
 	// points buffer
 	var vbo uint32
 	gl.GenBuffers(1, &vbo)
@@ -316,6 +317,8 @@ func makeVbo(canvas *tracer.Canvas) {
 		false,    // normalized?
 		0,        // stride
 		nil)      // array buffer offset
+
+	return colorbo
 }
 
 func renderLive(w *tracer.World) {
@@ -336,20 +339,23 @@ func renderLive(w *tracer.World) {
 	gl.BindVertexArray(vao)
 
 	// make buffers from out data and tell OpenGL about them
-	makeVbo(canvas)
+	colorbo := makeVbo(canvas)
 
 	go w.RenderLive(camera, canvas)
 
 	for !window.ShouldClose() {
-		draw(window, program, canvas)
+		draw(window, program, canvas, colorbo)
 
 	}
 
 }
 
-func draw(window *glfw.Window, program uint32, canvas *tracer.Canvas) {
+func draw(window *glfw.Window, program uint32, canvas *tracer.Canvas, colorbo uint32) {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	gl.UseProgram(program)
+
+	// gl.BindBuffer(gl.ARRAY_BUFFER, colorbo)
+	gl.BufferData(gl.ARRAY_BUFFER, 4*len(canvas.Colors()), gl.Ptr(canvas.Colors()), gl.STATIC_DRAW)
 
 	gl.DrawArrays(gl.POINTS, 0, int32(len(canvas.Points())/3))
 
