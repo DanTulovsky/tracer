@@ -63,8 +63,8 @@ func init() {
 }
 
 func env() *tracer.World {
-	width, height := 150.0, 100.0
-	// width, height := 400.0, 300.0
+	// width, height := 150.0, 100.0
+	width, height := 400.0, 300.0
 	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
@@ -215,7 +215,7 @@ func initGlfw(width, height int) *glfw.Window {
 	if err := glfw.Init(); err != nil {
 		panic(err)
 	}
-	glfw.WindowHint(glfw.Resizable, glfw.True)
+	glfw.WindowHint(glfw.Resizable, glfw.False)
 	glfw.WindowHint(glfw.ContextVersionMajor, 4)
 	glfw.WindowHint(glfw.ContextVersionMinor, 1)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
