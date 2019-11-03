@@ -12,8 +12,8 @@ import (
 
 var (
 	points = []float32{
-		// 0, 0.5, 0, // top
-		// -0.5, -0.5, 0, // left
+		0, 0.5, 0, // top
+		-0.5, -0.5, 0, // left
 		0.5, -0.5, 0, // right
 	}
 )
@@ -27,7 +27,7 @@ const (
 in vec3 vp;
 void main() {
 	gl_Position = vec4(vp, 1.0);
-	gl_PointSize = 5.0;
+	gl_PointSize = 3.0;
 }
 ` + "\x00"
 
@@ -95,8 +95,7 @@ func draw(vao uint32, window *glfw.Window, program uint32) {
 	gl.UseProgram(program)
 
 	gl.BindVertexArray(vao)
-	// gl.DrawArrays(gl.POINTS, 0, int32(len(points)))
-	gl.DrawArrays(gl.POINTS, 0, 1)
+	gl.DrawArrays(gl.POINTS, 0, int32(len(points)/3))
 
 	glfw.PollEvents()
 	window.SwapBuffers()
