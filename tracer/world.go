@@ -288,8 +288,9 @@ func (w *World) doLiveRender(camera *Camera, canvas *Canvas) {
 			}(x, y)
 		}
 	}
-
+	log.Println("Waiting for render to complete..")
 	wg.Wait()
+	log.Println("Render complete!")
 }
 
 // ShowInfo dumps info about the world
