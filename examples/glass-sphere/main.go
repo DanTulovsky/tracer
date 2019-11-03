@@ -11,10 +11,6 @@ import (
 	"github.com/DanTulovsky/tracer/tracer"
 )
 
-var (
-	output = flag.String("output", "", "name of the output file, if empty, renders to screen")
-)
-
 func init() {
 	// This is needed to arrange that main() runs on main thread.
 	// See documentation for functions that are only allowed to be called from the main thread.
@@ -162,15 +158,7 @@ func scene() {
 	w.AddObject(group(sphere(), pedestal()))
 	w.AddObject(background())
 
-	render(w)
-}
-
-func render(w *tracer.World) {
-	if *output != "" {
-		tracer.Render(w, *output)
-	} else {
-		tracer.RenderLive(w)
-	}
+	tracer.Render(w)
 }
 
 func main() {
