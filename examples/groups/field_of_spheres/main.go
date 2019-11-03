@@ -16,7 +16,6 @@ import (
 )
 
 var (
-	output     = flag.String("output", "", "name of the output file, if empty, renders to screen")
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 	memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 )
@@ -136,15 +135,7 @@ func scene() {
 
 	w.AddObject(g1)
 
-	render(w)
-}
-
-func render(w *tracer.World) {
-	if *output != "" {
-		tracer.Render(w, *output)
-	} else {
-		tracer.RenderLive(w)
-	}
+	tracer.Render(w)
 }
 
 func main() {

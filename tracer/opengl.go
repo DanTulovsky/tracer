@@ -88,8 +88,8 @@ func RenderLive(w *World) {
 	}
 }
 
-// Render renders to a file
-func Render(w *World, output string) {
+// RenderToFile renders to a file
+func RenderToFile(w *World, output string) {
 	camera := w.Camera()
 	width, height := int(camera.Hsize), int(camera.Vsize)
 	canvas := NewCanvas(width, height)
