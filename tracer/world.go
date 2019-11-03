@@ -3,8 +3,8 @@ package tracer
 import (
 	"log"
 	"math"
+	"runtime"
 	"sort"
-	"sync"
 
 	"golang.org/x/image/colornames"
 )
@@ -253,44 +253,30 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 
 	log.Println("Running render...")
 
-	var wg sync.WaitGroup
+	// allow this many renders to run at once
+	max := runtime.NumCPU()
+	log.Printf("Parallelism: %v", max)
+	sem := make(chan bool, max)
 
 	for y := 0.0; y < camera.Vsize-1; y++ {
 		for x := 0.0; x < camera.Hsize-1; x++ {
-			wg.Add(1)
+			sem <- true
 			go func(x, y float64) {
+				// work is done
+				defer func() { <-sem }()
 				ray := camera.RayForPixel(x, y)
 				clr := w.ColorAt(ray, w.Config.MaxRecusions)
 				canvas.SetFloat(x, y, clr)
-				wg.Done()
 			}(x, y)
 		}
 	}
 
-	wg.Wait()
+	log.Println("Wainting for render to complete...")
+	for i := 0; i < cap(sem); i++ {
+		sem <- true
+	}
+	log.Println("Render finished!")
 	return canvas
-}
-
-func (w *World) doLiveRender(camera *Camera, canvas *Canvas) {
-
-	log.Println("Running live render...")
-
-	var wg sync.WaitGroup
-
-	for y := 0.0; y < camera.Vsize-1; y++ {
-		for x := 0.0; x < camera.Hsize-1; x++ {
-			wg.Add(1)
-			go func(x, y float64) {
-				ray := camera.RayForPixel(x, y)
-				clr := w.ColorAt(ray, w.Config.MaxRecusions)
-				canvas.SetFloat(x, y, clr)
-				wg.Done()
-			}(x, y)
-		}
-	}
-	log.Println("Waiting for render to complete..")
-	wg.Wait()
-	log.Println("Render complete!")
 }
 
 // ShowInfo dumps info about the world
@@ -319,5 +305,5 @@ func (w *World) RenderLive(camera *Camera, canvas *Canvas) {
 
 	w.ShowInfo()
 
-	w.doLiveRender(camera, canvas)
+	w.doRender(camera, canvas)
 }
