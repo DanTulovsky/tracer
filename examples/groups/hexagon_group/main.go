@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"math"
 	"os"
@@ -12,11 +11,19 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/DanTulovsky/tracer/tracer"
-	"github.com/DanTulovsky/tracer/utils"
 )
 
-var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
-var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+var (
+	output     = flag.String("output", "", "name of the output file, if empty, renders to screen")
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
+	memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+)
+
+func init() {
+	// This is needed to arrange that main() runs on main thread.
+	// See documentation for functions that are only allowed to be called from the main thread.
+	runtime.LockOSThread()
+}
 
 func corner() *tracer.Sphere {
 	s := tracer.NewUnitSphere()
@@ -85,17 +92,13 @@ func hexagon() {
 }
 
 func render(w *tracer.World) {
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create(fmt.Sprintf("%s/Downloads/image.png", utils.Homedir()))
-	if err != nil {
-		log.Fatalln(err)
+	if *output != "" {
+		tracer.Render(w, *output)
+	} else {
+		tracer.RenderLive(w)
 	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
 }
+
 func main() {
 
 	flag.Parse()

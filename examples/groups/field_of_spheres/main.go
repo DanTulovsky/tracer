@@ -2,10 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"math"
-	"os"
+	"runtime"
 
 	"golang.org/x/image/colornames"
 
@@ -16,8 +15,17 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 )
 
-var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
-var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+var (
+	output     = flag.String("output", "", "name of the output file, if empty, renders to screen")
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
+	memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+)
+
+func init() {
+	// This is needed to arrange that main() runs on main thread.
+	// See documentation for functions that are only allowed to be called from the main thread.
+	runtime.LockOSThread()
+}
 
 // return a sphere at this point, scaled by size
 func sphere(p tracer.Point, size float64) *tracer.Sphere {
@@ -132,17 +140,13 @@ func scene() {
 }
 
 func render(w *tracer.World) {
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create(fmt.Sprintf("%s/Downloads/image.png", utils.Homedir()))
-	if err != nil {
-		log.Fatalln(err)
+	if *output != "" {
+		tracer.Render(w, *output)
+	} else {
+		tracer.RenderLive(w)
 	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
 }
+
 func main() {
 
 	flag.Parse()

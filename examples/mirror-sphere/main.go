@@ -2,16 +2,24 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"math"
-	"os"
+	"runtime"
 
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
-	"github.com/DanTulovsky/tracer/utils"
 )
+
+var (
+	output = flag.String("output", "", "name of the output file, if empty, renders to screen")
+)
+
+func init() {
+	// This is needed to arrange that main() runs on main thread.
+	// See documentation for functions that are only allowed to be called from the main thread.
+	runtime.LockOSThread()
+}
 
 func env() *tracer.World {
 	// width, height := 100.0, 100.0
@@ -105,22 +113,18 @@ func scene() {
 	render(w)
 }
 
+func render(w *tracer.World) {
+	if *output != "" {
+		tracer.Render(w, *output)
+	} else {
+		tracer.RenderLive(w)
+	}
+}
+
 func main() {
 
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	scene()
-}
-
-func render(w *tracer.World) {
-	canvas := w.Render()
-
-	f, err := os.Create(fmt.Sprintf("%s/Downloads/image.png", utils.Homedir()))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
 }
