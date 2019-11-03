@@ -25,7 +25,6 @@ import (
 var (
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 	memprofile = flag.String("memprofile", "", "write memory profile to `file`")
-	output     = flag.String("output", "", "name of the output file, if empty, renders to screen")
 )
 
 func init() {
@@ -387,7 +386,7 @@ func scene() {
 	// material.SetPattern(p4)
 	w.AddObject(left)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func colors() {
@@ -477,7 +476,7 @@ func mirrors() {
 	sphere1.Material().SetPattern(sphere1pattern)
 	w.AddObject(sphere1)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func mirror() {
@@ -584,7 +583,7 @@ func mirror() {
 	sphere1.Material().SetPattern(sphere1pattern)
 	w.AddObject(sphere1)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func cube() {
@@ -624,7 +623,7 @@ func cube() {
 	cube.SetTransform(tracer.IdentityMatrix().Scale(1, .5, 1).Translate(0, 1, 0))
 	w.AddObject(cube)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func glass() {
@@ -668,7 +667,7 @@ func glass() {
 	ball.Material().Transparency = 1
 	w.AddObject(ball)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func window() {
@@ -724,7 +723,7 @@ func window() {
 	ball.Material().Color = tracer.ColorName(colornames.Burlywood)
 	w.AddObject(ball)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func pond() {
@@ -830,7 +829,7 @@ func pond() {
 	cube2.Material().Color = tracer.ColorName(colornames.Lightblue)
 	w.AddObject(cube2)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func cylinder() {
@@ -910,7 +909,7 @@ func cylinder() {
 	// s.Material().ShadowCaster = false
 	// w.AddObject(s)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func spherewarp() {
@@ -960,7 +959,7 @@ func spherewarp() {
 	s.Material().ShadowCaster = false
 	w.AddObject(s)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func cone() {
@@ -1036,7 +1035,7 @@ func cone() {
 	s.Material().Reflective = 1
 	w.AddObject(s)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func group() {
@@ -1121,7 +1120,7 @@ func group() {
 	// g.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi / 2))
 	w.AddObject(g)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func triangle() {
@@ -1196,7 +1195,7 @@ func triangle() {
 	t3.Material().ShadowCaster = false
 	g1.AddMember(t3)
 
-	render(w)
+	tracer.Render(w)
 }
 
 func objParse() {
@@ -1274,14 +1273,6 @@ func objParse() {
 		}
 	}
 
-}
-
-func render(w *tracer.World) {
-	if *output != "" {
-		tracer.Render(w, *output)
-	} else {
-		tracer.RenderLive(w)
-	}
 }
 
 func main() {
