@@ -11,11 +11,12 @@ import (
 	"runtime/pprof"
 	"sync"
 
+	"github.com/mokiat/go-data-front/decoder/mtl"
+
 	_ "net/http/pprof"
 
 	"github.com/lucasb-eyer/go-colorful"
-	"github.com/udhos/gwob"
-
+	"github.com/mokiat/go-data-front/decoder/obj"
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
@@ -1190,42 +1191,83 @@ func triangle() {
 	render(w)
 }
 
-func obj() {
-	options := &gwob.ObjParserOptions{
-		LogStats: true,
-		Logger:   func(msg string) { fmt.Fprintln(os.Stderr, msg) },
-	}
-	dir := "/Users/dant/Downloads/"
-	fileObj := path.Join(dir, "test1.obj")
-	o, err := gwob.NewObjFromFile(fileObj, options) // parse/load OBJ
+func objParse() {
+
+	dir := "/Users/dtulovsky/go/src/github.com/DanTulovsky/tracer/obj"
+	fileObj := path.Join(dir, "test3.obj")
+
+	limits := obj.DefaultLimits()
+	limits.MaxReferenceCount = 128
+	decoder := obj.NewDecoder(limits)
+	file, _ := os.Open(fileObj)
+	defer file.Close()
+
+	model, err := decoder.Decode(file)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	fileMtl := path.Join(dir, o.Mtllib)
+	fmt.Printf("Model has %d vertices.\n", len(model.Vertices))
+	fmt.Printf("Model has %d texture coordinates.\n", len(model.TexCoords))
+	fmt.Printf("Model has %d normals.\n", len(model.Normals))
+	fmt.Printf("Model has %d objects.\n", len(model.Objects))
+	fmt.Printf("Model has %d material libs.\n", len(model.MaterialLibraries))
+	for _, ml := range model.MaterialLibraries {
+		fmt.Printf("  %v", ml)
+	}
+	fmt.Printf("First object has name: %s\n", model.Objects[0].Name)
 
-	lib, err := gwob.ReadMaterialLibFromFile(fileMtl, options)
-	if err != nil {
-		log.Fatalln(err)
+	// material library
+	lib := &mtl.Library{
+		Materials: []*mtl.Material{},
 	}
 
-	// Scan OBJ groups
-	for _, g := range o.Groups {
+	libDecoder := mtl.NewDecoder(
+		mtl.DecodeLimits{
+			MaxMaterialCount: 5,
+		})
 
-		mtl, found := lib.Lib[g.Usemtl]
-		if found {
-			log.Printf("obj=%s lib=%s group=%s material=%s MapKd=%s Kd=%v", fileObj, fileMtl, g.Name, g.Usemtl, mtl.MapKd, mtl.Kd)
-			continue
+	for _, ml := range model.MaterialLibraries {
+		fmt.Printf("  %v", ml)
+		f, err := os.Open(path.Join(dir, ml))
+		if err != nil {
+			log.Fatalln(err)
 		}
-
-		log.Printf("obj=%s lib=%s group=%s material=%s NOT FOUND", fileObj, fileMtl, g.Name, g.Usemtl)
+		l, err := libDecoder.Decode(f)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		lib.Materials = append(lib.Materials, l.Materials...)
 	}
 
-	log.Println(len(o.Coord))
-	log.Println(o.Coord)
-	log.Println(o.Coord64(0))
+	for _, o := range model.Objects {
+		log.Printf("Object:%v", o.Name)
+		for _, m := range o.Meshes {
+			log.Printf("  material: %v\n", m.MaterialName)
+			mat, ok := lib.FindMaterial(m.MaterialName)
+			if !ok {
+				log.Fatalf("Unable to find material %v in lib", m.MaterialName)
+			}
+			log.Printf("    %v\n", mat.Name)
+			log.Printf("    Diffuse: %v\n", mat.DiffuseColor)
+			log.Printf("    Ambient: %v\n", mat.AmbientColor)
+			log.Printf("    Specular: %v\n", mat.SpecularColor)
+			log.Printf("    Specular Exp: %v\n", mat.SpecularExponent)
+			log.Println("  Faces:")
+			for i, f := range m.Faces {
+				log.Printf("  (%v)", i)
+				for _, r := range f.References {
+					log.Printf("    vertex: %v", model.GetVertexFromReference(r))
+					log.Printf("    normal: %v", model.GetNormalFromReference(r))
+					log.Printf("    texture: %v", model.GetTexCoordFromReference(r))
+					log.Println()
+				}
+			}
+		}
+	}
 
 }
+
 func main() {
 
 	flag.Parse()
@@ -1263,7 +1305,7 @@ func main() {
 	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
-	obj()
+	objParse()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
