@@ -39,9 +39,11 @@ func TestNewCanvas(t *testing.T) {
 			// assert all pixels are black
 			for w := 0; w < c.Width; w++ {
 				for h := 0; h < c.Height; h++ {
-					assert.Equal(t, c.data[w][h], ColorName(colornames.Black))
+					assert.Equal(t, c.colors[w][h], ColorName(colornames.Black))
 				}
 			}
+
+			assert.Equal(t, tt.args.w*tt.args.h*3, len(c.points))
 		})
 	}
 }
@@ -96,7 +98,7 @@ func TestCanvas_Set(t *testing.T) {
 				assert.Error(t, tt.canvas.Set(tt.args.x, tt.args.y, tt.args.clr), "no error")
 			case false:
 				assert.NoError(t, tt.canvas.Set(tt.args.x, tt.args.y, tt.args.clr), "no error")
-				assert.Equal(t, tt.args.clr, tt.canvas.data[tt.args.x][tt.args.y], "should be equal")
+				assert.Equal(t, tt.args.clr, tt.canvas.colors[tt.args.x][tt.args.y], "should be equal")
 
 			}
 		})
@@ -153,7 +155,7 @@ func TestCanvas_SetFloat(t *testing.T) {
 				assert.Error(t, tt.canvas.SetFloat(tt.args.x, tt.args.y, tt.args.clr), "no error")
 			case false:
 				assert.NoError(t, tt.canvas.SetFloat(tt.args.x, tt.args.y, tt.args.clr), "no error")
-				assert.Equal(t, tt.args.clr, tt.canvas.data[int(tt.args.x)][int(tt.args.y)], "should be equal")
+				assert.Equal(t, tt.args.clr, tt.canvas.colors[int(tt.args.x)][int(tt.args.y)], "should be equal")
 
 			}
 		})
