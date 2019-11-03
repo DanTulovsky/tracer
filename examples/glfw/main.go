@@ -16,26 +16,48 @@ var (
 		-0.5, -0.5, 0, // left
 		0.5, -0.5, 0, // right
 	}
+	colors = []float32{
+		1, 0, 0, // red
+		0, 1, 0, // green
+		0, 0, 1, // blue
+	}
 )
 
 const (
 	width  = 500
 	height = 500
 
+	// executed for each vertex
 	vertexShaderSource = `
 #version 410
-in vec3 vp;
+// “layout(location = 0)” refers to the buffer we 
+// use to feed the vertexPosition_modelspace attribute
+layout(location = 0) in vec3 vp;
+layout(location = 1) in vec3 vertexColor;
+
+out vec3 fragmentColor;
+
+// called for each vertex
 void main() {
+	// set the vertex position to whatever was in the buffer
 	gl_Position = vec4(vp, 1.0);
-	gl_PointSize = 3.0;
+	gl_PointSize = 5.0;
+
+	fragmentColor = vertexColor;
 }
 ` + "\x00"
 
+	// executed for each sample
+	// since we use 4x antialising, we have 4 samples in each pixel
 	fragmentShaderSource = `
 #version 410
-out vec4 frag_colour;
+// passed in from the vertexShader above
+in vec3 fragmentColor;
+
+out vec4 color;
+
 void main() {
-	frag_colour = vec4(1, 0, 0, 1.0);
+	color = vec4(fragmentColor, 1.0);
 }
 ` + "\x00"
 )
@@ -70,7 +92,13 @@ func initOpenGL() uint32 {
 	if err := gl.Init(); err != nil {
 		panic(err)
 	}
+
+	// Allows drawing points
 	gl.Enable(gl.PROGRAM_POINT_SIZE)
+	// Depth test
+	gl.Enable(gl.DEPTH_TEST)
+	gl.DepthFunc(gl.LESS)
+
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	log.Println("OpenGL version", version)
 
@@ -90,32 +118,49 @@ func initOpenGL() uint32 {
 	return prog
 }
 
-func draw(vao uint32, window *glfw.Window, program uint32) {
+func draw(window *glfw.Window, program uint32) {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	gl.UseProgram(program)
 
-	gl.BindVertexArray(vao)
 	gl.DrawArrays(gl.POINTS, 0, int32(len(points)/3))
 
 	glfw.PollEvents()
 	window.SwapBuffers()
 }
 
-// makeVao initializes and returns a vertex array from the points provided.
-func makeVao(points []float32) uint32 {
+// makeVbo gives our data to OpenGL
+func makeVbo(points []float32) {
+	// points buffer
 	var vbo uint32
 	gl.GenBuffers(1, &vbo)
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, 4*len(points), gl.Ptr(points), gl.STATIC_DRAW)
 
-	var vao uint32
-	gl.GenVertexArrays(1, &vao)
-	gl.BindVertexArray(vao)
+	// the 0 here is the buffer in the VertexAttribPointer
 	gl.EnableVertexAttribArray(0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 0, nil)
+	gl.VertexAttribPointer(
+		0,        // must match the layout in the shader
+		3,        // size
+		gl.FLOAT, // type
+		false,    // normalized?
+		0,        // stride
+		nil)      // array buffer offset
 
-	return vao
+	// colors buffer
+	var colorbo uint32
+	gl.GenBuffers(1, &colorbo)
+	gl.BindBuffer(gl.ARRAY_BUFFER, colorbo)
+	gl.BufferData(gl.ARRAY_BUFFER, 4*len(colors), gl.Ptr(colors), gl.STATIC_DRAW)
+
+	// the 1 here is the buffer in the VertexAttribPointer
+	gl.EnableVertexAttribArray(1)
+	gl.VertexAttribPointer(
+		1,        // must match the layout in the shader
+		3,        // size
+		gl.FLOAT, // type
+		false,    // normalized?
+		0,        // stride
+		nil)      // array buffer offset
 }
 
 func compileShader(source string, shaderType uint32) (uint32, error) {
@@ -146,11 +191,17 @@ func main() {
 	defer glfw.Terminate()
 
 	program := initOpenGL()
-	vao := makeVao(points)
+
+	// What does this do?
+	var vao uint32
+	gl.GenVertexArrays(1, &vao)
+	gl.BindVertexArray(vao)
+
+	// make buffers from out data and tell OpenGL about them
+	makeVbo(points)
 
 	for !window.ShouldClose() {
-		// Do OpenGL stuff.
-		draw(vao, window, program)
+		draw(window, program)
 
 	}
 }
