@@ -20,11 +20,19 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
-	"github.com/DanTulovsky/tracer/utils"
 )
 
-var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
-var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+var (
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
+	memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+	output     = flag.String("output", "", "name of the output file, if empty, renders to screen")
+)
+
+func init() {
+	// This is needed to arrange that main() runs on main thread.
+	// See documentation for functions that are only allowed to be called from the main thread.
+	runtime.LockOSThread()
+}
 
 type projectile struct {
 	Position tracer.Point
@@ -1268,6 +1276,14 @@ func objParse() {
 
 }
 
+func render(w *tracer.World) {
+	if *output != "" {
+		tracer.Render(w, *output)
+	} else {
+		tracer.RenderLive(w)
+	}
+}
+
 func main() {
 
 	flag.Parse()
@@ -1303,9 +1319,9 @@ func main() {
 	// cone()
 	// point()
 	// group()
-	// triangle()
+	triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
-	objParse()
+	// objParse()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
@@ -1319,17 +1335,4 @@ func main() {
 		}
 	}
 
-}
-
-func render(w *tracer.World) {
-	canvas := w.Render()
-
-	// Export
-	f, err := os.Create(fmt.Sprintf("%s/Downloads/image.png", utils.Homedir()))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	canvas.ExportToPNG(f)
 }
