@@ -80,7 +80,7 @@ func RenderLive(w *World) {
 	// make buffers from out data and tell OpenGL about them
 	colorbo := makeVbo(canvas)
 
-	go w.RenderLive(camera, canvas)
+	go w.Render(camera, canvas)
 
 	for !window.ShouldClose() {
 		draw(window, program, canvas, colorbo)
@@ -90,7 +90,11 @@ func RenderLive(w *World) {
 
 // Render renders to a file
 func Render(w *World, output string) {
-	canvas := w.Render()
+	camera := w.Camera()
+	width, height := int(camera.Hsize), int(camera.Vsize)
+	canvas := NewCanvas(width, height)
+
+	w.Render(camera, canvas)
 
 	f, err := os.Create(output)
 	if err != nil {

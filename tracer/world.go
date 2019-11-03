@@ -285,21 +285,7 @@ func (w *World) ShowInfo() {
 }
 
 // Render renders the world using the world camera
-func (w *World) Render() *Canvas {
-	w.LintWorld()
-	w.PrecomputeValues()
-
-	camera := w.Camera()
-	canvas := NewCanvas(int(camera.Hsize), int(camera.Vsize))
-
-	w.ShowInfo()
-
-	return w.doRender(camera, canvas)
-}
-
-// RenderLive renders the world using the world camera
-// Output is a window on the screen using OpenGL
-func (w *World) RenderLive(camera *Camera, canvas *Canvas) {
+func (w *World) Render(camera *Camera, canvas *Canvas) {
 	w.LintWorld()
 	w.PrecomputeValues()
 
