@@ -11,12 +11,11 @@ import (
 	"runtime/pprof"
 	"sync"
 
-	"github.com/mokiat/go-data-front/decoder/mtl"
+	"github.com/DanTulovsky/tracer/utils"
 
 	_ "net/http/pprof"
 
 	"github.com/lucasb-eyer/go-colorful"
-	"github.com/mokiat/go-data-front/decoder/obj"
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
@@ -1200,78 +1199,34 @@ func triangle() {
 
 func objParse() {
 
-	dir := "/Users/dtulovsky/go/src/github.com/DanTulovsky/tracer/obj"
-	fileObj := path.Join(dir, "test3.obj")
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	file := path.Join(dir, "test1.obj")
 
-	limits := obj.DefaultLimits()
-	limits.MaxReferenceCount = 128
-	decoder := obj.NewDecoder(limits)
-	file, _ := os.Open(fileObj)
-	defer file.Close()
+	width, height := 400.0, 300.0
+	// width, height := 1000.0, 1000.0
 
-	model, err := decoder.Decode(file)
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(3, 4, -30), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-5, 4, -1), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 3, -4)
+	to := tracer.NewPoint(0, 0, 4)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	g, err := tracer.ParseOBJ(file)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	fmt.Printf("Model has %d vertices.\n", len(model.Vertices))
-	fmt.Printf("Model has %d texture coordinates.\n", len(model.TexCoords))
-	fmt.Printf("Model has %d normals.\n", len(model.Normals))
-	fmt.Printf("Model has %d objects.\n", len(model.Objects))
-	fmt.Printf("Model has %d material libs.\n", len(model.MaterialLibraries))
-	for _, ml := range model.MaterialLibraries {
-		fmt.Printf("  %v", ml)
-	}
-	fmt.Printf("First object has name: %s\n", model.Objects[0].Name)
-
-	// material library
-	lib := &mtl.Library{
-		Materials: []*mtl.Material{},
-	}
-
-	libDecoder := mtl.NewDecoder(
-		mtl.DecodeLimits{
-			MaxMaterialCount: 5,
-		})
-
-	for _, ml := range model.MaterialLibraries {
-		fmt.Printf("  %v", ml)
-		f, err := os.Open(path.Join(dir, ml))
-		if err != nil {
-			log.Fatalln(err)
-		}
-		l, err := libDecoder.Decode(f)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		lib.Materials = append(lib.Materials, l.Materials...)
-	}
-
-	for _, o := range model.Objects {
-		log.Printf("Object:%v", o.Name)
-		for _, m := range o.Meshes {
-			log.Printf("  material: %v\n", m.MaterialName)
-			mat, ok := lib.FindMaterial(m.MaterialName)
-			if !ok {
-				log.Fatalf("Unable to find material %v in lib", m.MaterialName)
-			}
-			log.Printf("    %v\n", mat.Name)
-			log.Printf("    Diffuse: %v\n", mat.DiffuseColor)
-			log.Printf("    Ambient: %v\n", mat.AmbientColor)
-			log.Printf("    Specular: %v\n", mat.SpecularColor)
-			log.Printf("    Specular Exp: %v\n", mat.SpecularExponent)
-			log.Println("  Faces:")
-			for i, f := range m.Faces {
-				log.Printf("  (%v)", i)
-				for _, r := range f.References {
-					log.Printf("    vertex: %v", model.GetVertexFromReference(r))
-					log.Printf("    normal: %v", model.GetNormalFromReference(r))
-					log.Printf("    texture: %v", model.GetTexCoordFromReference(r))
-					log.Println()
-				}
-			}
-		}
-	}
+	w.AddObject(g)
+	tracer.Render(w)
 
 }
 
@@ -1310,9 +1265,9 @@ func main() {
 	// cone()
 	// point()
 	// group()
-	triangle()
+	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
-	// objParse()
+	objParse()
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
