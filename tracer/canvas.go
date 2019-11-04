@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/png"
 	"io"
+	"runtime"
 	"sync"
 
 	"github.com/DanTulovsky/tracer/utils"
@@ -122,21 +123,22 @@ func (c *Canvas) ExportToPNG(w io.Writer) error {
 	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
 
 	var wg sync.WaitGroup
+	sem := make(chan bool, runtime.NumCPU())
 
-	// Almost certainly not needed here, but good exercise anyway
-	// TODO: Limit this to MAXProcs at a time - channels?
-	// e.g. https://medium.com/@zufolo/a-pattern-for-limiting-the-number-of-goroutines-in-execution-56e13b226e72
 	for col := 0; col < c.Width; col++ {
 		for row := 0; row < c.Height; row++ {
-			wg.Add(1)
+			sem <- true
 			go func(img *image.RGBA, col, row int, clr color.Color) {
+				defer func() { <-sem }()
 				img.Set(col, row, clr)
 				wg.Done()
 			}(img, col, row, c.colors[col][row])
 		}
 	}
 
-	wg.Wait()
+	for i := 0; i < cap(sem); i++ {
+		sem <- true
+	}
 
 	// Write
 	if err := png.Encode(w, img); err != nil {

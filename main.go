@@ -1197,12 +1197,9 @@ func triangle() {
 	tracer.Render(w)
 }
 
-func objParse() {
+func objParse(f string) {
 
-	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	file := path.Join(dir, "complex-smooth.obj")
-
-	width, height := 600.0, 500.0
+	width, height := 800.0, 500.0
 	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
@@ -1222,12 +1219,12 @@ func objParse() {
 	w.Camera().SetTransform(cameraTransform)
 	w.Camera().SetFoV(math.Pi / 5)
 
-	g, err := tracer.ParseOBJ(file)
+	g, err := tracer.ParseOBJ(f)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/1).Translate(0, 2, 0))
+	g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/1).Translate(-1.8, 2, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
@@ -1271,7 +1268,9 @@ func main() {
 	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
-	objParse()
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	f := path.Join(dir, "complex-smooth.obj")
+	objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
