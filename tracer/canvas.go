@@ -7,7 +7,6 @@ import (
 	"image/png"
 	"io"
 	"runtime"
-	"sync"
 
 	"github.com/DanTulovsky/tracer/utils"
 	"golang.org/x/image/colornames"
@@ -122,7 +121,6 @@ func (c *Canvas) ExportToPNG(w io.Writer) error {
 
 	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
 
-	var wg sync.WaitGroup
 	sem := make(chan bool, runtime.NumCPU())
 
 	for col := 0; col < c.Width; col++ {
@@ -131,7 +129,6 @@ func (c *Canvas) ExportToPNG(w io.Writer) error {
 			go func(img *image.RGBA, col, row int, clr color.Color) {
 				defer func() { <-sem }()
 				img.Set(col, row, clr)
-				wg.Done()
 			}(img, col, row, c.colors[col][row])
 		}
 	}
