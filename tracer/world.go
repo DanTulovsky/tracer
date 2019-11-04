@@ -274,6 +274,8 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 				defer func() { <-sem }()
 				ray := camera.RayForPixel(x, y)
 				clr := w.ColorAt(ray, w.Config.MaxRecusions)
+				// TODO: There is a race condition here, as canvas is also read by the GPU
+				// Only true when using GPU to display the render live.
 				canvas.SetFloat(x, y, clr)
 			}(x, y)
 		}
