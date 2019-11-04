@@ -1199,7 +1199,7 @@ func triangle() {
 
 func objParse(f string) {
 
-	width, height := 800.0, 500.0
+	width, height := 200.0, 200.0
 	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
