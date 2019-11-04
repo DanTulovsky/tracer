@@ -78,7 +78,8 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 
 	for _, r := range f.References {
 		v := model.GetVertexFromReference(r)
-		vertecies = append(vertecies, NewPoint(v.X, v.Y, v.Z))
+		// negate X because OBJ uses right-handed coordinates, and we use left-handed coordinates
+		vertecies = append(vertecies, NewPoint(-v.X, v.Y, v.Z))
 	}
 
 	for i := 1; i < len(vertecies)-1; i++ {
