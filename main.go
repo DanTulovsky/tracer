@@ -1200,10 +1200,10 @@ func triangle() {
 func objParse() {
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	file := path.Join(dir, "monkey.obj")
+	file := path.Join(dir, "complex-smooth.obj")
 
-	// width, height := 600.0, 500.0
-	width, height := 1000.0, 1000.0
+	width, height := 600.0, 500.0
+	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1215,7 +1215,7 @@ func objParse() {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 3, -8)
+	from := tracer.NewPoint(0, 6, -8)
 	to := tracer.NewPoint(0, 0, 4)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -1227,7 +1227,7 @@ func objParse() {
 		log.Fatalln(err)
 	}
 
-	g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi / 1))
+	g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/1).Translate(0, 2, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
