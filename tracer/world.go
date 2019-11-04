@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"runtime"
@@ -258,9 +259,16 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 	log.Printf("Parallelism: %v", max)
 	sem := make(chan bool, max)
 
+	total := (camera.Vsize - 1) * (camera.Hsize - 1)
+	last := 0.0
+
 	for y := 0.0; y < camera.Vsize-1; y++ {
 		for x := 0.0; x < camera.Hsize-1; x++ {
 			sem <- true
+
+			// Show progress
+			last = showProgress(total, last, camera.Vsize-1, camera.Hsize-1, x, y)
+
 			go func(x, y float64) {
 				// work is done
 				defer func() { <-sem }()
@@ -271,6 +279,7 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 		}
 	}
 
+	fmt.Println()
 	log.Println("Wainting for render to complete...")
 	for i := 0; i < cap(sem); i++ {
 		sem <- true
