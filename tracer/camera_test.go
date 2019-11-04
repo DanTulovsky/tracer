@@ -89,7 +89,7 @@ func TestNewCamera(t *testing.T) {
 			want: &Camera{
 				Hsize:      160,
 				Vsize:      120,
-				FoV:        math.Pi / 2,
+				fov:        math.Pi / 2,
 				Transform:  IdentityMatrix(),
 				HalfWidth:  1,
 				HalfHeight: 0.75,

@@ -31,6 +31,15 @@ func (g *Group) AddMember(m Shaper) {
 	m.SetParent(g)
 }
 
+// AddMembers adds a new member to this group
+func (g *Group) AddMembers(m ...Shaper) {
+	for _, mem := range m {
+
+		g.members = append(g.members, mem)
+		mem.SetParent(g)
+	}
+}
+
 // Members returns all the direct members of this group
 func (g *Group) Members() []Shaper {
 	return g.members

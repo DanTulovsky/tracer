@@ -23,7 +23,7 @@ func ViewTransform(from, to Point, up Vector) Matrix {
 // Camera defines the camera looking at the world
 type Camera struct {
 	Hsize, Vsize          float64 // canvas size
-	FoV                   float64 // field of view angle in radians
+	fov                   float64 // field of view angle in radians
 	Transform             Matrix  // view transformation matrix from the above function
 	HalfWidth, HalfHeight float64
 	PixelSize             float64
@@ -34,7 +34,7 @@ func NewCamera(hsize, vsize, fov float64) *Camera {
 	c := &Camera{
 		Hsize:     hsize,
 		Vsize:     vsize,
-		FoV:       fov,
+		fov:       fov,
 		Transform: IdentityMatrix(),
 	}
 
@@ -47,10 +47,16 @@ func (c *Camera) SetTransform(t Matrix) {
 	c.Transform = t
 }
 
+// SetFoV sets the field of view and recalculates the pixel size
+func (c *Camera) SetFoV(fov float64) {
+	c.fov = fov
+	c.setPixelSize()
+}
+
 // setPixelSize sets the world-space pixel size and half view values into the camera
 // Assumes the canvas is one unit away
 func (c *Camera) setPixelSize() {
-	halfView := math.Tan(c.FoV / 2)
+	halfView := math.Tan(c.fov / 2)
 	aspect := c.Hsize / c.Vsize
 
 	switch {
