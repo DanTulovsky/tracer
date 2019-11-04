@@ -640,3 +640,29 @@ func TestGroup_HasMembers(t *testing.T) {
 		})
 	}
 }
+
+func TestGroup_AddMembers(t *testing.T) {
+	type args struct {
+		m []Shaper
+	}
+	tests := []struct {
+		name string
+		g    *Group
+		args args
+	}{
+		{
+			name: "in group",
+			g:    NewGroup(),
+			args: args{
+				m: []Shaper{NewUnitCube(), NewUnitSphere()},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.g.AddMembers(tt.args.m...)
+
+			assert.Equal(t, 2, len(tt.g.Members()), "should equal")
+		})
+	}
+}

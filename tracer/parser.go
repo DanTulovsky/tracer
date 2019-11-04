@@ -71,6 +71,44 @@ func parseOBJ(f *os.File, dir string) (*obj.Model, *mtl.Library, error) {
 	return model, lib, nil
 }
 
+// triangulate converts a face into a list of triangles
+func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
+	var tri []Shaper
+	var vertecies []Point
+
+	for _, r := range f.References {
+		v := model.GetVertexFromReference(r)
+		vertecies = append(vertecies, NewPoint(v.X, v.Y, v.Z))
+	}
+
+	for i := 1; i < len(vertecies)-1; i++ {
+		t := NewTriangle(vertecies[0], vertecies[i], vertecies[i+1])
+		t.SetMaterial(mat)
+		tri = append(tri, t)
+	}
+
+	return tri
+
+}
+
+// convertMaterial converts OBJ material to *Material
+func convertMaterial(mat *mtl.Material) *Material {
+	// TODO: Implement this
+
+	log.Printf("    %v\n", mat.Name)
+	log.Printf("    Diffuse: %v\n", mat.DiffuseColor)
+	log.Printf("    Ambient: %v\n", mat.AmbientColor)
+	log.Printf("    Specular: %v\n", mat.SpecularColor)
+	log.Printf("    Specular Exp: %v\n", mat.SpecularExponent)
+	m := NewDefaultMaterial()
+
+	// For now set the diffuse color as the color of the object
+	d := mat.DiffuseColor
+	m.Color = NewColor(d.R, d.G, d.B)
+
+	return m
+}
+
 // convertData converts the parsed model to *Group instance
 func convertData(model *obj.Model, lib *mtl.Library) (*Group, error) {
 	g := NewGroup()
@@ -83,20 +121,13 @@ func convertData(model *obj.Model, lib *mtl.Library) (*Group, error) {
 			if !ok {
 				return nil, fmt.Errorf("Unable to find material %v in lib", m.MaterialName)
 			}
-			log.Printf("    %v\n", mat.Name)
-			log.Printf("    Diffuse: %v\n", mat.DiffuseColor)
-			log.Printf("    Ambient: %v\n", mat.AmbientColor)
-			log.Printf("    Specular: %v\n", mat.SpecularColor)
-			log.Printf("    Specular Exp: %v\n", mat.SpecularExponent)
+
+			omat := convertMaterial(mat)
+
 			log.Println("  Faces:")
-			for i, f := range m.Faces {
-				log.Printf("  (%v)", i)
-				for _, r := range f.References {
-					log.Printf("    vertex: %v", model.GetVertexFromReference(r))
-					log.Printf("    normal: %v", model.GetNormalFromReference(r))
-					log.Printf("    texture: %v", model.GetTexCoordFromReference(r))
-					log.Println()
-				}
+			for _, f := range m.Faces {
+				tri := triangulate(model, f, omat)
+				g.AddMembers(tri...)
 			}
 		}
 	}
