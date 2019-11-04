@@ -228,12 +228,14 @@ func TestWorld_Render(t *testing.T) {
 		name      string
 		world     *World
 		camera    *Camera
+		canvas    *Canvas
 		transform Matrix
 	}{
 		{
 			name:      "test1",
 			world:     NewDefaultTestWorld(),
 			camera:    NewCamera(11, 11, math.Pi/2),
+			canvas:    NewCanvas(100, 100),
 			transform: ViewTransform(NewPoint(0, 0, -5), NewPoint(0, 0, 0), NewVector(0, 1, 0)),
 		},
 	}
@@ -241,8 +243,8 @@ func TestWorld_Render(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.world.SetCamera(tt.camera)
 			tt.world.Camera().SetTransform(tt.transform)
-			canvas := tt.world.Render()
-			got, err := canvas.Get(5, 5)
+			tt.world.Render(tt.camera, tt.canvas)
+			got, err := tt.canvas.Get(5, 5)
 			if err != nil {
 				t.Error(err)
 			}
