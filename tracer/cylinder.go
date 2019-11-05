@@ -136,7 +136,7 @@ func (c *Cylinder) IntersectWith(r Ray) Intersections {
 }
 
 // NormalAt returns the normal vector at the given point on the surface of the cylinder
-func (c *Cylinder) NormalAt(p Point) Vector {
+func (c *Cylinder) NormalAt(p Point, xs Intersection) Vector {
 	// move point to object space
 	op := p.ToObjectSpace(c)
 

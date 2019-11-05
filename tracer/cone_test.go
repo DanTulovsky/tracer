@@ -185,7 +185,8 @@ func TestCone_IntersectWith(t *testing.T) {
 
 func TestCone_NormalAt(t *testing.T) {
 	type args struct {
-		p Point
+		p  Point
+		xs Intersection
 	}
 	tests := []struct {
 		name string
@@ -220,7 +221,7 @@ func TestCone_NormalAt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Normalize().Equals(tt.cone.NormalAt(tt.args.p)), "should equal")
+			assert.True(t, tt.want.Normalize().Equals(tt.cone.NormalAt(tt.args.p, tt.args.xs)), "should equal")
 		})
 	}
 }

@@ -143,7 +143,7 @@ func (c *Cone) IntersectWith(r Ray) Intersections {
 }
 
 // NormalAt returns the normal vector at the given point on the surface of the cone
-func (c *Cone) NormalAt(p Point) Vector {
+func (c *Cone) NormalAt(p Point, xs Intersection) Vector {
 	// move point to object space
 	op := p.ToObjectSpace(c)
 

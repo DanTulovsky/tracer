@@ -1198,8 +1198,8 @@ func triangle() {
 
 func objParse(f string) {
 
-	// width, height := 400.0, 400.0
-	width, height := 1000.0, 1000.0
+	// width, height := 640.0, 480.0
+	width, height := 1400.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1269,7 +1269,7 @@ func main() {
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "monkey.obj")
+	f := path.Join(dir, "complex-smooth2.obj")
 	objParse(f)
 
 	if *memprofile != "" {
