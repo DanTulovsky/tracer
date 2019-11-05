@@ -1269,7 +1269,7 @@ func main() {
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "complex-smooth2.obj")
+	f := path.Join(dir, "test6-smooth.obj")
 	objParse(f)
 
 	if *memprofile != "" {
