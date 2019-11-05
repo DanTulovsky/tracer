@@ -226,7 +226,7 @@ func TestGroup_NormalAt(t *testing.T) {
 
 	point := NewPoint(1.7321, 1.1547, -5.5774)
 	want := NewVector(0.285703, 0.428543, -0.8571605)
-	got := s.NormalAt(point)
+	got := s.NormalAt(point, Intersection{})
 
 	assert.True(t, want.Equals(got), "should be true")
 

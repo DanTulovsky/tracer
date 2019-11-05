@@ -48,7 +48,8 @@ func TestNewTriangle(t *testing.T) {
 
 func TestTriangle_NormalAt(t *testing.T) {
 	type args struct {
-		p Point
+		p  Point
+		xs Intersection
 	}
 	tests := []struct {
 		name string
@@ -65,7 +66,7 @@ func TestTriangle_NormalAt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			want := tt.tri.Normal
-			assert.Equal(t, want, tt.tri.NormalAt(tt.args.p))
+			assert.Equal(t, want, tt.tri.NormalAt(tt.args.p, tt.args.xs))
 		})
 	}
 }

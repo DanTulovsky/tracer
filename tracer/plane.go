@@ -26,7 +26,7 @@ func NewPlane() *Plane {
 }
 
 // NormalAt returns the normal vector at the given point on the surface of the plane
-func (pl *Plane) NormalAt(p Point) Vector {
+func (pl *Plane) NormalAt(p Point, xs Intersection) Vector {
 	on := NewVector(0, 1, 0)
 
 	// common calculation to all shapes
