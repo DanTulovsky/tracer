@@ -225,7 +225,8 @@ func TestCylinder_IntersectWith(t *testing.T) {
 
 func TestCylinder_NormalAt(t *testing.T) {
 	type args struct {
-		p Point
+		p  Point
+		xs Intersection
 	}
 	tests := []struct {
 		name string
@@ -316,7 +317,7 @@ func TestCylinder_NormalAt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, tt.c.NormalAt(tt.args.p), "should equal")
+			assert.Equal(t, tt.want, tt.c.NormalAt(tt.args.p, tt.args.xs), "should equal")
 		})
 	}
 }

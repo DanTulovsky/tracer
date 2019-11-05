@@ -79,7 +79,7 @@ func (c *Cube) IntersectWith(r Ray) Intersections {
 }
 
 // NormalAt returns the normal vector at the given point on the surface of the cube
-func (c *Cube) NormalAt(p Point) Vector {
+func (c *Cube) NormalAt(p Point, xs Intersection) Vector {
 
 	// move point to object space
 	op := p.ToObjectSpace(c)

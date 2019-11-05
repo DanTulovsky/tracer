@@ -11,7 +11,7 @@ type Shaper interface {
 	SetParent(*Group)
 
 	IntersectWith(Ray) Intersections
-	NormalAt(Point) Vector
+	NormalAt(Point, Intersection) Vector
 	PrecomputeValues()
 
 	Material() *Material
@@ -67,7 +67,7 @@ func (s *Shape) IntersectWith(r Ray) Intersections {
 }
 
 // NormalAt implements the Shaper interface
-func (s *Shape) NormalAt(p Point) Vector {
+func (s *Shape) NormalAt(p Point, xs Intersection) Vector {
 	panic("must implement NormalAt")
 }
 

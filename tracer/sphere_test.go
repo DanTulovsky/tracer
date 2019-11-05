@@ -172,7 +172,8 @@ func TestSphere_SetTransform(t *testing.T) {
 
 func TestSphere_NormalAt(t *testing.T) {
 	type args struct {
-		p Point
+		p  Point
+		xs Intersection
 	}
 	tests := []struct {
 		name   string
@@ -239,7 +240,7 @@ func TestSphere_NormalAt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.sphere.SetTransform(tt.m)
-			v := tt.sphere.NormalAt(tt.args.p)
+			v := tt.sphere.NormalAt(tt.args.p, tt.args.xs)
 
 			assert.True(t, tt.want.Equals(v), "should equal")
 			assert.True(t, v.Equals(v.Normalize()), "should equal")
