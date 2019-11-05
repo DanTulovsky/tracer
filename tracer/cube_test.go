@@ -175,7 +175,8 @@ func TestCube_IntersectWith(t *testing.T) {
 
 func TestCube_NormalAt(t *testing.T) {
 	type args struct {
-		p Point
+		p  Point
+		xs Intersection
 	}
 	tests := []struct {
 		name string
@@ -250,7 +251,7 @@ func TestCube_NormalAt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, tt.cube.NormalAt(tt.args.p))
+			assert.Equal(t, tt.want, tt.cube.NormalAt(tt.args.p, tt.args.xs))
 		})
 	}
 }

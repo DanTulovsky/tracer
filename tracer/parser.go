@@ -75,15 +75,19 @@ func parseOBJ(f *os.File, dir string) (*obj.Model, *mtl.Library, error) {
 func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 	var tri []Shaper
 	var vertecies []Point
+	var normals []Vector
 
 	for _, r := range f.References {
 		v := model.GetVertexFromReference(r)
-		// negate X and Z because OBJ uses right-handed coordinates, and we use left-handed coordinates
-		vertecies = append(vertecies, NewPoint(-v.X, v.Y, -v.Z))
+		// negate Z because OBJ uses right-handed coordinates, and we use left-handed coordinates
+		vertecies = append(vertecies, NewPoint(v.X, v.Y, -v.Z))
+
+		n := model.GetNormalFromReference(r)
+		normals = append(normals, NewVector(n.X, n.Y, -n.Z))
 	}
 
 	for i := 1; i < len(vertecies)-1; i++ {
-		t := NewTriangle(vertecies[0], vertecies[i], vertecies[i+1])
+		t := NewSmoothTriangle(vertecies[0], vertecies[i], vertecies[i+1], normals[0], normals[i], normals[i+1])
 		t.SetMaterial(mat)
 		tri = append(tri, t)
 	}

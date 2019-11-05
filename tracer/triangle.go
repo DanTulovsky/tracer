@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"errors"
 	"math"
 
 	"github.com/DanTulovsky/tracer/constants"
@@ -36,15 +37,14 @@ func NewTriangle(p1, p2, p3 Point) *Triangle {
 	return t
 }
 
-// IntersectWith returns the 't' value of Ray r intersecting with the triangle in sorted order
-func (t *Triangle) IntersectWith(r Ray) Intersections {
-	xs := NewIntersections()
+// sharedIntersectWith returns the tval, u, v, or an error if there is no intersection
+func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, error) {
 
 	dirCrossE2 := r.Dir.Cross(t.E2)
 	d := t.E1.Dot(dirCrossE2)
 	if math.Abs(d) < constants.Epsilon {
 		// ray parallel to surface of triangle
-		return xs
+		return 0, 0, 0, errors.New("no intersection")
 	}
 
 	f := 1.0 / d
@@ -52,23 +52,34 @@ func (t *Triangle) IntersectWith(r Ray) Intersections {
 	u := f * p1ToOrigin.Dot(dirCrossE2)
 	if u < 0 || u > 1 {
 		// ray passes beyond p1-p3 edge
-		return xs
+		return 0, 0, 0, errors.New("no intersection")
 	}
 
 	// ray misses p1-p2 and p2-p3 edges
 	oCrossE1 := p1ToOrigin.Cross(t.E1)
 	v := f * r.Dir.Dot(oCrossE1)
 	if v < 0 || (u+v) > 1 {
-		return xs
+		return 0, 0, 0, errors.New("no intersection")
 	}
 
-	tval := f * t.E2.Dot(oCrossE1)
+	return f * t.E2.Dot(oCrossE1), u, v, nil
+}
+
+// IntersectWith returns the 't' value of Ray r intersecting with the triangle in sorted order
+func (t *Triangle) IntersectWith(r Ray) Intersections {
+	xs := NewIntersections()
+
+	// u, v not used here
+	tval, _, _, err := t.sharedIntersectWith(r)
+	if err != nil {
+		return xs
+	}
 	xs = append(xs, NewIntersection(t, tval))
 	return xs
 }
 
 // NormalAt returns the normal of the triangle at the given point
-func (t *Triangle) NormalAt(p Point) Vector {
+func (t *Triangle) NormalAt(p Point, xs Intersection) Vector {
 	// world normal
 	return t.Normal.NormalToWorldSpace(t)
 }

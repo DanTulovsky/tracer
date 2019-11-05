@@ -12,6 +12,8 @@ import (
 type Intersection struct {
 	o Shaper
 	t float64
+	// Intersection point on the shape (used only for triangles)
+	u, v float64
 }
 
 // NewIntersection returns an intersection object
@@ -28,6 +30,11 @@ func (i Intersection) T() float64 {
 // Object returns the object of the intersection
 func (i Intersection) Object() Shaper {
 	return i.o
+}
+
+// NewIntersectionUV returns an intersection object with UV filled in
+func NewIntersectionUV(o Shaper, t, u, v float64) Intersection {
+	return Intersection{o: o, t: t, u: u, v: v}
 }
 
 // Intersections is a collection of Intersections
@@ -144,11 +151,12 @@ func findRefractiveIndexes(hit Intersection, xs Intersections) (n1, n2 float64) 
 }
 
 // PrepareComputations prepopulates the IntersectionState structure
-func PrepareComputations(i Intersection, r Ray, xs Intersections) *IntersectionState {
+func PrepareComputations(hit Intersection, r Ray, xs Intersections) *IntersectionState {
 	var n1, n2 float64
-	point := r.Position(i.T())
-	object := i.Object()
-	normalv := object.NormalAt(point)
+	point := r.Position(hit.T())
+	object := hit.Object()
+
+	normalv := object.NormalAt(point, hit)
 	eyev := r.Dir.Negate()
 	inside := false
 
@@ -161,10 +169,10 @@ func PrepareComputations(i Intersection, r Ray, xs Intersections) *IntersectionS
 	overPoint := point.AddVector(normalv.Scale(constants.Epsilon))
 	underPoint := point.SubVector(normalv.Scale(constants.Epsilon))
 	reflectv := r.Dir.Reflect(normalv)
-	n1, n2 = findRefractiveIndexes(i, xs)
+	n1, n2 = findRefractiveIndexes(hit, xs)
 
 	return &IntersectionState{
-		T:          i.T(),
+		T:          hit.T(),
 		Object:     object,
 		Point:      point,
 		EyeV:       eyev,

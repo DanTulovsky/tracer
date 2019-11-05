@@ -33,7 +33,6 @@ func TestNewIntersection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewIntersection(tt.args.o, tt.args.t)
-			got.Object().SetName(tt.want.Object().Name())
 			assert.Equal(t, tt.want, got, "should be equal")
 		})
 	}
@@ -183,7 +182,6 @@ func TestPrepareComputations(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			xs := NewIntersections(tt.args.i)
 			comps := PrepareComputations(tt.args.i, tt.args.r, xs)
-			// assert.Equal(t, tt.want, comps, "should equal")
 			assert.InEpsilon(t, tt.want.T, comps.T, constants.Epsilon, "should equal")
 			assert.True(t, tt.want.Point.Equals(comps.Point))
 			assert.True(t, tt.want.EyeV.Equals(comps.EyeV))
@@ -385,6 +383,42 @@ func TestSchlick(t *testing.T) {
 			got := Schlick(state)
 
 			assert.InDelta(t, tt.want, got, constants.Epsilon, "should equal")
+		})
+	}
+}
+
+func TestNewIntersectionUV(t *testing.T) {
+	type args struct {
+		o Shaper
+		t float64
+		u float64
+		v float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want Intersection
+	}{
+		{
+			name: "test1",
+			args: args{
+				o: newTestTriangle(),
+				t: 3.5,
+				u: 0.2,
+				v: 0.4,
+			},
+			want: Intersection{
+				o: newTestTriangle(),
+				t: 3.5,
+				u: 0.2,
+				v: 0.4,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := NewIntersectionUV(tt.args.o, tt.args.t, tt.args.u, tt.args.v)
+			assert.Equal(t, tt.want, got, "should be equal")
 		})
 	}
 }
