@@ -1216,7 +1216,7 @@ func objParse(f string) {
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
-	w.Camera().SetFoV(math.Pi / 5)
+	w.Camera().SetFoV(math.Pi / 3)
 
 	g, err := tracer.ParseOBJ(f)
 	if err != nil {
