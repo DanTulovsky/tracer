@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"path"
 	"runtime"
 	"runtime/pprof"
 	"sync"
@@ -16,6 +17,7 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
+	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -1037,8 +1039,8 @@ func cone() {
 func group() {
 
 	// width, height := 100.0, 100.0
-	// width, height := 400.0, 400.0
-	width, height := 2000.0, 1500.0
+	width, height := 400.0, 400.0
+	// width, height := 2000.0, 1500.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1262,13 +1264,13 @@ func main() {
 	// cylinder()
 	// cone()
 	// point()
-	group()
+	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 
-	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	// f := path.Join(dir, "monkey.obj")
-	// objParse(f)
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	f := path.Join(dir, "monkey.obj")
+	objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
