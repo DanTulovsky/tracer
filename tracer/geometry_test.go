@@ -112,7 +112,7 @@ func TestShape_Parent(t *testing.T) {
 	tests := []struct {
 		name  string
 		shape *Shape
-		want  *Group
+		want  Shaper
 	}{
 		{
 			name:  "default group is nil",
