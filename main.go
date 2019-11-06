@@ -1039,8 +1039,8 @@ func cone() {
 func group() {
 
 	// width, height := 100.0, 100.0
-	// width, height := 400.0, 400.0
-	width, height := 2000.0, 1500.0
+	width, height := 400.0, 400.0
+	// width, height := 2000.0, 1500.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1216,7 +1216,7 @@ func objParse(f string) {
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
-	w.Camera().SetFoV(math.Pi / 5)
+	w.Camera().SetFoV(math.Pi / 3)
 
 	g, err := tracer.ParseOBJ(f)
 	if err != nil {
@@ -1269,7 +1269,7 @@ func main() {
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "complex-smooth3.obj")
+	f := path.Join(dir, "test6-smooth.obj")
 	objParse(f)
 
 	if *memprofile != "" {
