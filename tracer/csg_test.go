@@ -312,13 +312,10 @@ func TestCSG_FilterIntersections(t *testing.T) {
 		right Shaper
 		op    Operation
 	}
-	type args struct {
-		xs Intersections
-	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name         string
+		fields       fields
+		want1, want2 int
 	}{
 		{
 			fields: fields{
@@ -326,24 +323,43 @@ func TestCSG_FilterIntersections(t *testing.T) {
 				right: NewUnitCube(),
 				op:    Union,
 			},
-			args: args{
-				xs: NewIntersections(
-					NewIntersection(NewUnitSphere(), 1),
-					NewIntersection(NewUnitCube(), 2),
-					NewIntersection(NewUnitSphere(), 3),
-					NewIntersection(NewUnitCube(), 4),
-				),
+			want1: 0,
+			want2: 3,
+		},
+		{
+			fields: fields{
+				left:  NewUnitSphere(),
+				right: NewUnitCube(),
+				op:    Intersect,
 			},
+			want1: 1,
+			want2: 2,
+		},
+		{
+			fields: fields{
+				left:  NewUnitSphere(),
+				right: NewUnitCube(),
+				op:    Difference,
+			},
+			want1: 0,
+			want2: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			xs := NewIntersections(
+				NewIntersection(tt.fields.left, 1),
+				NewIntersection(tt.fields.right, 2),
+				NewIntersection(tt.fields.left, 3),
+				NewIntersection(tt.fields.right, 4),
+			)
 			csg := NewCSG(tt.fields.left, tt.fields.right, tt.fields.op)
 			want := NewIntersections(
-				NewIntersection(csg, 0),
-				NewIntersection(csg, 3),
+				NewIntersection(csg, xs[tt.want1].t),
+				NewIntersection(csg, xs[tt.want2].t),
 			)
-			assert.Equal(t, want, csg.FilterIntersections(tt.args.xs), "should equal")
+			assert.Equal(t, want[0].t, csg.FilterIntersections(xs)[0].t, "should equal")
+			assert.Equal(t, want[1].t, csg.FilterIntersections(xs)[1].t, "should equal")
 		})
 	}
 }
