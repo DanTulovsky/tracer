@@ -6,9 +6,9 @@ type Shaper interface {
 
 	HasMembers() bool
 
-	Parent() *Group
+	Parent() Shaper
 	HasParent() bool
-	SetParent(*Group)
+	SetParent(Shaper)
 
 	IntersectWith(Ray) Intersections
 	NormalAt(Point, Intersection) Vector
@@ -32,7 +32,7 @@ type Shape struct {
 	material  *Material
 	bound     Bound // cache the group bounding box
 
-	parent *Group
+	parent Shaper
 }
 
 // HasMembers returns true if this is a group that has members
@@ -47,7 +47,7 @@ func (s *Shape) PrecomputeValues() {
 }
 
 // Parent returns the parent group this shape is part of
-func (s *Shape) Parent() *Group {
+func (s *Shape) Parent() Shaper {
 	return s.parent
 }
 
@@ -57,7 +57,7 @@ func (s *Shape) HasParent() bool {
 }
 
 // SetParent sets the parents of the object
-func (s *Shape) SetParent(p *Group) {
+func (s *Shape) SetParent(p Shaper) {
 	s.parent = p
 }
 
