@@ -116,3 +116,8 @@ func (c *Cube) PrecomputeValues() {
 	// calculate group bounding box
 	c.calculateBounds()
 }
+
+// Includes implements includes logic
+func (c *Cube) Includes(s Shaper) bool {
+	return c == s
+}

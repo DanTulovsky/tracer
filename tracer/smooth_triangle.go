@@ -52,3 +52,8 @@ func (t *SmoothTriangle) NormalAt(p Point, hit Intersection) Vector {
 	v := t.N2.Scale(hit.u).AddVector(t.N3.Scale(hit.v)).AddVector(t.N1.Scale(1 - hit.u - hit.v))
 	return v.NormalToWorldSpace(t)
 }
+
+// Includes implements includes logic
+func (t *SmoothTriangle) Includes(s Shaper) bool {
+	return t == s
+}
