@@ -110,3 +110,8 @@ func (t *Triangle) PrecomputeValues() {
 	// calculate group bounding box
 	t.calculateBounds()
 }
+
+// Includes implements includes logic
+func (t *Triangle) Includes(s Shaper) bool {
+	return t == s
+}

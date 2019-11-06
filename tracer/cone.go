@@ -187,3 +187,8 @@ func (c *Cone) PrecomputeValues() {
 	// calculate group bounding box
 	c.calculateBounds()
 }
+
+// Includes implements includes logic
+func (c *Cone) Includes(s Shaper) bool {
+	return c == s
+}

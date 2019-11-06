@@ -68,3 +68,8 @@ func (pl *Plane) PrecomputeValues() {
 	// calculate group bounding box
 	pl.calculateBounds()
 }
+
+// Includes implements includes logic
+func (pl *Plane) Includes(s Shaper) bool {
+	return pl == s
+}

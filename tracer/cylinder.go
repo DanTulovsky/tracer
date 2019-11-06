@@ -174,3 +174,8 @@ func (c *Cylinder) PrecomputeValues() {
 	// calculate group bounding box
 	c.calculateBounds()
 }
+
+// Includes implements includes logic
+func (c *Cylinder) Includes(s Shaper) bool {
+	return c == s
+}

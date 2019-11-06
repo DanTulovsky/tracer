@@ -10,6 +10,11 @@ type Shaper interface {
 	HasParent() bool
 	SetParent(Shaper)
 
+	// If A is a Group, true if any child includes B
+	// If A is a CSG, true if either child includes B
+	// If A is anything else, true if A == B
+	Includes(Shaper) bool
+
 	IntersectWith(Ray) Intersections
 	NormalAt(Point, Intersection) Vector
 	PrecomputeValues()
@@ -33,6 +38,11 @@ type Shape struct {
 	bound     Bound // cache the group bounding box
 
 	parent Shaper
+}
+
+// Includes implements includes logic
+func (s *Shape) Includes(s2 Shaper) bool {
+	panic("please implement Includes")
 }
 
 // HasMembers returns true if this is a group that has members

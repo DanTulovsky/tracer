@@ -101,3 +101,8 @@ func (s *Sphere) PrecomputeValues() {
 	// calculate group bounding box
 	s.calculateBounds()
 }
+
+// Includes implements includes logic
+func (s *Sphere) Includes(s2 Shaper) bool {
+	return s == s2
+}
