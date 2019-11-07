@@ -6,7 +6,6 @@ import (
 	"log"
 	"math"
 	"os"
-	"path"
 	"runtime"
 	"runtime/pprof"
 	"sync"
@@ -17,7 +16,6 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
-	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -1230,6 +1228,43 @@ func objParse(f string) {
 
 }
 
+func csg() {
+	width, height := 640.0, 480.0
+	// width, height := 1400.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(3, 4, -30), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-5, 4, -1), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 6, -8)
+	to := tracer.NewPoint(0, 0, 4)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+	w.Camera().SetFoV(math.Pi / 3)
+
+	s1 := tracer.NewClosedCylinder(-5, 5)
+	s1.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi / 2))
+	s1.Material().Color = tracer.ColorName(colornames.Lightcyan)
+
+	s2 := tracer.NewUnitSphere()
+	s2.SetTransform(tracer.IdentityMatrix().Scale(1, 2, 1))
+	s2.Material().Color = tracer.ColorName(colornames.Lightcoral)
+
+	op := tracer.Difference
+	csg := tracer.NewCSG(s1, s2, op)
+
+	w.AddObject(csg)
+
+	tracer.Render(w)
+}
+
 func main() {
 
 	flag.Parse()
@@ -1267,10 +1302,11 @@ func main() {
 	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
+	csg()
 
-	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "test6-smooth.obj")
-	objParse(f)
+	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	// f := path.Join(dir, "test6-smooth.obj")
+	// objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

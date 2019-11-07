@@ -94,3 +94,14 @@ func (csg *CSG) IntersectWith(r Ray) Intersections {
 
 	return csg.FilterIntersections(x1)
 }
+
+// NormalAt is unuse here
+func (csg *CSG) NormalAt(p Point, xs Intersection) Vector {
+	return NewVector(0, 0, 1)
+}
+
+// PrecomputeValues precomputes some values for render speedup
+func (csg *CSG) PrecomputeValues() {
+	csg.left.PrecomputeValues()
+	csg.right.PrecomputeValues()
+}
