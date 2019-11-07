@@ -111,12 +111,14 @@ func (w *World) Camera() *Camera {
 
 // ColorAt returns the color in the world where the given ray hits
 func (w *World) ColorAt(r Ray, remaining int) Color {
+	// First solve the visibility problem
 	xs := w.Intersections(r)
 	hit, err := xs.Hit()
 	if err != nil {
 		return Black()
 	}
 
+	// Second solve the shading problem
 	state := PrepareComputations(hit, r, xs)
 	return w.shadeHit(state, remaining).Clamp()
 }
