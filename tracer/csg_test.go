@@ -382,8 +382,10 @@ func TestCSG_IntersectWith2(t *testing.T) {
 
 	xs := c.IntersectWith(r)
 	assert.Equal(t, 2, len(xs), "should be 0")
-	assert.Equal(t, 4, xs[0].t, "should equal")
+
+	assert.Equal(t, 4.0, xs[0].t, "should equal")
 	assert.Equal(t, s1, xs[0].Object(), "should equal")
+
 	assert.Equal(t, 6.5, xs[1].t, "should equal")
-	assert.Equal(t, s2, xs[0].Object(), "should equal")
+	assert.Equal(t, s2, xs[1].Object(), "should equal")
 }
