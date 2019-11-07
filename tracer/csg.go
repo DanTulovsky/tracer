@@ -1,5 +1,7 @@
 package tracer
 
+import "sort"
+
 // Operation defines the operation applied to a CSG
 type Operation int
 
@@ -80,4 +82,15 @@ func (csg *CSG) FilterIntersections(xs Intersections) Intersections {
 // Includes implements includes logic
 func (csg *CSG) Includes(s2 Shaper) bool {
 	return (csg.left.Includes(s2) || csg.right.Includes(s2))
+}
+
+// IntersectWith returns the 't' values of Ray r intersecting with the CSG in sorted order
+func (csg *CSG) IntersectWith(r Ray) Intersections {
+	x1 := csg.left.IntersectWith(r)
+	x2 := csg.right.IntersectWith(r)
+
+	x1 = append(x1, x2...)
+	sort.Sort(byT(x1))
+
+	return csg.FilterIntersections(x1)
 }
