@@ -17,9 +17,10 @@ func NewPlane() *Plane {
 
 	return &Plane{
 		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultMaterial(),
-			shape:     "plane",
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+			material:         NewDefaultMaterial(),
+			shape:            "plane",
 			// name:      uuid.New().String(),
 		},
 	}
@@ -42,7 +43,7 @@ func (pl *Plane) IntersectWith(r Ray) Intersections {
 	t := Intersections{}
 
 	//  common calculation for all shapes
-	r = r.Transform(pl.transform.Inverse())
+	r = r.Transform(pl.transformInverse)
 
 	// parallel or coplanar
 	if math.Abs(r.Dir.Y()) < constants.Epsilon {

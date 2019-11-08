@@ -17,9 +17,10 @@ func TestNewGroup(t *testing.T) {
 			want: &Group{
 				members: []Shaper{},
 				Shape: Shape{
-					transform: IdentityMatrix(),
-					material:  NewDefaultMaterial(),
-					shape:     "group",
+					transform:        IdentityMatrix(),
+					transformInverse: IdentityMatrix().Inverse(),
+					material:         NewDefaultMaterial(),
+					shape:            "group",
 				},
 			},
 		},

@@ -25,6 +25,7 @@ type Camera struct {
 	Hsize, Vsize          float64 // canvas size
 	fov                   float64 // field of view angle in radians
 	Transform             Matrix  // view transformation matrix from the above function
+	TransformInverse      Matrix  // pre-cache the inverse as it's called for each pixel
 	HalfWidth, HalfHeight float64
 	PixelSize             float64
 }
@@ -32,10 +33,11 @@ type Camera struct {
 // NewCamera returns
 func NewCamera(hsize, vsize, fov float64) *Camera {
 	c := &Camera{
-		Hsize:     hsize,
-		Vsize:     vsize,
-		fov:       fov,
-		Transform: IdentityMatrix(),
+		Hsize:            hsize,
+		Vsize:            vsize,
+		fov:              fov,
+		Transform:        IdentityMatrix(),
+		TransformInverse: IdentityMatrix().Inverse(),
 	}
 
 	c.setPixelSize()
@@ -45,6 +47,7 @@ func NewCamera(hsize, vsize, fov float64) *Camera {
 // SetTransform sets the transform on the camera
 func (c *Camera) SetTransform(t Matrix) {
 	c.Transform = t
+	c.TransformInverse = t.Inverse()
 }
 
 // SetFoV sets the field of view and recalculates the pixel size
@@ -84,8 +87,8 @@ func (c *Camera) RayForPixel(x, y float64) Ray {
 	wy := c.HalfHeight - yoffset
 
 	// transform the canvas point and the origin using the camera's matrix
-	pixel := NewPoint(wx, wy, -1).TimesMatrix(c.Transform.Inverse())
-	origin := Origin().TimesMatrix(c.Transform.Inverse())
+	pixel := NewPoint(wx, wy, -1).TimesMatrix(c.TransformInverse)
+	origin := Origin().TimesMatrix(c.TransformInverse)
 	direction := pixel.SubPoint(origin).Normalize()
 
 	return NewRay(origin, direction)

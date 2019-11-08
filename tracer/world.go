@@ -274,6 +274,7 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 			go func(x, y float64) {
 				// work is done
 				defer func() { <-sem }()
+
 				ray := camera.RayForPixel(x, y)
 				clr := w.ColorAt(ray, w.Config.MaxRecusions)
 				// TODO: There is a race condition here, as canvas is also read by the GPU

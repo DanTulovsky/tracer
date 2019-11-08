@@ -3,6 +3,7 @@ package tracer
 import (
 	"errors"
 	"math"
+	"sort"
 
 	"github.com/DanTulovsky/tracer/constants"
 )
@@ -26,9 +27,10 @@ func NewTriangle(p1, p2, p3 Point) *Triangle {
 		E1: p2.SubPoint(p1),
 		E2: p3.SubPoint(p1),
 		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultMaterial(),
-			shape:     "triangle",
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+			material:         NewDefaultMaterial(),
+			shape:            "triangle",
 		},
 	}
 
@@ -69,12 +71,15 @@ func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, error)
 func (t *Triangle) IntersectWith(r Ray) Intersections {
 	xs := NewIntersections()
 
+	r = r.Transform(t.transformInverse)
+
 	// u, v not used here
 	tval, _, _, err := t.sharedIntersectWith(r)
 	if err != nil {
 		return xs
 	}
 	xs = append(xs, NewIntersection(t, tval))
+	sort.Sort(byT(xs))
 	return xs
 }
 

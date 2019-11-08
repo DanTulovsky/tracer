@@ -107,9 +107,10 @@ func TestNewUnitSphere(t *testing.T) {
 				Center: NewPoint(0, 0, 0),
 				Radius: 1,
 				Shape: Shape{
-					transform: IdentityMatrix(),
-					material:  NewDefaultMaterial(),
-					shape:     "sphere",
+					transform:        IdentityMatrix(),
+					transformInverse: IdentityMatrix().Inverse(),
+					material:         NewDefaultMaterial(),
+					shape:            "sphere",
 				},
 			},
 		},

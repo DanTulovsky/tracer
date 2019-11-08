@@ -25,9 +25,10 @@ func NewDefaultCylinder() *Cylinder {
 		Maximum: math.MaxFloat64,
 		Closed:  false,
 		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultMaterial(),
-			shape:     "cylinder",
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+			material:         NewDefaultMaterial(),
+			shape:            "cylinder",
 		},
 	}
 }
@@ -91,7 +92,7 @@ func (c *Cylinder) IntersectWith(r Ray) Intersections {
 	// transform the ray by the inverse of the sphere transfrom matrix
 	// instead of changing the sphere, we change the ray coming from the camera
 	// by the inverse, which achieves the same thing
-	r = r.Transform(c.transform.Inverse())
+	r = r.Transform(c.transformInverse)
 
 	// check for intersections with the caps
 	t = append(t, c.intersectCaps(r)...)

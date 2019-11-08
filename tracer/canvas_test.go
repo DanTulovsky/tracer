@@ -99,7 +99,6 @@ func TestCanvas_Set(t *testing.T) {
 			case false:
 				assert.NoError(t, tt.canvas.Set(tt.args.x, tt.args.y, tt.args.clr), "no error")
 				assert.Equal(t, tt.args.clr, tt.canvas.colors[tt.args.x][tt.args.y], "should be equal")
-
 			}
 		})
 	}
