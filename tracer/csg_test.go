@@ -373,7 +373,7 @@ func TestCSG_IntersectWith1(t *testing.T) {
 	c := NewCSG(NewUnitSphere(), NewUnitCube(), Union)
 	r := NewRay(NewPoint(0, 2, -5), NewVector(0, 0, 1))
 
-	xs := c.IntersectWith(r)
+	xs := c.IntersectWith(r, NewIntersections())
 	assert.Equal(t, 0, len(xs), "should be 0")
 }
 func TestCSG_IntersectWith2(t *testing.T) {
@@ -385,7 +385,7 @@ func TestCSG_IntersectWith2(t *testing.T) {
 	c := NewCSG(s1, s2, Union)
 	r := NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1))
 
-	xs := c.IntersectWith(r)
+	xs := c.IntersectWith(r, NewIntersections())
 	assert.Equal(t, 2, len(xs), "should be 0")
 
 	assert.Equal(t, 4.0, xs[0].t, "should equal")

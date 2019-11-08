@@ -67,7 +67,7 @@ func TestWorld_Intersections(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			is := tt.world.Intersections(tt.args.r)
+			is := tt.world.Intersections(tt.args.r, NewIntersections())
 			assert.Equal(t, 4, len(is))
 
 			for x := 0; x < len(is); x++ {
@@ -218,7 +218,7 @@ func TestWorld_ColorAt(t *testing.T) {
 			tt.world.Objects[0].SetMaterial(tt.m1)
 			tt.world.Objects[1].SetMaterial(tt.m2)
 
-			assert.True(t, tt.want.Equal(tt.world.ColorAt(tt.args.r, 1)), "should equal")
+			assert.True(t, tt.want.Equal(tt.world.ColorAt(tt.args.r, 1, NewIntersections())), "should equal")
 		})
 	}
 }
@@ -380,7 +380,7 @@ func TestWorld_AvoidInfRecursion(t *testing.T) {
 
 	r := NewRay(NewPoint(0, 0, 0), NewVector(0, 1, 0))
 
-	clr := w.ColorAt(r, 4)
+	clr := w.ColorAt(r, 4, NewIntersections())
 	assert.NotNil(t, clr)
 }
 

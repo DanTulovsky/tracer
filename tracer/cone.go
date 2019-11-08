@@ -95,9 +95,7 @@ func (c *Cone) intersectCaps(r Ray) Intersections {
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the cone in sorted order
-func (c *Cone) IntersectWith(r Ray) Intersections {
-	t := Intersections{}
-
+func (c *Cone) IntersectWith(r Ray, t Intersections) Intersections {
 	// transform the ray by the inverse of the sphere transfrom matrix
 	// instead of changing the sphere, we change the ray coming from the camera
 	// by the inverse, which achieves the same thing

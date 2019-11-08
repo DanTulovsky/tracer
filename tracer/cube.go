@@ -55,9 +55,7 @@ func (c *Cube) checkAxis(o, d float64) (float64, float64) {
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the Cube in sorted order
-func (c *Cube) IntersectWith(r Ray) Intersections {
-
-	t := Intersections{}
+func (c *Cube) IntersectWith(r Ray, t Intersections) Intersections {
 
 	// common to all shapes
 	r = r.Transform(c.transformInverse)

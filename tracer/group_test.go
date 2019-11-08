@@ -201,7 +201,7 @@ func TestGroup_IntersectWith(t *testing.T) {
 			}
 			tt.group.PrecomputeValues()
 
-			got := tt.group.IntersectWith(tt.args.r)
+			got := tt.group.IntersectWith(tt.args.r, NewIntersections())
 
 			assert.Equal(t, tt.wantXS, len(got), "should be equal")
 

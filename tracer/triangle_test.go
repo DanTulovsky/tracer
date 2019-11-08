@@ -136,7 +136,7 @@ func TestTriangle_IntersectWith(t *testing.T) {
 			if tt.wantXS > 0 {
 				want = append(want, NewIntersection(tt.tri, tt.wantT1))
 			}
-			got := tt.tri.IntersectWith(tt.args.r)
+			got := tt.tri.IntersectWith(tt.args.r, NewIntersections())
 
 			assert.Equal(t, len(want), len(got), "should equal")
 			if tt.wantXS > 0 {

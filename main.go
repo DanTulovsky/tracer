@@ -942,7 +942,7 @@ func triangle() {
 
 func objParse(f string) {
 
-	width, height := 640.0, 480.0
+	width, height := 240.0, 180.0
 	// width, height := 1400.0, 1000.0
 
 	// setup world, default light and camera
@@ -950,8 +950,8 @@ func objParse(f string) {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(3, 4, -30), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-5, 4, -1), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 10, 0), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -971,7 +971,6 @@ func objParse(f string) {
 
 	w.AddObject(g)
 	tracer.Render(w)
-
 }
 
 func csg() {
@@ -983,8 +982,8 @@ func csg() {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(3, 4, -30), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-5, 4, -1), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 20, 0), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-10, -4, -1), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -1039,7 +1038,6 @@ func main() {
 	// spherewarp()
 	// cylinder()
 	// cone()
-	// point()
 	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front

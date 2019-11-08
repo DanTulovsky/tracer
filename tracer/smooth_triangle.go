@@ -48,13 +48,11 @@ func (t *SmoothTriangle) Equal(t2 *SmoothTriangle) bool {
 }
 
 // IntersectWith returns the 't' value of Ray r intersecting with the triangle in sorted order
-func (t *SmoothTriangle) IntersectWith(r Ray) Intersections {
-	xs := NewIntersections()
-
+func (t *SmoothTriangle) IntersectWith(r Ray, xs Intersections) Intersections {
 	r = r.Transform(t.transformInverse)
 
-	tval, u, v, err := t.sharedIntersectWith(r)
-	if err != nil {
+	tval, u, v, found := t.sharedIntersectWith(r)
+	if !found {
 		return xs
 	}
 

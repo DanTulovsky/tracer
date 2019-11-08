@@ -93,7 +93,7 @@ func TestSmoothTriangle_IntersectWith(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.tri.IntersectWith(tt.args.r)
+			got := tt.tri.IntersectWith(tt.args.r, NewIntersections())
 			assert.InDelta(t, tt.wantu, got[0].u, constants.Epsilon, "should equal")
 			assert.InDelta(t, tt.wantv, got[0].v, constants.Epsilon, "should equal")
 		})
