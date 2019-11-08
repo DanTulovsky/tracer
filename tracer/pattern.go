@@ -14,12 +14,14 @@ type Patterner interface {
 	ColorAtObject(Shaper, Point) Color
 
 	Transform() Matrix
+	TransformInverse() Matrix
 	SetTransform(Matrix)
 }
 
 // basePattern is the base pattern for others
 type basePattern struct {
-	transform Matrix
+	transform        Matrix
+	transformInverse Matrix
 }
 
 // Transform returns the pattern transform
@@ -30,6 +32,12 @@ func (bp *basePattern) Transform() Matrix {
 // SetTransform sets the transform
 func (bp *basePattern) SetTransform(m Matrix) {
 	bp.transform = m
+	bp.transformInverse = m.Inverse()
+}
+
+// TransformInverse returns the inverse of the pattern transform
+func (bp *basePattern) TransformInverse() Matrix {
+	return bp.transformInverse
 }
 
 // ColorAt implements Patterner
@@ -40,7 +48,7 @@ func (bp *basePattern) ColorAtObject(o Shaper, p Point) Color {
 // objectSpacePoint returns the world point as object point
 func (bp *basePattern) objectSpacePoint(o Shaper, p Point) Point {
 	op := p.ToObjectSpace(o)
-	return op.TimesMatrix(bp.Transform().Inverse())
+	return op.TimesMatrix(bp.TransformInverse())
 }
 
 // StripedPattern is a patternt at overlays stripes
@@ -55,7 +63,8 @@ func NewStripedPattern(c1, c2 Color) *StripedPattern {
 		a: c1,
 		b: c2,
 		basePattern: basePattern{
-			transform: IdentityMatrix(),
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
 		},
 	}
 }
@@ -85,7 +94,8 @@ func NewGradientPattern(c1, c2 Color) *GradientPattern {
 		a: c1,
 		b: c2,
 		basePattern: basePattern{
-			transform: IdentityMatrix(),
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
 		},
 	}
 }
@@ -115,7 +125,8 @@ func NewRingPattern(c1, c2 Color) *RingPattern {
 		a: c1,
 		b: c2,
 		basePattern: basePattern{
-			transform: IdentityMatrix(),
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
 		},
 	}
 }
@@ -145,7 +156,8 @@ func NewCheckerPattern(c1, c2 Color) *CheckerPattern {
 		a: c1,
 		b: c2,
 		basePattern: basePattern{
-			transform: IdentityMatrix(),
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
 		},
 	}
 }
@@ -187,7 +199,8 @@ func NewPertrubedPattern(p Patterner, maxNoise float64) *PertrubedPattern {
 		noise:    n,
 		maxNoise: maxNoise,
 		basePattern: basePattern{
-			transform: IdentityMatrix(),
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
 		},
 	}
 }
@@ -215,7 +228,8 @@ func NewBlendedPattern(p1, p2 Patterner) *BlendedPattern {
 		p1: p1,
 		p2: p2,
 		basePattern: basePattern{
-			transform: IdentityMatrix(),
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
 		},
 	}
 }

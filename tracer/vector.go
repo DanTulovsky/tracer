@@ -157,7 +157,7 @@ func (v Vector) Reflect(n Vector) Vector {
 
 // NormalToWorldSpace converts the given vector from object space to world space
 func (v Vector) NormalToWorldSpace(s Shaper) Vector {
-	n := v.TimesMatrix(s.Transform().Inverse().Transpose())
+	n := v.TimesMatrix(s.TransformInverse().Transpose())
 	n.SetW(0)
 	n = n.Normalize()
 
