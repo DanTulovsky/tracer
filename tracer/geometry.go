@@ -41,6 +41,22 @@ type Shape struct {
 	bound            Bound // cache the group bounding box
 
 	parent Shaper
+
+	// localNormalAt
+	lna func(Point, Intersection) Vector
+}
+
+// Equal returns true if the shapes are equal
+func (s *Shape) Equal(s2 *Shape) bool {
+	return s.shape == s2.shape &&
+		s.name == s2.name &&
+		s.transform.Equals(s2.Transform()) &&
+		s.transformInverse.Equals(s2.Transform()) &&
+		s.material.Equals(s2.material) &&
+		s.bound == s2.bound &&
+		s.parent == s2.parent &&
+		(s.lna != nil) == (s2.lna != nil)
+
 }
 
 // Includes implements includes logic
@@ -81,7 +97,21 @@ func (s *Shape) IntersectWith(r Ray) Intersections {
 
 // NormalAt implements the Shaper interface
 func (s *Shape) NormalAt(p Point, xs Intersection) Vector {
-	panic("must implement NormalAt")
+	// move point to object space
+	op := p.ToObjectSpace(s)
+
+	// object normal, this is different for each shape
+	on := s.lna(op, xs)
+
+	// world normal
+	wn := on.NormalToWorldSpace(s)
+
+	return wn.Normalize()
+}
+
+// localNormalAt return the local normal vector at the point
+func (s *Shape) localNormalAt(p Point, xs Intersection) Vector {
+	panic("must implement localNormalAt")
 }
 
 // Material returns the material of the shape

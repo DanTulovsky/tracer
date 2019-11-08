@@ -69,7 +69,7 @@ func TestPoint_Equals(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.p.Equals(tt.args.p), tt.want, "should be equal")
+			assert.Equal(t, tt.p.Equal(tt.args.p), tt.want, "should be equal")
 		})
 	}
 }
@@ -322,7 +322,7 @@ func TestPoint_TimesMatrix(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equals(tt.p.TimesMatrix(tt.args.m)), "should be true")
+			assert.True(t, tt.want.Equal(tt.p.TimesMatrix(tt.args.m)), "should be true")
 		})
 	}
 }
@@ -378,5 +378,5 @@ func TestPoint_ToObjectSpace(t *testing.T) {
 	want := NewPoint(0, 0, -1)
 	got := point.ToObjectSpace(s)
 
-	assert.True(t, want.Equals(got), "should equal")
+	assert.True(t, want.Equal(got), "should equal")
 }

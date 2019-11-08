@@ -15,32 +15,26 @@ type Plane struct {
 // NewPlane returns a new plane
 func NewPlane() *Plane {
 
-	return &Plane{
+	pl := &Plane{
 		Shape: Shape{
 			transform:        IdentityMatrix(),
 			transformInverse: IdentityMatrix().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "plane",
-			// name:      uuid.New().String(),
 		},
 	}
+	pl.lna = pl.NormalAt
+	return pl
+}
+
+// Equal returns true if the planes are equal
+func (pl *Plane) Equal(pl2 *Plane) bool {
+	return pl.Shape.Equal(&pl2.Shape)
 }
 
 // NormalAt returns the normal vector at the given point on the surface of the plane
+// Avoid unneeded calculations and override the Shape method
 func (pl *Plane) NormalAt(p Point, xs Intersection) Vector {
-	// move point to object space
-	op := p.ToObjectSpace(pl)
-
-	// object normal, this is different for each shape
-	on := pl.localNormalAt(op, xs)
-
-	// world normal
-	wn := on.NormalToWorldSpace(pl)
-
-	return wn.Normalize()
-}
-
-func (pl *Plane) localNormalAt(p Point, xs Intersection) Vector {
 	return NewVector(0, 1, 0)
 }
 

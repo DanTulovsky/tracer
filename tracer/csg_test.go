@@ -1,8 +1,10 @@
 package tracer
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,8 +39,10 @@ func TestNewCSG(t *testing.T) {
 					shape:            "csg",
 				},
 			}
+			want.Shape.lna = want.localNormalAt
 			got := NewCSG(tt.args.s1, tt.args.s2, tt.args.op)
-			assert.Equal(t, want, got, "should equal")
+			diff := cmp.Diff(want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 			assert.Equal(t, got, tt.args.s1.Parent(), "should equal")
 			assert.Equal(t, got, tt.args.s2.Parent(), "should equal")
 		})

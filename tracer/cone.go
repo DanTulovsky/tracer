@@ -18,7 +18,7 @@ type Cone struct {
 
 // NewDefaultCone returns a new default cone
 func NewDefaultCone() *Cone {
-	return &Cone{
+	c := &Cone{
 		Minimum: -math.MaxFloat64,
 		Maximum: math.MaxFloat64,
 		Closed:  false,
@@ -29,6 +29,8 @@ func NewDefaultCone() *Cone {
 			shape:            "cone",
 		},
 	}
+	c.lna = c.localNormalAt
+	return c
 }
 
 // NewCone returns a new cone capped at min and max (y axis values, exclusive)
@@ -47,6 +49,14 @@ func NewClosedCone(min, max float64) *Cone {
 	c := NewCone(min, max)
 	c.Closed = true
 	return c
+}
+
+// Equal returns true if the cones are equal
+func (c *Cone) Equal(c2 *Cone) bool {
+	return c.Shape.Equal(&c2.Shape) &&
+		c.Minimum == c2.Minimum &&
+		c.Maximum == c2.Maximum &&
+		c.Closed == c2.Closed
 }
 
 // checkCap checks to see if the intersection at t is within the radius of the cone from the
@@ -141,20 +151,6 @@ func (c *Cone) IntersectWith(r Ray) Intersections {
 
 	sort.Sort(byT(t))
 	return t
-}
-
-// NormalAt returns the normal vector at the given point on the surface of the cone
-func (c *Cone) NormalAt(p Point, xs Intersection) Vector {
-	// move point to object space
-	op := p.ToObjectSpace(c)
-
-	// object normal, this is different for each shape
-	on := c.localNormalAt(op, xs)
-
-	// world normal
-	wn := on.NormalToWorldSpace(c)
-
-	return wn.Normalize()
 }
 
 func (c *Cone) localNormalAt(p Point, xs Intersection) Vector {

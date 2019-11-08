@@ -391,7 +391,7 @@ func TestVector_Reflect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equals(tt.v.Reflect(tt.args.n)), "should be equal")
+			assert.True(t, tt.want.Equal(tt.v.Reflect(tt.args.n)), "should be equal")
 		})
 	}
 }
@@ -413,5 +413,5 @@ func TestVector_NormalToWorldSpace(t *testing.T) {
 	want := NewVector(0.285714, 0.428571, -0.857142)
 	got := vector.NormalToWorldSpace(s)
 
-	assert.True(t, want.Equals(got), "should equal")
+	assert.True(t, want.Equal(got), "should equal")
 }

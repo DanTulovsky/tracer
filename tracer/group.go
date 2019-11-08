@@ -4,6 +4,8 @@ import (
 	"math"
 	"sort"
 
+	"github.com/google/go-cmp/cmp"
+
 	"github.com/DanTulovsky/tracer/constants"
 )
 
@@ -24,6 +26,12 @@ func NewGroup() *Group {
 			shape:            "group",
 		},
 	}
+}
+
+// Equal returns true if the groups are equal
+func (g *Group) Equal(g2 *Group) bool {
+	return g.Shape.Equal(&g2.Shape) &&
+		cmp.Equal(g.members, g2.members)
 }
 
 // AddMember adds a new member to this group
@@ -139,10 +147,6 @@ func (g *Group) IntersectWith(r Ray) Intersections {
 
 // NormalAt returns the normal vector at the given point on the surface of the group
 func (g *Group) NormalAt(p Point, xs Intersection) Vector {
-	return g.localNormalAt(p, xs)
-}
-
-func (g *Group) localNormalAt(p Point, xs Intersection) Vector {
 	panic("called NormalAt on a group")
 }
 

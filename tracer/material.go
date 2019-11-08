@@ -1,5 +1,9 @@
 package tracer
 
+import (
+	"github.com/google/go-cmp/cmp"
+)
+
 // Material is a material to apply to shapes
 type Material struct {
 	Color                                                                            Color
@@ -66,4 +70,9 @@ func (m *Material) HasPattern() bool {
 // SetPattern sets a pattern on a material
 func (m *Material) SetPattern(p Patterner) {
 	m.Pattern = p
+}
+
+// Equals return true if the materials are the same
+func (m *Material) Equals(m2 *Material) bool {
+	return cmp.Equal(m, m2)
 }

@@ -14,7 +14,7 @@ type Sphere struct {
 
 // NewUnitSphere returns a new Sphere centered at the origin with r=1
 func NewUnitSphere() *Sphere {
-	return &Sphere{
+	s := &Sphere{
 		Center: NewPoint(0, 0, 0),
 		Radius: 1,
 		Shape: Shape{
@@ -22,22 +22,24 @@ func NewUnitSphere() *Sphere {
 			transformInverse: IdentityMatrix().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "sphere",
-			// name:      uuid.New().String(),
 		},
 	}
+	s.lna = s.localNormalAt
+	return s
+}
+
+// Equal returns true if the spheres are equal
+func (s *Sphere) Equal(s2 *Sphere) bool {
+	return s.Shape.Equal(&s2.Shape) &&
+		s.Center.Equal(s2.Center) &&
+		s.Radius == s2.Radius
 }
 
 // NewGlassSphere returns a new Sphere centered at the origin with r=1, with a transparent material
 func NewGlassSphere() *Sphere {
-	return &Sphere{
-		Center: NewPoint(0, 0, 0),
-		Radius: 1,
-		Shape: Shape{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
-			material:         NewDefaultGlassMaterial(),
-		},
-	}
+	s := NewUnitSphere()
+	s.SetMaterial(NewDefaultGlassMaterial())
+	return s
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the Sphere in sorted order
@@ -72,21 +74,6 @@ func (s *Sphere) IntersectWith(r Ray) Intersections {
 	sort.Sort(byT(t))
 
 	return t
-}
-
-// NormalAt returns the normal vector at the given point on the surface of the sphere
-func (s *Sphere) NormalAt(p Point, xs Intersection) Vector {
-
-	// move point to object space
-	op := p.ToObjectSpace(s)
-
-	// object normal, this is different for each shape
-	on := s.localNormalAt(op, xs)
-
-	// world normal
-	wn := on.NormalToWorldSpace(s)
-
-	return wn.Normalize()
 }
 
 func (s *Sphere) localNormalAt(p Point, xs Intersection) Vector {

@@ -19,7 +19,7 @@ type Cylinder struct {
 
 // NewDefaultCylinder returns a new cylinder
 func NewDefaultCylinder() *Cylinder {
-	return &Cylinder{
+	c := &Cylinder{
 		Radius:  1.0,
 		Minimum: -math.MaxFloat64,
 		Maximum: math.MaxFloat64,
@@ -31,6 +31,8 @@ func NewDefaultCylinder() *Cylinder {
 			shape:            "cylinder",
 		},
 	}
+	c.lna = c.localNormalAt
+	return c
 }
 
 // NewCylinder returns a new cylinder capped at min and max (y axis values, exclusive)
@@ -49,6 +51,14 @@ func NewClosedCylinder(min, max float64) *Cylinder {
 	c := NewCylinder(min, max)
 	c.Closed = true
 	return c
+}
+
+// Equal returns true if the cylinders are equal
+func (c *Cylinder) Equal(c2 *Cylinder) bool {
+	return c.Shape.Equal(&c2.Shape) &&
+		c.Radius == c2.Radius &&
+		c.Minimum == c2.Minimum &&
+		c.Closed == c2.Closed
 }
 
 // checkCap checks to see if the intersection at t is within the radius of the cylinder from the
@@ -134,20 +144,6 @@ func (c *Cylinder) IntersectWith(r Ray) Intersections {
 
 	sort.Sort(byT(t))
 	return t
-}
-
-// NormalAt returns the normal vector at the given point on the surface of the cylinder
-func (c *Cylinder) NormalAt(p Point, xs Intersection) Vector {
-	// move point to object space
-	op := p.ToObjectSpace(c)
-
-	// object normal, this is different for each shape
-	on := c.localNormalAt(op, xs)
-
-	// world normal
-	wn := on.NormalToWorldSpace(c)
-
-	return wn.Normalize()
 }
 
 func (c *Cylinder) localNormalAt(p Point, xs Intersection) Vector {

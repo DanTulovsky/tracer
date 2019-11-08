@@ -1,10 +1,12 @@
 package tracer
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
 	"github.com/DanTulovsky/tracer/constants"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,7 +35,8 @@ func TestNewIntersection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewIntersection(tt.args.o, tt.args.t)
-			assert.Equal(t, tt.want, got, "should be equal")
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }
@@ -90,9 +93,8 @@ func TestIntersections_Hit(t *testing.T) {
 			if tt.wantErr {
 				assert.Error(t, err, "should error")
 			} else {
-				// fix for random names
-				got.Object().SetName(tt.want.Object().Name())
-				assert.Equal(t, tt.want, got, "should equal")
+				diff := cmp.Diff(tt.want, got)
+				assert.Equal(t, "", fmt.Sprint(diff))
 			}
 		})
 	}
@@ -183,11 +185,11 @@ func TestPrepareComputations(t *testing.T) {
 			xs := NewIntersections(tt.args.i)
 			comps := PrepareComputations(tt.args.i, tt.args.r, xs)
 			assert.InEpsilon(t, tt.want.T, comps.T, constants.Epsilon, "should equal")
-			assert.True(t, tt.want.Point.Equals(comps.Point))
-			assert.True(t, tt.want.EyeV.Equals(comps.EyeV))
-			assert.True(t, tt.want.NormalV.Equals(comps.NormalV))
-			assert.True(t, tt.want.OverPoint.Equals(comps.OverPoint))
-			assert.True(t, tt.want.ReflectV.Equals(comps.ReflectV))
+			assert.True(t, tt.want.Point.Equal(comps.Point))
+			assert.True(t, tt.want.EyeV.Equal(comps.EyeV))
+			assert.True(t, tt.want.NormalV.Equal(comps.NormalV))
+			assert.True(t, tt.want.OverPoint.Equal(comps.OverPoint))
+			assert.True(t, tt.want.ReflectV.Equal(comps.ReflectV))
 		})
 	}
 }
@@ -418,7 +420,8 @@ func TestNewIntersectionUV(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewIntersectionUV(tt.args.o, tt.args.t, tt.args.u, tt.args.v)
-			assert.Equal(t, tt.want, got, "should be equal")
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }

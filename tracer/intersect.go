@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/DanTulovsky/tracer/constants"
+	"github.com/google/go-cmp/cmp"
 )
 
 // Intersection encapsulates an intersection t value an an object
@@ -35,6 +36,14 @@ func (i Intersection) Object() Shaper {
 // NewIntersectionUV returns an intersection object with UV filled in
 func NewIntersectionUV(o Shaper, t, u, v float64) Intersection {
 	return Intersection{o: o, t: t, u: u, v: v}
+}
+
+// Equal returns true if the intersections are the same
+func (i Intersection) Equal(i2 Intersection) bool {
+	return i.t == i2.t &&
+		i.u == i2.u &&
+		i.v == i2.v &&
+		cmp.Equal(i.Object(), i2.Object())
 }
 
 // Intersections is a collection of Intersections

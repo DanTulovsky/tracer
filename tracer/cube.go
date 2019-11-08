@@ -14,15 +14,21 @@ type Cube struct {
 
 // NewUnitCube returns a 1x1x1 cube
 func NewUnitCube() *Cube {
-	return &Cube{
+	c := &Cube{
 		Shape: Shape{
 			transform:        IdentityMatrix(),
 			transformInverse: IdentityMatrix().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "cube",
-			// name:      uuid.New().String(),
 		},
 	}
+	c.lna = c.localNormalAt
+	return c
+}
+
+// Equal returns true if the cubes are equal
+func (c *Cube) Equal(c2 *Cube) bool {
+	return c.Shape.Equal(&c2.Shape)
 }
 
 // checkAxis is a helper function for check for intersection of the cube and ray
@@ -77,21 +83,6 @@ func (c *Cube) IntersectWith(r Ray) Intersections {
 	sort.Sort(byT(t))
 
 	return t
-}
-
-// NormalAt returns the normal vector at the given point on the surface of the cube
-func (c *Cube) NormalAt(p Point, xs Intersection) Vector {
-
-	// move point to object space
-	op := p.ToObjectSpace(c)
-
-	// object normal, this is different for each shape
-	on := c.localNormalAt(op, xs)
-
-	// world normal
-	wn := on.NormalToWorldSpace(c)
-
-	return wn.Normalize()
 }
 
 func (c *Cube) localNormalAt(p Point, xs Intersection) Vector {

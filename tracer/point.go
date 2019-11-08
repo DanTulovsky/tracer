@@ -79,8 +79,8 @@ func (p Point) String() string {
 	return fmt.Sprintf("Point(%.2f, %.2f, %.2f)", p.X(), p.Y(), p.Z())
 }
 
-// Equals compares points
-func (p Point) Equals(s Point) bool {
+// Equal compares points
+func (p Point) Equal(s Point) bool {
 	if utils.Equals(p.X(), s.X()) && utils.Equals(p.Y(), s.Y()) && utils.Equals(p.Z(), s.Z()) && utils.Equals(p.W(), s.W()) {
 		return true
 	}

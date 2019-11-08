@@ -1,8 +1,10 @@
 package tracer
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,8 +27,10 @@ func TestNewPlane(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.want.Shape.lna = tt.want.localNormalAt
 			got := NewPlane()
-			assert.Equal(t, tt.want, got, "should equal")
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }
@@ -123,8 +127,9 @@ func TestPlane_IntersectWith(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			assert.Equal(t, tt.want, tt.plane.IntersectWith(tt.args.r))
+			got := tt.plane.IntersectWith(tt.args.r)
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }

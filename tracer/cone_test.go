@@ -1,10 +1,12 @@
 package tracer
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
 	"github.com/DanTulovsky/tracer/constants"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,7 +32,10 @@ func TestNewDefaultCone(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, NewDefaultCone())
+			tt.want.Shape.lna = tt.want.localNormalAt
+			got := NewDefaultCone()
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }
@@ -62,7 +67,10 @@ func TestNewCone(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, NewCone(-5, 4))
+			tt.want.Shape.lna = tt.want.localNormalAt
+			got := NewCone(-5, 4)
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }
@@ -94,7 +102,10 @@ func TestNewClosedCone(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, NewClosedCone(-5, 4))
+			tt.want.Shape.lna = tt.want.localNormalAt
+			got := NewClosedCone(-5, 4)
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }
@@ -224,7 +235,7 @@ func TestCone_NormalAt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Normalize().Equals(tt.cone.NormalAt(tt.args.p, tt.args.xs)), "should equal")
+			assert.True(t, tt.want.Normalize().Equal(tt.cone.NormalAt(tt.args.p, tt.args.xs)), "should equal")
 		})
 	}
 }
