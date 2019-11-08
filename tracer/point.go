@@ -95,5 +95,5 @@ func (p Point) ToObjectSpace(s Shaper) Point {
 		res = p.ToObjectSpace(s.Parent())
 	}
 
-	return res.TimesMatrix(s.Transform().Inverse())
+	return res.TimesMatrix(s.TransformInverse())
 }
