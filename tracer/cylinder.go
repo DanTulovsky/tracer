@@ -70,9 +70,7 @@ func (c *Cylinder) checkCap(r Ray, t float64) bool {
 	return (math.Pow(x, 2) + math.Pow(z, 2)) <= c.Radius
 }
 
-func (c *Cylinder) intersectCaps(r Ray) Intersections {
-	xs := NewIntersections()
-
+func (c *Cylinder) intersectCaps(r Ray, xs Intersections) Intersections {
 	// caps only matter if the cylinder is closed and might possibly be intersected by the ray
 	if !c.Closed || math.Abs(r.Dir.Y()) < constants.Epsilon {
 		return xs
@@ -103,7 +101,7 @@ func (c *Cylinder) IntersectWith(r Ray, t Intersections) Intersections {
 	r = r.Transform(c.transformInverse)
 
 	// check for intersections with the caps
-	t = append(t, c.intersectCaps(r)...)
+	t = c.intersectCaps(r, t)
 
 	// cylinder custom
 	a := math.Pow(r.Dir.X(), 2) + math.Pow(r.Dir.Z(), 2)

@@ -69,9 +69,7 @@ func (c *Cone) checkCap(r Ray, t, y float64) bool {
 }
 
 // intersectCaps returns intersections with the caps
-func (c *Cone) intersectCaps(r Ray) Intersections {
-	xs := NewIntersections()
-
+func (c *Cone) intersectCaps(r Ray, xs Intersections) Intersections {
 	// caps only matter if the cone is closed and might possibly be intersected by the ray
 	if !c.Closed || math.Abs(r.Dir.Y()) < constants.Epsilon {
 		return xs
@@ -104,7 +102,7 @@ func (c *Cone) IntersectWith(r Ray, t Intersections) Intersections {
 	// cylinder custom
 
 	// check for intersections with the caps
-	t = append(t, c.intersectCaps(r)...)
+	t = c.intersectCaps(r, t)
 
 	a := math.Pow(r.Dir.X(), 2) - math.Pow(r.Dir.Y(), 2) + math.Pow(r.Dir.Z(), 2)
 	b := 2*r.Origin.X()*r.Dir.X() - 2*r.Origin.Y()*r.Dir.Y() + 2*r.Origin.Z()*r.Dir.Z()
