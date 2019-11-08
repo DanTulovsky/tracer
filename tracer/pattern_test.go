@@ -42,7 +42,8 @@ func TestNewStripedPattern(t *testing.T) {
 				a: Black(),
 				b: White(),
 				basePattern: basePattern{
-					transform: IdentityMatrix(),
+					transform:        IdentityMatrix(),
+					transformInverse: IdentityMatrix().Inverse(),
 				},
 			},
 		},
@@ -268,7 +269,8 @@ func TestNewGradientPattern(t *testing.T) {
 				a: White(),
 				b: Black(),
 				basePattern: basePattern{
-					transform: IdentityMatrix(),
+					transform:        IdentityMatrix(),
+					transformInverse: IdentityMatrix().Inverse(),
 				},
 			},
 		},
