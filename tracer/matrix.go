@@ -238,7 +238,7 @@ func (m Matrix) Submatrix(row, col int) Matrix {
 	return new
 }
 
-// Minor returns the minr of a matrix
+// Minor returns the minor of a matrix
 func (m Matrix) Minor(row, col int) float64 {
 	return m.Submatrix(row, col).Determinant()
 }
