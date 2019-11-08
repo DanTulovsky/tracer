@@ -2,38 +2,34 @@ package main
 
 import "log"
 
+// Shaper is the interface
 type Shaper interface {
 	Foo()
-	A() int
 }
 
+// Common has common components for all concrete type
 type Common struct {
-	a int
+	lf func()
 }
 
+// this is different for each concrete type, does nothing here
 func (c *Common) localFoo() {
 	log.Println("inside common localFoo")
 }
 
+// Foo is called from the outside, does some work, calls localFoo, does other work
 func (c *Common) Foo() {
 	log.Println("inside common Foo")
-	c.localFoo()
+
+	log.Println("running pre-common")
+	c.lf()
+	log.Println("running post-common")
 
 }
 
-func (c *Common) A() int {
-	return c.a
-}
-
+// Alpha implements Shaper
 type Alpha struct {
-	C, D float64
 	Common
-}
-
-func (a *Alpha) Foo() {
-	log.Println("inside alpha Foo")
-	a.Common.Foo()
-	a.localFoo()
 }
 
 func (a *Alpha) localFoo() {
@@ -42,18 +38,14 @@ func (a *Alpha) localFoo() {
 
 func main() {
 	alpha := &Alpha{
-		C: 34.5,
-		D: 11.1,
-
-		Common: Common{
-			a: 10,
-		},
+		Common: Common{},
 	}
+
+	alpha.lf = alpha.localFoo
 
 	run(alpha)
 }
 
 func run(s Shaper) {
-
 	s.Foo()
 }
