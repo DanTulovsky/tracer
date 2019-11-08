@@ -9,7 +9,6 @@ import (
 	"path"
 	"runtime"
 	"runtime/pprof"
-	"sync"
 
 	_ "net/http/pprof"
 
@@ -31,259 +30,10 @@ func init() {
 	runtime.LockOSThread()
 }
 
-type projectile struct {
-	Position tracer.Point
-	Velocity tracer.Vector
-}
-
-type environment struct {
-	Gravity tracer.Vector
-	Wind    tracer.Vector
-}
-
-func tick(e environment, p projectile) projectile {
-	position := p.Position.AddVector(p.Velocity)
-	velocity := p.Velocity.AddVector(e.Gravity).AddVector(e.Wind)
-
-	return projectile{Position: position, Velocity: velocity}
-}
-
-func addToCanvas(c *tracer.Canvas, p projectile) error {
-	pos := p.Position
-
-	x := int(pos.X())
-	y := c.Height - int(pos.Y())
-
-	c.Set(x, y, tracer.ColorName(colornames.Red))
-
-	return nil
-}
-
-func testCanvas() {
-	// Canvas
-	c := tracer.NewCanvas(900, 550)
-
-	ticks := 0
-	vScale := 11.25
-	startiPosition := tracer.NewPoint(0, 1, 0)
-	initialVelocity := tracer.NewVector(1, 1.8, 0).Normalize().Scale(vScale)
-	gravity := tracer.NewVector(0, -0.1, 0)
-	wind := tracer.NewVector(-0.01, 0, 0)
-
-	p := projectile{Position: startiPosition, Velocity: initialVelocity}
-	e := environment{Gravity: gravity, Wind: wind}
-
-	fmt.Printf("position: %2f\n", p.Position)
-	for p.Position.Y() > 0 {
-		p = tick(e, p)
-		fmt.Printf("position: %2f\n", p.Position)
-		ticks++
-		addToCanvas(c, p)
-	}
-	fmt.Printf("Total Ticks: %v\n", ticks)
-
-	// Export
-	f, err := os.Create("image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	c.ExportToPNG(f)
-}
-
-func test1() {
-
-	p := tracer.NewPoint(1, 1.000000001, 1)
-	p2 := tracer.NewPoint(2, 4, 6)
-	p3 := tracer.NewPoint(2, 4, 6.000000001)
-
-	log.Printf("%#v", p.Equals(p2))
-	log.Printf("%#v", p2.Equals(p3))
-}
-
-func clock() {
-
-	c := tracer.NewCanvas(550, 600)
-
-	// center
-	center := tracer.NewVector(275, 0, 300)
-	c.SetFloat(center.X(), center.Z(), tracer.ColorName(colornames.Yellow))
-
-	radius := 7.0 / 8.0 * center.X()
-	twelve := tracer.NewPoint(0, 0, 1)
-
-	for hour := 1.0; hour <= 12; hour++ {
-		m := tracer.IdentityMatrix().RotateY(hour*(math.Pi/6.0)).Scale(radius, 1, radius).Translate(center.X(), center.Y(), center.Z())
-		p := twelve.TimesMatrix(m)
-		c.SetFloat(p.X(), p.Z(), tracer.ColorName(colornames.Red))
-	}
-
-	// Export
-	f, err := os.Create("image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	c.ExportToPNG(f)
-}
-
-func circle() {
-	// first circle drawn by a ray
-	canvasX := 200
-	canvasY := canvasX
-
-	c := tracer.NewCanvas(canvasX, canvasY)
-
-	// camera location
-	camera := tracer.NewPoint(0, 0, -5)
-
-	type wall struct {
-		Z    float64
-		Size float64
-	}
-
-	// wall is parallel to the y-axis, on negative z
-	// size is large enough to sho a unit spere at the origin from the camera
-	w := wall{Z: 10, Size: 7}
-
-	// size of a world pixel
-	pixelSize := w.Size / float64(canvasX)
-
-	// transform matrix
-	m := tracer.IdentityMatrix().Scale(1, 0.5, 1).RotateZ(math.Pi/4).Shear(1, 0, 0, 0, 0, 0)
-
-	shape := tracer.NewUnitSphere()
-	shape.SetTransform(m)
-
-	clr := tracer.ColorName(colorful.HappyColor())
-
-	// for each row of pixels on the canvas
-	for y := 0.0; y < float64(canvasY); y++ {
-		// world coordinate of y
-		wy := w.Size/2 - pixelSize*y
-
-		for x := 0.0; x < float64(canvasX); x++ {
-
-			// world y coordinate of x
-			wx := -w.Size/2 + pixelSize*x
-
-			// point on the wall the ray is targetting
-			target := tracer.NewPoint(wx, wy, w.Z)
-
-			// the ray from camera to the world target
-			ray := tracer.NewRay(camera, target.SubPoint(camera).Normalize())
-
-			if _, err := shape.IntersectWith(ray).Hit(); err == nil {
-				c.SetFloat(x, y, clr)
-			}
-		}
-	}
-
-	// Export
-	f, err := os.Create("image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	c.ExportToPNG(f)
-}
-
-func sphere() {
-
-	// first sphere drawn by a ray
-	canvasX := 200
-	canvasY := canvasX
-
-	c := tracer.NewCanvas(canvasX, canvasY)
-
-	// camera location
-	camera := tracer.NewPoint(0, 0, -5)
-
-	type wall struct {
-		Z    float64
-		Size float64
-	}
-
-	// wall is parallel to the y-axis, on negative z
-	// size is large enough to sho a unit spere at the origin from the camera
-	w := wall{Z: 10, Size: 7}
-
-	// size of a world pixel
-	pixelSize := w.Size / float64(canvasX)
-
-	// transform matrix
-	// m := tracer.IdentityMatrix().Scale(1, 0.5, 1).RotateZ(math.Pi/4).Shear(1, 0, 0, 0, 0, 0)
-	m := tracer.IdentityMatrix()
-
-	// material
-	mat := tracer.NewDefaultMaterial()
-	mat.Color = tracer.ColorName(colornames.Yellow)
-	mat.Ambient = 0.1
-	mat.Diffuse = 0.9
-	mat.Specular = 0.9
-	mat.Shininess = 30.0
-
-	shape := tracer.NewUnitSphere()
-	shape.SetTransform(m)
-	shape.SetMaterial(mat)
-
-	// light source
-	light := tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.ColorName(colornames.White))
-
-	var wg sync.WaitGroup
-
-	// for each row of pixels on the canvas
-	for y := 0.0; y < float64(canvasY); y++ {
-		for x := 0.0; x < float64(canvasX); x++ {
-
-			wg.Add(1)
-
-			go func(x, y float64) {
-
-				// world coordinate of y
-				wy := w.Size/2 - pixelSize*y
-				// world y coordinate of x
-				wx := -w.Size/2 + pixelSize*x
-
-				// point on the wall the ray is targetting
-				target := tracer.NewPoint(wx, wy, w.Z)
-
-				// the ray from camera to the world target
-				ray := tracer.NewRay(camera, target.SubPoint(camera).Normalize())
-
-				if hit, err := shape.IntersectWith(ray).Hit(); err == nil {
-					xs := tracer.NewIntersections(hit)
-
-					comp := tracer.PrepareComputations(hit, ray, xs)
-					clr := tracer.ColorAtPoint(comp.Object.Material(), comp.Object, comp.Point, light, comp.EyeV, comp.NormalV, false)
-
-					c.SetFloat(x, y, clr)
-				}
-				wg.Done()
-
-			}(x, y)
-		}
-	}
-
-	wg.Wait()
-
-	// Export
-	f, err := os.Create("image.png")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("Exporting canvas to %v", f.Name())
-	c.ExportToPNG(f)
-}
-
 func scene() {
 
-	width, height := 300.0, 300.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 300.0, 300.0
+	width, height := 1200.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -404,12 +154,11 @@ func colors() {
 
 func mirrors() {
 
-	width, height := 300.0, 300.0
-	// width, height := 1000.0, 1000.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
-	w.Config.MaxRecusions = 3
+	w.Config.MaxRecusions = 5
 
 	// override light here
 	w.SetLights([]tracer.Light{
@@ -425,7 +174,7 @@ func mirrors() {
 
 	// floor
 	floor := tracer.NewPlane()
-	floor.Material().Color = tracer.ColorName(colornames.White)
+	floor.Material().Color = tracer.ColorName(colornames.Darkblue)
 	floor.Material().Specular = 0
 	floor.Material().Reflective = 0.5
 	w.AddObject(floor)
@@ -453,7 +202,7 @@ func mirrors() {
 	cube1.SetTransform(
 		tracer.IdentityMatrix().Scale(0.001, 1, 10).Translate(-2, 2, 0))
 	cube1.Material().Reflective = 1
-	// cube1.Material().Color = tracer.ColorName(colornames.Black)
+	cube1.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(cube1)
 
 	// mirror2
@@ -461,7 +210,7 @@ func mirrors() {
 	cube2.SetTransform(
 		tracer.IdentityMatrix().Scale(0.001, 1, 5).Translate(2, 2, 0))
 	cube2.Material().Reflective = 1
-	// cube2.Material().Color = tracer.ColorName(colornames.Black)
+	cube2.Material().Color = tracer.ColorName(colornames.Black)
 	w.AddObject(cube2)
 
 	// sphere1
@@ -480,8 +229,7 @@ func mirrors() {
 func mirror() {
 
 	// width, height := 300.0, 300.0
-	width, height := 400.0, 400.0
-	// width, height := 1000.0, 1000.0
+	width, height := 1200.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -586,9 +334,7 @@ func mirror() {
 
 func cube() {
 
-	// width, height := 300.0, 300.0
-	width, height := 500.0, 500.0
-	// width, height := 1000.0, 1000.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -626,8 +372,8 @@ func cube() {
 
 func glass() {
 
-	width, height := 500.0, 500.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 500.0, 500.0
+	width, height := 1200.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -670,9 +416,8 @@ func glass() {
 
 func window() {
 
-	// width, height := 200.0, 200.0
-	width, height := 500.0, 500.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 500.0, 500.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -727,8 +472,8 @@ func window() {
 func pond() {
 
 	// width, height := 100.0, 100.0
-	width, height := 400.0, 400.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 400.0, 400.0
+	width, height := 1400.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -833,8 +578,8 @@ func pond() {
 func cylinder() {
 
 	// width, height := 100.0, 100.0
-	width, height := 400.0, 400.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 400.0, 400.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -912,9 +657,8 @@ func cylinder() {
 
 func spherewarp() {
 
-	// width, height := 100.0, 100.0
-	width, height := 200.0, 200.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 200.0, 200.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -963,8 +707,8 @@ func spherewarp() {
 func cone() {
 
 	// width, height := 100.0, 100.0
-	width, height := 200.0, 200.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 200.0, 200.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1039,8 +783,8 @@ func cone() {
 func group() {
 
 	// width, height := 100.0, 100.0
-	width, height := 400.0, 400.0
-	// width, height := 2000.0, 1500.0
+	// width, height := 400.0, 400.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1122,8 +866,8 @@ func group() {
 }
 
 func triangle() {
-	width, height := 400.0, 300.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 400.0, 300.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1284,11 +1028,6 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	// testCanvas()
-	// test1()
-	// clock()
-	// circle()
-	// sphere()
 	// scene()
 	// colors()
 	// mirrors()
