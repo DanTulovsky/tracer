@@ -23,9 +23,10 @@ func NewDefaultCone() *Cone {
 		Maximum: math.MaxFloat64,
 		Closed:  false,
 		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultMaterial(),
-			shape:     "cone",
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+			material:         NewDefaultMaterial(),
+			shape:            "cone",
 		},
 	}
 }
@@ -90,7 +91,7 @@ func (c *Cone) IntersectWith(r Ray) Intersections {
 	// transform the ray by the inverse of the sphere transfrom matrix
 	// instead of changing the sphere, we change the ray coming from the camera
 	// by the inverse, which achieves the same thing
-	r = r.Transform(c.transform.Inverse())
+	r = r.Transform(c.transformInverse)
 
 	// cylinder custom
 

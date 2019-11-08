@@ -31,9 +31,10 @@ func TestNewCSG(t *testing.T) {
 				right: tt.args.s2,
 				op:    Union,
 				Shape: Shape{
-					transform: IdentityMatrix(),
-					material:  NewDefaultMaterial(),
-					shape:     "csg",
+					transform:        IdentityMatrix(),
+					transformInverse: IdentityMatrix().Inverse(),
+					material:         NewDefaultMaterial(),
+					shape:            "csg",
 				},
 			}
 			got := NewCSG(tt.args.s1, tt.args.s2, tt.args.op)

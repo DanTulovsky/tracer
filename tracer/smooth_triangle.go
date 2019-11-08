@@ -1,5 +1,7 @@
 package tracer
 
+import "sort"
+
 // SmoothTriangle is a triangle defined by 3 points in 3d space and the normals at those points
 type SmoothTriangle struct {
 	P1, P2, P3 Point
@@ -24,9 +26,10 @@ func NewSmoothTriangle(p1, p2, p3 Point, n1, n2, n3 Vector) *SmoothTriangle {
 			E1: p2.SubPoint(p1),
 			E2: p3.SubPoint(p1),
 			Shape: Shape{
-				transform: IdentityMatrix(),
-				material:  NewDefaultMaterial(),
-				shape:     "smooth-triangle",
+				transform:        IdentityMatrix(),
+				transformInverse: IdentityMatrix().Inverse(),
+				material:         NewDefaultMaterial(),
+				shape:            "smooth-triangle",
 			},
 		},
 	}
@@ -38,12 +41,15 @@ func NewSmoothTriangle(p1, p2, p3 Point, n1, n2, n3 Vector) *SmoothTriangle {
 func (t *SmoothTriangle) IntersectWith(r Ray) Intersections {
 	xs := NewIntersections()
 
+	r = r.Transform(t.transformInverse)
+
 	tval, u, v, err := t.sharedIntersectWith(r)
 	if err != nil {
 		return xs
 	}
 
 	xs = append(xs, NewIntersectionUV(t, tval, u, v))
+	sort.Sort(byT(xs))
 	return xs
 }
 

@@ -18,9 +18,10 @@ func NewUnitSphere() *Sphere {
 		Center: NewPoint(0, 0, 0),
 		Radius: 1,
 		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultMaterial(),
-			shape:     "sphere",
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+			material:         NewDefaultMaterial(),
+			shape:            "sphere",
 			// name:      uuid.New().String(),
 		},
 	}
@@ -32,8 +33,9 @@ func NewGlassSphere() *Sphere {
 		Center: NewPoint(0, 0, 0),
 		Radius: 1,
 		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultGlassMaterial(),
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+			material:         NewDefaultGlassMaterial(),
 		},
 	}
 }
@@ -41,12 +43,12 @@ func NewGlassSphere() *Sphere {
 // IntersectWith returns the 't' values of Ray r intersecting with the Sphere in sorted order
 func (s *Sphere) IntersectWith(r Ray) Intersections {
 
-	t := Intersections{}
+	t := NewIntersections()
 
 	// transform the ray by the inverse of the sphere transfrom matrix
 	// instead of changing the sphere, we change the ray coming from the camera
 	// by the inverse, which achieves the same thing
-	r = r.Transform(s.transform.Inverse())
+	r = r.Transform(s.transformInverse)
 
 	// vector from sphere's center to ray origin
 	sphereToRay := r.Origin.SubPoint(s.Center)

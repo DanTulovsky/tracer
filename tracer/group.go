@@ -18,9 +18,10 @@ func NewGroup() *Group {
 	return &Group{
 		members: []Shaper{},
 		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultMaterial(),
-			shape:     "group",
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+			material:         NewDefaultMaterial(),
+			shape:            "group",
 		},
 	}
 }
@@ -120,7 +121,7 @@ func (g *Group) IntersectWith(r Ray) Intersections {
 	// transform the ray by the inverse of the group transfrom matrix
 	// instead of changing the group, we change the ray coming from the camera
 	// by the inverse, which achieves the same thing
-	r = r.Transform(g.transform.Inverse())
+	r = r.Transform(g.transformInverse)
 
 	if !g.IntersectWithBoundingBox(r, g.Bounds()) {
 		// bail out early, ray does not intersect group bounding box

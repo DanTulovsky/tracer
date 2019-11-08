@@ -51,9 +51,10 @@ func TestNewSmoothTriangle(t *testing.T) {
 					E1: NewVector(-1, -1, 0),
 					E2: NewVector(1, -1, 0),
 					Shape: Shape{
-						transform: IdentityMatrix(),
-						material:  NewDefaultMaterial(),
-						shape:     "smooth-triangle",
+						transform:        IdentityMatrix(),
+						transformInverse: IdentityMatrix().Inverse(),
+						material:         NewDefaultMaterial(),
+						shape:            "smooth-triangle",
 					},
 				},
 			},

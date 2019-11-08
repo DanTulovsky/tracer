@@ -32,9 +32,10 @@ func NewCSG(s1, s2 Shaper, op Operation) *CSG {
 		right: s2,
 		op:    op,
 		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultMaterial(),
-			shape:     "csg",
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+			material:         NewDefaultMaterial(),
+			shape:            "csg",
 		},
 	}
 	csg.left.SetParent(csg)

@@ -16,9 +16,10 @@ type Cube struct {
 func NewUnitCube() *Cube {
 	return &Cube{
 		Shape: Shape{
-			transform: IdentityMatrix(),
-			material:  NewDefaultMaterial(),
-			shape:     "cube",
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+			material:         NewDefaultMaterial(),
+			shape:            "cube",
 			// name:      uuid.New().String(),
 		},
 	}
@@ -53,7 +54,7 @@ func (c *Cube) IntersectWith(r Ray) Intersections {
 	t := Intersections{}
 
 	// common to all shapes
-	r = r.Transform(c.transform.Inverse())
+	r = r.Transform(c.transformInverse)
 
 	// Cube specific
 	var tmin, tmax float64

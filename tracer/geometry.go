@@ -27,15 +27,19 @@ type Shaper interface {
 
 	SetTransform(Matrix)
 	Transform() Matrix
+
+	SetTransformInverse(Matrix)
+	TransformInverse() Matrix
 }
 
 // Shape is the abstract shape
 type Shape struct {
-	name      string
-	shape     string
-	transform Matrix
-	material  *Material
-	bound     Bound // cache the group bounding box
+	name             string
+	shape            string
+	transform        Matrix
+	transformInverse Matrix
+	material         *Material
+	bound            Bound // cache the group bounding box
 
 	parent Shaper
 }
@@ -99,6 +103,17 @@ func (s *Shape) Transform() Matrix {
 // SetTransform sets the transformation matrix of the shape
 func (s *Shape) SetTransform(m Matrix) {
 	s.transform = m
+	s.transformInverse = m.Inverse()
+}
+
+// TransformInverse returns the inverse of the transformation matrix of the shape
+func (s *Shape) TransformInverse() Matrix {
+	return s.transformInverse
+}
+
+// SetTransformInverse sets the inverse of the transformation matrix of the shape
+func (s *Shape) SetTransformInverse(m Matrix) {
+	s.transformInverse = m
 }
 
 // Name returns the name of the shape

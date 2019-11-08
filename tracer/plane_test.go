@@ -15,9 +15,10 @@ func TestNewPlane(t *testing.T) {
 			name: "test1",
 			want: &Plane{
 				Shape: Shape{
-					transform: IdentityMatrix(),
-					material:  NewDefaultMaterial(),
-					shape:     "plane",
+					transform:        IdentityMatrix(),
+					transformInverse: IdentityMatrix().Inverse(),
+					material:         NewDefaultMaterial(),
+					shape:            "plane",
 				},
 			},
 		},
