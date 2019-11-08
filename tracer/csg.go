@@ -96,8 +96,12 @@ func (csg *CSG) IntersectWith(r Ray) Intersections {
 	return csg.FilterIntersections(x1)
 }
 
-// NormalAt is unuse here
+// NormalAt is unused here
 func (csg *CSG) NormalAt(p Point, xs Intersection) Vector {
+	return csg.localNormalAt(p, xs)
+}
+
+func (csg *CSG) localNormalAt(p Point, xs Intersection) Vector {
 	return NewVector(0, 0, 1)
 }
 
