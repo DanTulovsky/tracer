@@ -1,9 +1,11 @@
 package tracer
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/DanTulovsky/tracer/constants"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -62,8 +64,10 @@ func TestNewSmoothTriangle(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tri := NewSmoothTriangle(tt.args.p1, tt.args.p2, tt.args.p3, tt.args.n1, tt.args.n2, tt.args.n3)
-			assert.Equal(t, tt.want, tri, "should equal")
+			tt.want.Shape.lna = tt.want.localNormalAt
+			got := NewSmoothTriangle(tt.args.p1, tt.args.p2, tt.args.p3, tt.args.n1, tt.args.n2, tt.args.n3)
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }
@@ -118,7 +122,7 @@ func TestSmoothTriangle_NormalAt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equals(tt.tri.NormalAt(tt.args.p, tt.args.xs)), "should equal")
+			assert.True(t, tt.want.Equal(tt.tri.NormalAt(tt.args.p, tt.args.xs)), "should equal")
 		})
 	}
 }

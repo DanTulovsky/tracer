@@ -1,9 +1,11 @@
 package tracer
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -116,10 +118,11 @@ func TestNewUnitSphere(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got := NewUnitSphere()
-
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, got, "should equal")
+			tt.want.Shape.lna = tt.want.localNormalAt
+			got := NewUnitSphere()
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }
@@ -243,8 +246,8 @@ func TestSphere_NormalAt(t *testing.T) {
 			tt.sphere.SetTransform(tt.m)
 			v := tt.sphere.NormalAt(tt.args.p, tt.args.xs)
 
-			assert.True(t, tt.want.Equals(v), "should equal")
-			assert.True(t, v.Equals(v.Normalize()), "should equal")
+			assert.True(t, tt.want.Equal(v), "should equal")
+			assert.True(t, v.Equal(v.Normalize()), "should equal")
 		})
 	}
 }

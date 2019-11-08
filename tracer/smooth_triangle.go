@@ -33,8 +33,18 @@ func NewSmoothTriangle(p1, p2, p3 Point, n1, n2, n3 Vector) *SmoothTriangle {
 			},
 		},
 	}
+	t.lna = t.localNormalAt
 
 	return t
+}
+
+// Equal returns true if the mooth triangles are equal
+func (t *SmoothTriangle) Equal(t2 *SmoothTriangle) bool {
+	return t.Shape.Equal(&t2.Shape) &&
+		t.Triangle.Equal(&t2.Triangle) &&
+		t.N1 == t2.N1 &&
+		t.N2 == t2.N2 &&
+		t.N3 == t2.N3
 }
 
 // IntersectWith returns the 't' value of Ray r intersecting with the triangle in sorted order
@@ -55,11 +65,11 @@ func (t *SmoothTriangle) IntersectWith(r Ray) Intersections {
 
 // NormalAt returns the normal of the triangle at u,v stored in hit
 func (t *SmoothTriangle) NormalAt(unused Point, hit Intersection) Vector {
-	v := t.localNormalAt(hit)
+	v := t.localNormalAt(unused, hit)
 	return v.NormalToWorldSpace(t)
 }
 
-func (t *SmoothTriangle) localNormalAt(hit Intersection) Vector {
+func (t *SmoothTriangle) localNormalAt(unused Point, hit Intersection) Vector {
 	return t.N2.Scale(hit.u).AddVector(t.N3.Scale(hit.v)).AddVector(t.N1.Scale(1 - hit.u - hit.v))
 }
 

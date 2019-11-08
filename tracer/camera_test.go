@@ -176,7 +176,7 @@ func TestCamera_RayForPixel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.camera.SetTransform(tt.transform)
-			assert.True(t, tt.want.Equals(tt.camera.RayForPixel(tt.args.x, tt.args.y)), "should equal")
+			assert.True(t, tt.want.Equal(tt.camera.RayForPixel(tt.args.x, tt.args.y)), "should equal")
 		})
 	}
 }

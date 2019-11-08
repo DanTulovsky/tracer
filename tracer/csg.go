@@ -1,6 +1,8 @@
 package tracer
 
-import "sort"
+import (
+	"sort"
+)
 
 // Operation defines the operation applied to a CSG
 type Operation int
@@ -38,9 +40,18 @@ func NewCSG(s1, s2 Shaper, op Operation) *CSG {
 			shape:            "csg",
 		},
 	}
+	csg.lna = csg.localNormalAt
+
 	csg.left.SetParent(csg)
 	csg.right.SetParent(csg)
 	return csg
+}
+
+// Equal returns true if the CSGs are equal
+func (csg *CSG) Equal(csg2 *CSG) bool {
+	return csg.Shape.Equal(&csg2.Shape) &&
+		// cmp.Equal(csg.left, csg.right) &&
+		csg.op == csg2.op
 }
 
 // IntersectionAllowed returns true if this is a valid intersection
@@ -98,11 +109,7 @@ func (csg *CSG) IntersectWith(r Ray) Intersections {
 
 // NormalAt is unused here
 func (csg *CSG) NormalAt(p Point, xs Intersection) Vector {
-	return csg.localNormalAt(p, xs)
-}
-
-func (csg *CSG) localNormalAt(p Point, xs Intersection) Vector {
-	return NewVector(0, 0, 1)
+	panic("called NormalAt on CSG shape")
 }
 
 // PrecomputeValues precomputes some values for render speedup

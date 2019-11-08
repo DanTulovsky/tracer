@@ -1,9 +1,11 @@
 package tracer
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/DanTulovsky/tracer/constants"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,7 +44,9 @@ func TestNewTriangle(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, NewTriangle(tt.args.p1, tt.args.p2, tt.args.p3))
+			got := NewTriangle(tt.args.p1, tt.args.p2, tt.args.p3)
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }

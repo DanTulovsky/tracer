@@ -1,10 +1,12 @@
 package tracer
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
 	"github.com/DanTulovsky/tracer/constants"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,10 +33,10 @@ func TestNewDefaultCylinder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.want.Shape.lna = tt.want.localNormalAt
 			got := NewDefaultCylinder()
-			tt.want.Shape.name = got.name // random uuid
-
-			assert.Equal(t, tt.want, got, "should equal")
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }
@@ -369,7 +371,10 @@ func TestNewCylinder(t *testing.T) {
 				assert.Panics(t, func() { NewCylinder(tt.args.min, tt.args.max) }, "should panic")
 
 			} else {
-				assert.Equal(t, tt.want, NewCylinder(tt.args.min, tt.args.max), "should equal")
+				tt.want.Shape.lna = tt.want.localNormalAt
+				got := NewCylinder(tt.args.min, tt.args.max)
+				diff := cmp.Diff(tt.want, got)
+				assert.Equal(t, "", fmt.Sprint(diff))
 			}
 		})
 	}
@@ -421,7 +426,10 @@ func TestNewClosedCylinder(t *testing.T) {
 				assert.Panics(t, func() { NewClosedCylinder(tt.args.min, tt.args.max) }, "should panic")
 
 			} else {
-				assert.Equal(t, tt.want, NewClosedCylinder(tt.args.min, tt.args.max), "should equal")
+				tt.want.Shape.lna = tt.want.localNormalAt
+				got := NewClosedCylinder(tt.args.min, tt.args.max)
+				diff := cmp.Diff(tt.want, got)
+				assert.Equal(t, "", fmt.Sprint(diff))
 			}
 		})
 	}

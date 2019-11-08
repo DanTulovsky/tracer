@@ -142,8 +142,8 @@ func (v Vector) String() string {
 	return fmt.Sprintf("Vector(%.2f, %.2f, %.2f)", v.X(), v.Y(), v.Z())
 }
 
-// Equals compares vectors
-func (v Vector) Equals(s Vector) bool {
+// Equal compares vectors
+func (v Vector) Equal(s Vector) bool {
 	if utils.Equals(v.X(), s.X()) && utils.Equals(v.Y(), s.Y()) && utils.Equals(v.Z(), s.Z()) && utils.Equals(v.W(), s.W()) {
 		return true
 	}

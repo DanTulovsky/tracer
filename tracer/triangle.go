@@ -39,6 +39,16 @@ func NewTriangle(p1, p2, p3 Point) *Triangle {
 	return t
 }
 
+// Equal returns true if the triangles are equal
+func (t *Triangle) Equal(t2 *Triangle) bool {
+	return t.Shape.Equal(&t2.Shape) &&
+		t.P1.Equal(t2.P1) &&
+		t.P2.Equal(t2.P2) &&
+		t.P3.Equal(t2.P3) &&
+		t.E1.Equal(t2.E1) &&
+		t.E2.Equal(t2.E2)
+}
+
 // sharedIntersectWith returns the tval, u, v, or an error if there is no intersection
 func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, error) {
 
