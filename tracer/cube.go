@@ -86,22 +86,27 @@ func (c *Cube) NormalAt(p Point, xs Intersection) Vector {
 	op := p.ToObjectSpace(c)
 
 	// object normal, this is different for each shape
-	var on Vector
-	maxc := math.Max(math.Max(math.Abs(op.X()), math.Abs(op.Y())), math.Abs(op.Z()))
-
-	switch maxc {
-	case math.Abs(op.X()):
-		on = NewVector(op.X(), 0, 0)
-	case math.Abs(op.Y()):
-		on = NewVector(0, op.Y(), 0)
-	default:
-		on = NewVector(0, 0, op.Z())
-	}
+	on := c.localNormalAt(op, xs)
 
 	// world normal
 	wn := on.NormalToWorldSpace(c)
 
 	return wn.Normalize()
+}
+
+func (c *Cube) localNormalAt(p Point, xs Intersection) Vector {
+	var on Vector
+	maxc := math.Max(math.Max(math.Abs(p.X()), math.Abs(p.Y())), math.Abs(p.Z()))
+
+	switch maxc {
+	case math.Abs(p.X()):
+		on = NewVector(p.X(), 0, 0)
+	case math.Abs(p.Y()):
+		on = NewVector(0, p.Y(), 0)
+	default:
+		on = NewVector(0, 0, p.Z())
+	}
+	return on
 }
 
 // calculateBounds calculates the bounding box of the shape

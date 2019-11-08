@@ -81,13 +81,16 @@ func (s *Sphere) NormalAt(p Point, xs Intersection) Vector {
 	op := p.ToObjectSpace(s)
 
 	// object normal, this is different for each shape
-	on := op.SubPoint(Origin())
+	on := s.localNormalAt(op, xs)
 
 	// world normal
 	wn := on.NormalToWorldSpace(s)
 
 	return wn.Normalize()
+}
 
+func (s *Sphere) localNormalAt(p Point, xs Intersection) Vector {
+	return p.SubPoint(Origin())
 }
 
 // calculateBounds calculates the bounding box of the shape

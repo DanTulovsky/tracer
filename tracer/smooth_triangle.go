@@ -54,9 +54,13 @@ func (t *SmoothTriangle) IntersectWith(r Ray) Intersections {
 }
 
 // NormalAt returns the normal of the triangle at u,v stored in hit
-func (t *SmoothTriangle) NormalAt(p Point, hit Intersection) Vector {
-	v := t.N2.Scale(hit.u).AddVector(t.N3.Scale(hit.v)).AddVector(t.N1.Scale(1 - hit.u - hit.v))
+func (t *SmoothTriangle) NormalAt(unused Point, hit Intersection) Vector {
+	v := t.localNormalAt(hit)
 	return v.NormalToWorldSpace(t)
+}
+
+func (t *SmoothTriangle) localNormalAt(hit Intersection) Vector {
+	return t.N2.Scale(hit.u).AddVector(t.N3.Scale(hit.v)).AddVector(t.N1.Scale(1 - hit.u - hit.v))
 }
 
 // Includes implements includes logic

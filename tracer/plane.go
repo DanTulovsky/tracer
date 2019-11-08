@@ -28,13 +28,20 @@ func NewPlane() *Plane {
 
 // NormalAt returns the normal vector at the given point on the surface of the plane
 func (pl *Plane) NormalAt(p Point, xs Intersection) Vector {
-	on := NewVector(0, 1, 0)
+	// move point to object space
+	op := p.ToObjectSpace(pl)
 
-	// common calculation to all shapes
+	// object normal, this is different for each shape
+	on := pl.localNormalAt(op, xs)
+
 	// world normal
 	wn := on.NormalToWorldSpace(pl)
 
 	return wn.Normalize()
+}
+
+func (pl *Plane) localNormalAt(p Point, xs Intersection) Vector {
+	return NewVector(0, 1, 0)
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the plane in sorted order

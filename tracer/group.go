@@ -139,6 +139,10 @@ func (g *Group) IntersectWith(r Ray) Intersections {
 
 // NormalAt returns the normal vector at the given point on the surface of the group
 func (g *Group) NormalAt(p Point, xs Intersection) Vector {
+	return g.localNormalAt(p, xs)
+}
+
+func (g *Group) localNormalAt(p Point, xs Intersection) Vector {
 	panic("called NormalAt on a group")
 }
 

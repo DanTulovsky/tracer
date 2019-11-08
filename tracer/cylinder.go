@@ -142,24 +142,30 @@ func (c *Cylinder) NormalAt(p Point, xs Intersection) Vector {
 	op := p.ToObjectSpace(c)
 
 	// object normal, this is different for each shape
-	var on Vector
-
-	// compute the square of the distance form the y-axis
-	dist := math.Pow(op.X(), 2) + math.Pow(op.Z(), 2)
-
-	switch {
-	case dist < 1 && op.Y() >= c.Maximum-constants.Epsilon:
-		on = NewVector(0, 1, 0)
-	case dist < 1 && op.Y() <= c.Minimum+constants.Epsilon:
-		on = NewVector(0, -1, 0)
-	default:
-		on = NewVector(op.X(), 0, op.Z())
-	}
+	on := c.localNormalAt(op, xs)
 
 	// world normal
 	wn := on.NormalToWorldSpace(c)
 
 	return wn.Normalize()
+}
+
+func (c *Cylinder) localNormalAt(p Point, xs Intersection) Vector {
+	// object normal, this is different for each shape
+	var on Vector
+
+	// compute the square of the distance form the y-axis
+	dist := math.Pow(p.X(), 2) + math.Pow(p.Z(), 2)
+
+	switch {
+	case dist < 1 && p.Y() >= c.Maximum-constants.Epsilon:
+		on = NewVector(0, 1, 0)
+	case dist < 1 && p.Y() <= c.Minimum+constants.Epsilon:
+		on = NewVector(0, -1, 0)
+	default:
+		on = NewVector(p.X(), 0, p.Z())
+	}
+	return on
 }
 
 // calculateBounds calculates the bounding box of the shape
