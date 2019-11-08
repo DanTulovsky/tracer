@@ -215,7 +215,7 @@ func TestCylinder_IntersectWith(t *testing.T) {
 				want = append(want, NewIntersection(tt.c, tt.wantT1))
 				want = append(want, NewIntersection(tt.c, tt.wantT2))
 			}
-			got := tt.c.IntersectWith(tt.args.r)
+			got := tt.c.IntersectWith(tt.args.r, NewIntersections())
 
 			assert.Equal(t, len(want), len(got), "should equal")
 			if tt.wantXS > 0 {

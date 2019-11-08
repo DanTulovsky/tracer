@@ -15,7 +15,7 @@ type Shaper interface {
 	// If A is anything else, true if A == B
 	Includes(Shaper) bool
 
-	IntersectWith(Ray) Intersections
+	IntersectWith(Ray, Intersections) Intersections
 	NormalAt(Point, Intersection) Vector
 	PrecomputeValues()
 
@@ -91,7 +91,7 @@ func (s *Shape) SetParent(p Shaper) {
 }
 
 // IntersectWith implements Shaper interface
-func (s *Shape) IntersectWith(r Ray) Intersections {
+func (s *Shape) IntersectWith(r Ray, xs Intersections) Intersections {
 	panic("must implement IntersectWith")
 }
 

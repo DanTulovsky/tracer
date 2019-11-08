@@ -127,7 +127,7 @@ func TestPlane_IntersectWith(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.plane.IntersectWith(tt.args.r)
+			got := tt.plane.IntersectWith(tt.args.r, NewIntersections())
 			diff := cmp.Diff(tt.want, got)
 			assert.Equal(t, "", fmt.Sprint(diff))
 		})

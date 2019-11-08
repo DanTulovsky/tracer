@@ -93,7 +93,7 @@ func TestSphere_IntersectWith(t *testing.T) {
 			}
 
 			tt.sphere.SetTransform(tt.transform)
-			assert.Equalf(t, want, tt.sphere.IntersectWith(tt.args.r), "should equal")
+			assert.Equalf(t, want, tt.sphere.IntersectWith(tt.args.r, NewIntersections()), "should equal")
 		})
 	}
 }

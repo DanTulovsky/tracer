@@ -1,11 +1,11 @@
 package tracer
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"runtime"
 	"sort"
+	"sync"
 
 	"golang.org/x/image/colornames"
 )
@@ -76,11 +76,11 @@ func (w *World) AddObject(o Shaper) {
 }
 
 // Intersections returns all the intersections in the world with the given ray
-func (w *World) Intersections(r Ray) Intersections {
+func (w *World) Intersections(r Ray, xs Intersections) Intersections {
 	var is Intersections
 
 	for _, o := range w.Objects {
-		iso := o.IntersectWith(r)
+		iso := o.IntersectWith(r, xs)
 		is = append(is, iso...)
 	}
 
@@ -110,9 +110,9 @@ func (w *World) Camera() *Camera {
 }
 
 // ColorAt returns the color in the world where the given ray hits
-func (w *World) ColorAt(r Ray, remaining int) Color {
+func (w *World) ColorAt(r Ray, remaining int, xs Intersections) Color {
 	// First solve the visibility problem
-	xs := w.Intersections(r)
+	xs = w.Intersections(r, xs)
 	hit, err := xs.Hit()
 	if err != nil {
 		return Black()
@@ -131,7 +131,7 @@ func (w *World) ReflectedColor(state *IntersectionState, remaining int) Color {
 	}
 
 	reflectR := NewRay(state.OverPoint, state.ReflectV)
-	clr := w.ColorAt(reflectR, remaining-1)
+	clr := w.ColorAt(reflectR, remaining-1, NewIntersections())
 
 	return clr.Scale(state.Object.Material().Reflective)
 }
@@ -142,7 +142,6 @@ func (w *World) RefractedColor(state *IntersectionState, remaining int) Color {
 	if remaining <= 0 || state.Object.Material().Transparency == 0 {
 		return Black()
 	}
-
 	// check for total internal reflection
 
 	// find the ratio of the first index of refraction to the second
@@ -171,7 +170,8 @@ func (w *World) RefractedColor(state *IntersectionState, remaining int) Color {
 
 	// find the color of the refracted ray, making sure to multiply
 	// by the transparency value to account for any opacity
-	clr := w.ColorAt(refractedRay, remaining-1).Scale(state.Object.Material().Transparency)
+	clr := w.ColorAt(
+		refractedRay, remaining-1, NewIntersections()).Scale(state.Object.Material().Transparency)
 
 	return clr
 
@@ -204,7 +204,6 @@ func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 
 			result = surface.Add(reflected.Scale(reflectance)).Add(refracted.Scale((1 - reflectance)))
 		} else {
-
 			result = result.Add(surface.Add(reflected.Add(refracted)))
 		}
 	}
@@ -215,7 +214,6 @@ func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 // IsShadowed returns true if p is in a shadow from the given light
 // TODO: Change this to be a range rather than a bool
 func (w *World) IsShadowed(p Point, l Light) bool {
-
 	v := l.Position().SubPoint(p)
 	distance := v.Magnitude()
 	direction := v.Normalize()
@@ -223,7 +221,7 @@ func (w *World) IsShadowed(p Point, l Light) bool {
 	r := NewRay(p, direction)
 
 	// TODO: This can cut out early, by returning the first intersection with t > 0 if it's a shadow caster
-	intersections := w.Intersections(r)
+	intersections := w.Intersections(r, NewIntersections())
 
 	// Some objects do not cast shadows, so we need to look at all the objects r intersects with
 	sort.Sort(byT(intersections))
@@ -254,6 +252,33 @@ func (w *World) PrecomputeValues() {
 	}
 }
 
+type pixel struct {
+	x, y float64
+}
+
+// Render is the work done by the renderWorker, renders one pixel
+func (p *pixel) Render(w *World, canvas *Canvas, xs Intersections) {
+
+	ray := w.Camera().RayForPixel(p.x, p.y)
+	clr := w.ColorAt(ray, w.Config.MaxRecusions, xs)
+	// TODO: There is a race condition here, as canvas is also read by the GPU
+	// Only true when using GPU to display the render live.
+	canvas.SetFloat(p.x, p.y, clr)
+}
+
+// renderWorker processes a single pixel at a time
+func (w *World) renderWorker(in chan *pixel, canvas *Canvas) {
+	// One intersections list per worker, making these per pixel is very expensive
+	xs := NewIntersections()
+
+	for p := range in {
+		// render the pixel
+		p.Render(w, canvas, xs)
+		// clear intersections for next pixel
+		xs = xs[:0]
+	}
+}
+
 func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 
 	log.Println("Running render...")
@@ -261,43 +286,39 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 	// allow this many renders to run at once
 	max := runtime.NumCPU()
 	log.Printf("Parallelism: %v", max)
-	sem := make(chan bool, max)
 
-	total := (camera.Vsize - 1) * (camera.Hsize - 1)
-	last := 0.0
+	// total := (camera.Vsize - 1) * (camera.Hsize - 1)
+	// last := 0.0
+
+	// create communications channel
+	pending := make(chan *pixel)
+	var wg sync.WaitGroup
+
+	// start the render goroutines
+	for i := 0; i < max; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			w.renderWorker(pending, canvas)
+		}()
+	}
 
 	for y := 0.0; y < camera.Vsize-1; y++ {
 		for x := 0.0; x < camera.Hsize-1; x++ {
-			sem <- true
-
-			// Show progress
-			last = showProgress(total, last, camera.Vsize-1, camera.Hsize-1, x, y)
-
-			go func(x, y float64) {
-				// work is done
-				defer func() { <-sem }()
-
-				ray := camera.RayForPixel(x, y)
-				clr := w.ColorAt(ray, w.Config.MaxRecusions)
-				// TODO: There is a race condition here, as canvas is also read by the GPU
-				// Only true when using GPU to display the render live.
-				canvas.SetFloat(x, y, clr)
-			}(x, y)
+			// send work to workers
+			pending <- &pixel{x: x, y: y}
 		}
 	}
+	close(pending)
+	wg.Wait()
 
-	fmt.Println()
-	log.Println("Wainting for render to complete...")
-	for i := 0; i < cap(sem); i++ {
-		sem <- true
-	}
-	log.Println("Render finished!")
+	log.Print("Render finished!")
 	return canvas
 }
 
 // ShowInfo dumps info about the world
 func (w *World) ShowInfo() {
-	log.Printf("Camera: %#v", w.Camera())
+	// log.Printf("Camera: %#v", w.Camera())
 }
 
 // Render renders the world using the world camera

@@ -1,7 +1,6 @@
 package tracer
 
 import (
-	"errors"
 	"math"
 	"sort"
 
@@ -50,13 +49,14 @@ func (t *Triangle) Equal(t2 *Triangle) bool {
 }
 
 // sharedIntersectWith returns the tval, u, v, or an error if there is no intersection
-func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, error) {
+// if no intersection is found, the last bool is false
+func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, bool) {
 
 	dirCrossE2 := r.Dir.Cross(t.E2)
 	d := t.E1.Dot(dirCrossE2)
 	if math.Abs(d) < constants.Epsilon {
 		// ray parallel to surface of triangle
-		return 0, 0, 0, errors.New("no intersection")
+		return 0, 0, 0, false
 	}
 
 	f := 1.0 / d
@@ -64,28 +64,26 @@ func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, error)
 	u := f * p1ToOrigin.Dot(dirCrossE2)
 	if u < 0 || u > 1 {
 		// ray passes beyond p1-p3 edge
-		return 0, 0, 0, errors.New("no intersection")
+		return 0, 0, 0, false
 	}
 
 	// ray misses p1-p2 and p2-p3 edges
 	oCrossE1 := p1ToOrigin.Cross(t.E1)
 	v := f * r.Dir.Dot(oCrossE1)
 	if v < 0 || (u+v) > 1 {
-		return 0, 0, 0, errors.New("no intersection")
+		return 0, 0, 0, false
 	}
 
-	return f * t.E2.Dot(oCrossE1), u, v, nil
+	return f * t.E2.Dot(oCrossE1), u, v, true
 }
 
 // IntersectWith returns the 't' value of Ray r intersecting with the triangle in sorted order
-func (t *Triangle) IntersectWith(r Ray) Intersections {
-	xs := NewIntersections()
-
+func (t *Triangle) IntersectWith(r Ray, xs Intersections) Intersections {
 	r = r.Transform(t.transformInverse)
 
 	// u, v not used here
-	tval, _, _, err := t.sharedIntersectWith(r)
-	if err != nil {
+	tval, _, _, found := t.sharedIntersectWith(r)
+	if !found {
 		return xs
 	}
 	xs = append(xs, NewIntersection(t, tval))

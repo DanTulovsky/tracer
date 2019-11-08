@@ -97,9 +97,9 @@ func (csg *CSG) Includes(s2 Shaper) bool {
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the CSG in sorted order
-func (csg *CSG) IntersectWith(r Ray) Intersections {
-	x1 := csg.left.IntersectWith(r)
-	x2 := csg.right.IntersectWith(r)
+func (csg *CSG) IntersectWith(r Ray, xs Intersections) Intersections {
+	x1 := csg.left.IntersectWith(r, xs)
+	x2 := csg.right.IntersectWith(r, xs)
 
 	x1 = append(x1, x2...)
 	sort.Sort(byT(x1))

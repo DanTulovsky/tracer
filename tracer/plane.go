@@ -39,9 +39,7 @@ func (pl *Plane) NormalAt(p Point, xs Intersection) Vector {
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the plane in sorted order
-func (pl *Plane) IntersectWith(r Ray) Intersections {
-
-	t := Intersections{}
+func (pl *Plane) IntersectWith(r Ray, t Intersections) Intersections {
 
 	//  common calculation for all shapes
 	r = r.Transform(pl.transformInverse)

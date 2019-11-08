@@ -186,7 +186,7 @@ func TestCone_IntersectWith(t *testing.T) {
 				want = append(want, NewIntersection(tt.c, tvalue))
 			}
 
-			got := tt.c.IntersectWith(tt.args.r)
+			got := tt.c.IntersectWith(tt.args.r, NewIntersections())
 
 			assert.Equal(t, len(want), len(got), "should equal")
 
