@@ -129,7 +129,7 @@ func TestWorld_shadeHit(t *testing.T) {
 			xs := NewIntersections(tt.args.i)
 
 			state := PrepareComputations(tt.args.i, tt.args.r, xs)
-			assert.True(t, tt.want.Equal(tt.world.shadeHit(state, 1)), "should equal")
+			assert.True(t, tt.want.Equal(tt.world.shadeHit(state, 1, NewIntersections())), "should equal")
 		})
 	}
 }
@@ -151,7 +151,7 @@ func TestWorld_shadeHitShadow(t *testing.T) {
 	i := xs[0]
 
 	state := PrepareComputations(i, r, xs)
-	c := w.shadeHit(state, 1)
+	c := w.shadeHit(state, 1, NewIntersections())
 	assert.Equal(t, NewColor(0.1, 0.1, 0.1), c, "should equal")
 }
 
@@ -300,7 +300,7 @@ func TestWorld_IsShadowed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// default world has only one light
-			assert.Equal(t, tt.want, tt.world.IsShadowed(tt.args.p, tt.world.Lights[0]))
+			assert.Equal(t, tt.want, tt.world.IsShadowed(tt.args.p, tt.world.Lights[0], NewIntersections()))
 		})
 	}
 }
@@ -317,7 +317,7 @@ func TestWorld_ReflectedColor_NotReflective(t *testing.T) {
 	i := xs[0]
 
 	state := PrepareComputations(i, r, xs)
-	clr := w.ReflectedColor(state, 1)
+	clr := w.ReflectedColor(state, 1, NewIntersections())
 
 	assert.Equal(t, Black(), clr, "should equal")
 }
@@ -336,7 +336,7 @@ func TestWorld_ReflectedColor_Reflective(t *testing.T) {
 	i := xs[0]
 
 	state := PrepareComputations(i, r, xs)
-	clr := w.ReflectedColor(state, 1)
+	clr := w.ReflectedColor(state, 1, NewIntersections())
 	expected := NewColor(0.19033, 0.23791, 0.142749)
 
 	assert.True(t, expected.Equal(clr), "should equal")
@@ -356,7 +356,7 @@ func TestWorld_shadeHit_Reflective(t *testing.T) {
 	i := xs[0]
 
 	state := PrepareComputations(i, r, xs)
-	clr := w.shadeHit(state, 1)
+	clr := w.shadeHit(state, 1, NewIntersections())
 	expected := NewColor(0.876757, 0.924340, 0.829174)
 
 	assert.True(t, expected.Equal(clr), "should equal")
@@ -398,7 +398,7 @@ func TestWorld_shadeHit_MaxRecursiveReflected(t *testing.T) {
 	i := xs[0]
 
 	state := PrepareComputations(i, r, xs)
-	clr := w.ReflectedColor(state, 0)
+	clr := w.ReflectedColor(state, 0, NewIntersections())
 	expected := Black()
 	log.Println(clr)
 
@@ -417,7 +417,7 @@ func TestWorld_RefractedColor_Opaque(t *testing.T) {
 	i := xs[0]
 
 	state := PrepareComputations(i, r, xs)
-	clr := w.RefractedColor(state, 5)
+	clr := w.RefractedColor(state, 5, NewIntersections())
 
 	assert.Equal(t, Black(), clr, "should equal")
 }
@@ -436,7 +436,7 @@ func TestWorld_efractedColor_MaxRecursion(t *testing.T) {
 	i := xs[0]
 
 	state := PrepareComputations(i, r, xs)
-	clr := w.RefractedColor(state, 0)
+	clr := w.RefractedColor(state, 0, NewIntersections())
 
 	assert.Equal(t, Black(), clr, "should equal")
 }
@@ -455,7 +455,7 @@ func TestWorldRefractedColor_TotalInternalReflection(t *testing.T) {
 	i := xs[1] // inside the sphere
 
 	state := PrepareComputations(i, r, xs)
-	clr := w.RefractedColor(state, 5)
+	clr := w.RefractedColor(state, 5, NewIntersections())
 
 	assert.Equal(t, Black(), clr, "should equal")
 }
@@ -479,7 +479,7 @@ func TestWorldRefractedColor_Normal(t *testing.T) {
 		NewIntersection(a, 0.9899))
 
 	state := PrepareComputations(xs[2], r, xs)
-	clr := w.RefractedColor(state, 5)
+	clr := w.RefractedColor(state, 5, NewIntersections())
 
 	assert.True(t, NewColor(0, 0.998874, 0.047218).Equal(clr), "should be true")
 }
@@ -503,7 +503,7 @@ func TestWorld_shadeHit_Transparent(t *testing.T) {
 	xs := NewIntersections(NewIntersection(floor, math.Sqrt2))
 
 	state := PrepareComputations(xs[0], r, xs)
-	clr := w.shadeHit(state, 5)
+	clr := w.shadeHit(state, 5, NewIntersections())
 
 	assert.True(t, NewColor(0.936425, 0.686425, 0.686425).Equal(clr), "should be true")
 }
@@ -528,7 +528,7 @@ func TestWorld_shadeHit_Schlick(t *testing.T) {
 	xs := NewIntersections(NewIntersection(floor, math.Sqrt2))
 
 	state := PrepareComputations(xs[0], r, xs)
-	clr := w.shadeHit(state, 5)
+	clr := w.shadeHit(state, 5, NewIntersections())
 
 	assert.True(t, NewColor(0.93391, 0.69643, 0.69243).Equal(clr), "should be true")
 

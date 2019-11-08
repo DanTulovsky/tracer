@@ -120,25 +120,26 @@ func (w *World) ColorAt(r Ray, remaining int, xs Intersections) Color {
 
 	// Second solve the shading problem
 	state := PrepareComputations(hit, r, xs)
-	return w.shadeHit(state, remaining).Clamp()
+	return w.shadeHit(state, remaining, xs).Clamp()
 }
 
 // ReflectedColor returns the reflected color given an IntersectionState
 // remaining controls how many times a light ray can bounce between the same objects
-func (w *World) ReflectedColor(state *IntersectionState, remaining int) Color {
+func (w *World) ReflectedColor(state *IntersectionState, remaining int, xs Intersections) Color {
 	if remaining <= 0 || state.Object.Material().Reflective == 0 {
 		return Black()
 	}
 
 	reflectR := NewRay(state.OverPoint, state.ReflectV)
-	clr := w.ColorAt(reflectR, remaining-1, NewIntersections())
+	xs = xs[:0]
+	clr := w.ColorAt(reflectR, remaining-1, xs)
 
 	return clr.Scale(state.Object.Material().Reflective)
 }
 
 // RefractedColor returns the refracted color given an IntersectionState
 // remaining controls how many times a light ray can bounce between the same objects
-func (w *World) RefractedColor(state *IntersectionState, remaining int) Color {
+func (w *World) RefractedColor(state *IntersectionState, remaining int, xs Intersections) Color {
 	if remaining <= 0 || state.Object.Material().Transparency == 0 {
 		return Black()
 	}
@@ -170,20 +171,21 @@ func (w *World) RefractedColor(state *IntersectionState, remaining int) Color {
 
 	// find the color of the refracted ray, making sure to multiply
 	// by the transparency value to account for any opacity
-	clr := w.ColorAt(
-		refractedRay, remaining-1, NewIntersections()).Scale(state.Object.Material().Transparency)
+	xs = xs[:0]
+	clr := w.ColorAt(refractedRay, remaining-1, xs).Scale(state.Object.Material().Transparency)
 
 	return clr
 
 }
 
 // ShadeHit returns the color at the intersection enapsulated by IntersectionState
-func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
+func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersections) Color {
 
+	xs = xs[:0] // clear intersections
 	var result Color
 
 	for _, l := range w.Lights {
-		isShadowed := w.IsShadowed(state.OverPoint, l)
+		isShadowed := w.IsShadowed(state.OverPoint, l, xs)
 
 		surface := lighting(
 			state.Object.Material(),
@@ -194,8 +196,8 @@ func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 			state.NormalV,
 			isShadowed)
 
-		reflected := w.ReflectedColor(state, remaining)
-		refracted := w.RefractedColor(state, remaining)
+		reflected := w.ReflectedColor(state, remaining, xs)
+		refracted := w.RefractedColor(state, remaining, xs)
 
 		m := state.Object.Material()
 		if m.Reflective > 0 && m.Transparency > 0 {
@@ -213,7 +215,7 @@ func (w *World) shadeHit(state *IntersectionState, remaining int) Color {
 
 // IsShadowed returns true if p is in a shadow from the given light
 // TODO: Change this to be a range rather than a bool
-func (w *World) IsShadowed(p Point, l Light) bool {
+func (w *World) IsShadowed(p Point, l Light, xs Intersections) bool {
 	v := l.Position().SubPoint(p)
 	distance := v.Magnitude()
 	direction := v.Normalize()
@@ -221,7 +223,7 @@ func (w *World) IsShadowed(p Point, l Light) bool {
 	r := NewRay(p, direction)
 
 	// TODO: This can cut out early, by returning the first intersection with t > 0 if it's a shadow caster
-	intersections := w.Intersections(r, NewIntersections())
+	intersections := w.Intersections(r, xs)
 
 	// Some objects do not cast shadows, so we need to look at all the objects r intersects with
 	sort.Sort(byT(intersections))
