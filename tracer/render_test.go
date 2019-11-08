@@ -1,9 +1,13 @@
 package tracer
 
 import (
+	"fmt"
+	"log"
 	"math"
+	"path"
 	"testing"
 
+	"github.com/DanTulovsky/tracer/utils"
 	"golang.org/x/image/colornames"
 )
 
@@ -174,6 +178,45 @@ func scene() *World {
 func BenchmarkRenderGlassSphere(b *testing.B) {
 
 	w := scene()
+	for n := 0; n < b.N; n++ {
+		RenderToFile(w, "/tmp/output.png")
+	}
+}
+
+func BenchmarkRenderObjParse1(b *testing.B) {
+
+	// width, height := 640.0, 480.0
+	width, height := 1400.0, 1000.0
+
+	// setup world, default light and camera
+	w := NewDefaultWorld(width, height)
+
+	// override light here
+	w.SetLights([]Light{
+		NewPointLight(NewPoint(3, 4, -30), NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-5, 4, -1), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := NewPoint(0, 6, -8)
+	to := NewPoint(0, 0, 4)
+	up := NewVector(0, 1, 0)
+	cameraTransform := ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+	w.Camera().SetFoV(math.Pi / 3)
+
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	f := path.Join(dir, "test6-smooth.obj")
+
+	g, err := ParseOBJ(f)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	g.SetTransform(IdentityMatrix().Translate(0, 2, 0))
+
+	w.AddObject(g)
+
 	for n := 0; n < b.N; n++ {
 		RenderToFile(w, "/tmp/output.png")
 	}

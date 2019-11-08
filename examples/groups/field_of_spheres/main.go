@@ -58,8 +58,8 @@ func glassSphere(p tracer.Point, size float64) *tracer.Sphere {
 func scene() {
 
 	// width, height := 100.0, 100.0
-	width, height := 400.0, 200.0
-	// width, height := 1000.0, 1000.0
+	// width, height := 400.0, 200.0
+	width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
