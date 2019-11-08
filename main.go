@@ -942,8 +942,8 @@ func triangle() {
 
 func objParse(f string) {
 
-	width, height := 240.0, 180.0
-	// width, height := 1400.0, 1000.0
+	// width, height := 240.0, 180.0
+	width, height := 1400.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -974,8 +974,8 @@ func objParse(f string) {
 }
 
 func csg() {
-	width, height := 640.0, 480.0
-	// width, height := 1400.0, 1000.0
+	// width, height := 640.0, 480.0
+	width, height := 1400.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)

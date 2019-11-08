@@ -134,9 +134,12 @@ func (g *Group) IntersectWith(r Ray, t Intersections) Intersections {
 		return t
 	}
 
+	xs := NewIntersections()
+
 	for _, m := range g.Members() {
-		mxs := m.IntersectWith(r, NewIntersections())
+		mxs := m.IntersectWith(r, xs)
 		t = append(t, mxs...)
+		xs = xs[:0]
 	}
 
 	sort.Sort(byT(t))
