@@ -942,20 +942,20 @@ func triangle() {
 
 func objParse(f string) {
 
-	// width, height := 240.0, 180.0
-	width, height := 1400.0, 1000.0
+	width, height := 640.0, 480.0
+	// width, height := 1400.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(0, 10, 0), tracer.NewColor(1, 1, 1)),
-		tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 3, -10), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 6, -8)
+	from := tracer.NewPoint(0, 2, -8)
 	to := tracer.NewPoint(0, 0, 4)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -982,7 +982,7 @@ func csg() {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(0, 20, 0), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 20, -35), tracer.NewColor(1, 1, 1)),
 		// tracer.NewPointLight(tracer.NewPoint(-10, -4, -1), tracer.NewColor(1, 1, 1)),
 	})
 
@@ -1044,7 +1044,7 @@ func main() {
 	// csg()
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "complex-smooth.obj")
+	f := path.Join(dir, "complex-smooth4.obj")
 	objParse(f)
 
 	if *memprofile != "" {

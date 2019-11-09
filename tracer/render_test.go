@@ -183,7 +183,10 @@ func BenchmarkRenderGlassSphere(b *testing.B) {
 	}
 }
 
-func benchmarkRenderObjParse(filename string, b *testing.B) {
+// func BenchmarkRenderObjParse(filename string, b *testing.B) {
+func BenchmarkRenderObjParse(b *testing.B) {
+	// for profiling
+	filename := "complex-smooth1.obj"
 
 	// width, height := 640.0, 480.0
 	width, height := 1400.0, 1000.0
@@ -220,7 +223,7 @@ func benchmarkRenderObjParse(filename string, b *testing.B) {
 	}
 }
 
-func BenchmarkRenderObjParse0(b *testing.B) { benchmarkRenderObjParse("complex-smooth.obj", b) }
-func BenchmarkRenderObjParse1(b *testing.B) { benchmarkRenderObjParse("complex-smooth1.obj", b) }
-func BenchmarkRenderObjParse2(b *testing.B) { benchmarkRenderObjParse("complex-smooth2.obj", b) }
-func BenchmarkRenderObjParse3(b *testing.B) { benchmarkRenderObjParse("monkey", b) }
+// func BenchmarkRenderObjParse0(b *testing.B) { benchmarkRenderObjParse("complex-smooth.obj", b) }
+// func BenchmarkRenderObjParse1(b *testing.B) { benchmarkRenderObjParse("complex-smooth1.obj", b) }
+// func BenchmarkRenderObjParse2(b *testing.B) { benchmarkRenderObjParse("complex-smooth2.obj", b) }
+// func BenchmarkRenderObjParse3(b *testing.B) { benchmarkRenderObjParse("monkey", b) }
