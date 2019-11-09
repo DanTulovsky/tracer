@@ -92,11 +92,11 @@ func (t *Triangle) IntersectWith(r Ray, xs Intersections) Intersections {
 }
 
 // NormalAt returns the normal of the triangle at the given point
-func (t *Triangle) NormalAt(unused Point, xs Intersection) Vector {
+func (t *Triangle) NormalAt(unused Point, xs *Intersection) Vector {
 	return t.localNormalAt(xs)
 }
 
-func (t *Triangle) localNormalAt(xs Intersection) Vector {
+func (t *Triangle) localNormalAt(xs *Intersection) Vector {
 	return t.Normal.NormalToWorldSpace(t)
 }
 

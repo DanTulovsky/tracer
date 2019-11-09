@@ -1044,7 +1044,7 @@ func main() {
 	// csg()
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "test6-smooth.obj")
+	f := path.Join(dir, "complex-smooth.obj")
 	objParse(f)
 
 	if *memprofile != "" {

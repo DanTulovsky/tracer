@@ -108,7 +108,7 @@ func (csg *CSG) IntersectWith(r Ray, xs Intersections) Intersections {
 }
 
 // NormalAt is unused here
-func (csg *CSG) NormalAt(p Point, xs Intersection) Vector {
+func (csg *CSG) NormalAt(p Point, xs *Intersection) Vector {
 	panic("called NormalAt on CSG shape")
 }
 

@@ -83,7 +83,7 @@ func (c *Cube) IntersectWith(r Ray, t Intersections) Intersections {
 	return t
 }
 
-func (c *Cube) localNormalAt(p Point, xs Intersection) Vector {
+func (c *Cube) localNormalAt(p Point, xs *Intersection) Vector {
 	var on Vector
 	maxc := math.Max(math.Max(math.Abs(p.X()), math.Abs(p.Y())), math.Abs(p.Z()))
 

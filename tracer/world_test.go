@@ -79,7 +79,7 @@ func TestWorld_Intersections(t *testing.T) {
 
 func TestWorld_shadeHit(t *testing.T) {
 	type args struct {
-		i         Intersection
+		i         *Intersection
 		r         Ray
 		material  *Material
 		transform Matrix

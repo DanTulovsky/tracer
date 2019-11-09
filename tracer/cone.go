@@ -149,7 +149,7 @@ func (c *Cone) IntersectWith(r Ray, t Intersections) Intersections {
 	return t
 }
 
-func (c *Cone) localNormalAt(p Point, xs Intersection) Vector {
+func (c *Cone) localNormalAt(p Point, xs *Intersection) Vector {
 	// object normal, this is different for each shape
 	var on Vector
 

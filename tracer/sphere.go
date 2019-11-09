@@ -73,7 +73,7 @@ func (s *Sphere) IntersectWith(r Ray, t Intersections) Intersections {
 	return t
 }
 
-func (s *Sphere) localNormalAt(p Point, xs Intersection) Vector {
+func (s *Sphere) localNormalAt(p Point, xs *Intersection) Vector {
 	return p.SubPoint(Origin())
 }
 
