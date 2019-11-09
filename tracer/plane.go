@@ -34,7 +34,7 @@ func (pl *Plane) Equal(pl2 *Plane) bool {
 
 // NormalAt returns the normal vector at the given point on the surface of the plane
 // Avoid unneeded calculations and override the Shape method
-func (pl *Plane) NormalAt(p Point, xs Intersection) Vector {
+func (pl *Plane) NormalAt(p Point, xs *Intersection) Vector {
 	return NewVector(0, 1, 0)
 }
 

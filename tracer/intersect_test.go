@@ -18,7 +18,7 @@ func TestNewIntersection(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want Intersection
+		want *Intersection
 	}{
 		{
 			name: "test1",
@@ -26,7 +26,7 @@ func TestNewIntersection(t *testing.T) {
 				o: NewUnitSphere(),
 				t: 3.0,
 			},
-			want: Intersection{
+			want: &Intersection{
 				o: NewUnitSphere(),
 				t: 3.0,
 			},
@@ -45,7 +45,7 @@ func TestIntersections_Hit(t *testing.T) {
 	tests := []struct {
 		name    string
 		i       Intersections
-		want    Intersection
+		want    *Intersection
 		wantErr bool
 	}{
 		{
@@ -102,7 +102,7 @@ func TestIntersections_Hit(t *testing.T) {
 
 func TestPrepareComputations(t *testing.T) {
 	type args struct {
-		i Intersection
+		i *Intersection
 		r Ray
 	}
 	tests := []struct {
@@ -399,7 +399,7 @@ func TestNewIntersectionUV(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want Intersection
+		want *Intersection
 	}{
 		{
 			name: "test1",
@@ -409,7 +409,7 @@ func TestNewIntersectionUV(t *testing.T) {
 				u: 0.2,
 				v: 0.4,
 			},
-			want: Intersection{
+			want: &Intersection{
 				o: newTestTriangle(),
 				t: 3.5,
 				u: 0.2,

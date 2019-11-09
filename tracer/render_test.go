@@ -183,7 +183,7 @@ func BenchmarkRenderGlassSphere(b *testing.B) {
 	}
 }
 
-func BenchmarkRenderObjParse1(b *testing.B) {
+func benchmarkRenderObjParse(filename string, b *testing.B) {
 
 	// width, height := 640.0, 480.0
 	width, height := 1400.0, 1000.0
@@ -206,9 +206,7 @@ func BenchmarkRenderObjParse1(b *testing.B) {
 	w.Camera().SetFoV(math.Pi / 3)
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "test6-smooth.obj")
-
-	g, err := ParseOBJ(f)
+	g, err := ParseOBJ(path.Join(dir, filename))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -221,3 +219,8 @@ func BenchmarkRenderObjParse1(b *testing.B) {
 		RenderToFile(w, "/tmp/output.png")
 	}
 }
+
+func BenchmarkRenderObjParse0(b *testing.B) { benchmarkRenderObjParse("complex-smooth.obj", b) }
+func BenchmarkRenderObjParse1(b *testing.B) { benchmarkRenderObjParse("complex-smooth1.obj", b) }
+func BenchmarkRenderObjParse2(b *testing.B) { benchmarkRenderObjParse("complex-smooth2.obj", b) }
+func BenchmarkRenderObjParse3(b *testing.B) { benchmarkRenderObjParse("monkey", b) }

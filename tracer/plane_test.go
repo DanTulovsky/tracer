@@ -38,7 +38,7 @@ func TestNewPlane(t *testing.T) {
 func TestPlane_NormalAt(t *testing.T) {
 	type args struct {
 		p  Point
-		xs Intersection
+		xs *Intersection
 	}
 	tests := []struct {
 		name  string

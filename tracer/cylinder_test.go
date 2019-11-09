@@ -229,7 +229,7 @@ func TestCylinder_IntersectWith(t *testing.T) {
 func TestCylinder_NormalAt(t *testing.T) {
 	type args struct {
 		p  Point
-		xs Intersection
+		xs *Intersection
 	}
 	tests := []struct {
 		name string

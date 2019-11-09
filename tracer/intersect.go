@@ -18,28 +18,27 @@ type Intersection struct {
 }
 
 // NewIntersection returns an intersection object
-// TODO: Return as pointer
-func NewIntersection(o Shaper, t float64) Intersection {
-	return Intersection{o: o, t: t}
+func NewIntersection(o Shaper, t float64) *Intersection {
+	return &Intersection{o: o, t: t}
 }
 
 // T returns the t value for the intersection
-func (i Intersection) T() float64 {
+func (i *Intersection) T() float64 {
 	return i.t
 }
 
 // Object returns the object of the intersection
-func (i Intersection) Object() Shaper {
+func (i *Intersection) Object() Shaper {
 	return i.o
 }
 
 // NewIntersectionUV returns an intersection object with UV filled in
-func NewIntersectionUV(o Shaper, t, u, v float64) Intersection {
-	return Intersection{o: o, t: t, u: u, v: v}
+func NewIntersectionUV(o Shaper, t, u, v float64) *Intersection {
+	return &Intersection{o: o, t: t, u: u, v: v}
 }
 
 // Equal returns true if the intersections are the same
-func (i Intersection) Equal(i2 Intersection) bool {
+func (i *Intersection) Equal(i2 *Intersection) bool {
 	return i.t == i2.t &&
 		i.u == i2.u &&
 		i.v == i2.v &&
@@ -47,11 +46,10 @@ func (i Intersection) Equal(i2 Intersection) bool {
 }
 
 // Intersections is a collection of Intersections
-// TODO: Return as list of pointers
-type Intersections []Intersection
+type Intersections []*Intersection
 
 // NewIntersections aggregates the given intersections into a sorted list
-func NewIntersections(i ...Intersection) Intersections {
+func NewIntersections(i ...*Intersection) Intersections {
 	is := Intersections{}
 
 	for _, int := range i {
@@ -63,17 +61,17 @@ func NewIntersections(i ...Intersection) Intersections {
 }
 
 // Hit returns the visible intersection (lowest non-negative value)
-func (i Intersections) Hit() (Intersection, error) {
+func (i Intersections) Hit() (*Intersection, error) {
 
 	sort.Sort(byT(i))
 
-	for _, int := range i {
-		if int.t >= 0 {
-			return int, nil
+	for _, xs := range i {
+		if xs.t >= 0 {
+			return xs, nil
 		}
 	}
 
-	return Intersection{}, fmt.Errorf("no intersections")
+	return &Intersection{}, fmt.Errorf("no intersections")
 }
 
 // byT sorts Intersections by the t value
@@ -128,7 +126,7 @@ func delObjectFromList(o Shaper, list []Shaper) []Shaper {
 }
 
 // findRefractiveIndexes returns the refractive indexes of leaving material and entering material
-func findRefractiveIndexes(hit Intersection, xs Intersections) (n1, n2 float64) {
+func findRefractiveIndexes(hit *Intersection, xs Intersections) (n1, n2 float64) {
 	var containers []Shaper
 
 	for _, i := range xs {
@@ -160,7 +158,7 @@ func findRefractiveIndexes(hit Intersection, xs Intersections) (n1, n2 float64) 
 }
 
 // PrepareComputations prepopulates the IntersectionState structure
-func PrepareComputations(hit Intersection, r Ray, xs Intersections) *IntersectionState {
+func PrepareComputations(hit *Intersection, r Ray, xs Intersections) *IntersectionState {
 	var n1, n2 float64
 	point := r.Position(hit.T())
 	object := hit.Object()

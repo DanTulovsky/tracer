@@ -177,7 +177,7 @@ func TestSphere_SetTransform(t *testing.T) {
 func TestSphere_NormalAt(t *testing.T) {
 	type args struct {
 		p  Point
-		xs Intersection
+		xs *Intersection
 	}
 	tests := []struct {
 		name   string

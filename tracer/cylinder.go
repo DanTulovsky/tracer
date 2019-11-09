@@ -142,7 +142,7 @@ func (c *Cylinder) IntersectWith(r Ray, t Intersections) Intersections {
 	return t
 }
 
-func (c *Cylinder) localNormalAt(p Point, xs Intersection) Vector {
+func (c *Cylinder) localNormalAt(p Point, xs *Intersection) Vector {
 	// object normal, this is different for each shape
 	var on Vector
 

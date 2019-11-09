@@ -16,7 +16,7 @@ type Shaper interface {
 	Includes(Shaper) bool
 
 	IntersectWith(Ray, Intersections) Intersections
-	NormalAt(Point, Intersection) Vector
+	NormalAt(Point, *Intersection) Vector
 	PrecomputeValues()
 
 	Material() *Material
@@ -43,7 +43,7 @@ type Shape struct {
 	parent Shaper
 
 	// localNormalAt
-	lna func(Point, Intersection) Vector
+	lna func(Point, *Intersection) Vector
 }
 
 // Equal returns true if the shapes are equal
@@ -96,7 +96,7 @@ func (s *Shape) IntersectWith(r Ray, xs Intersections) Intersections {
 }
 
 // NormalAt implements the Shaper interface
-func (s *Shape) NormalAt(p Point, xs Intersection) Vector {
+func (s *Shape) NormalAt(p Point, xs *Intersection) Vector {
 	// move point to object space
 	op := p.ToObjectSpace(s)
 
@@ -110,7 +110,7 @@ func (s *Shape) NormalAt(p Point, xs Intersection) Vector {
 }
 
 // localNormalAt return the local normal vector at the point
-func (s *Shape) localNormalAt(p Point, xs Intersection) Vector {
+func (s *Shape) localNormalAt(p Point, xs *Intersection) Vector {
 	panic("must implement localNormalAt")
 }
 

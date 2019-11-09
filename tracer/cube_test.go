@@ -183,7 +183,7 @@ func TestCube_IntersectWith(t *testing.T) {
 func TestCube_NormalAt(t *testing.T) {
 	type args struct {
 		p  Point
-		xs Intersection
+		xs *Intersection
 	}
 	tests := []struct {
 		name string
