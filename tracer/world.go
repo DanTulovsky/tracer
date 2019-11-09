@@ -222,7 +222,6 @@ func (w *World) IsShadowed(p Point, l Light, xs Intersections) bool {
 
 	r := NewRay(p, direction)
 
-	// TODO: This can cut out early, by returning the first intersection with t > 0 if it's a shadow caster
 	intersections := w.Intersections(r, xs)
 
 	// Some objects do not cast shadows, so we need to look at all the objects r intersects with

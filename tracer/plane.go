@@ -35,7 +35,10 @@ func (pl *Plane) Equal(pl2 *Plane) bool {
 // NormalAt returns the normal vector at the given point on the surface of the plane
 // Avoid unneeded calculations and override the Shape method
 func (pl *Plane) NormalAt(p Point, xs *Intersection) Vector {
-	return NewVector(0, 1, 0)
+	on := NewVector(0, 1, 0)
+	wn := on.NormalToWorldSpace(pl)
+
+	return wn.Normalize()
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the plane in sorted order

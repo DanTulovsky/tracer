@@ -2,11 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"math"
 	"os"
-	"path"
 	"runtime"
 	"runtime/pprof"
 
@@ -16,7 +14,6 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
-	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -30,7 +27,7 @@ func init() {
 	runtime.LockOSThread()
 }
 
-func scene() {
+func sceneold() {
 
 	// width, height := 300.0, 300.0
 	width, height := 1200.0, 1000.0
@@ -1010,6 +1007,104 @@ func csg() {
 	tracer.Render(w)
 }
 
+func env() *tracer.World {
+	width, height := 640.0, 480.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(0, 4, -1), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 3, -4)
+	to := tracer.NewPoint(0, -1, 10)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	return w
+}
+
+func floor() *tracer.Plane {
+	p := tracer.NewPlane()
+	pp := tracer.NewCheckerPattern(tracer.ColorName(colornames.Red), tracer.ColorName(colornames.White))
+	p.Material().SetPattern(pp)
+
+	return p
+}
+
+func ceiling() *tracer.Plane {
+	p := tracer.NewPlane()
+	p.SetTransform(tracer.IdentityMatrix().Translate(0, 5, 0))
+	pp := tracer.NewCheckerPattern(tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.White))
+	p.Material().SetPattern(pp)
+
+	return p
+}
+
+func backWall() *tracer.Plane {
+	p := tracer.NewPlane()
+	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
+	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
+	p.Material().SetPattern(pp)
+	p.Material().Specular = 0
+
+	return p
+}
+
+func rightWall() *tracer.Plane {
+	p := tracer.NewPlane()
+	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(4, 0, 0))
+	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
+	p.Material().SetPattern(pp)
+	p.Material().Specular = 0
+
+	return p
+}
+func leftWall() *tracer.Plane {
+	p := tracer.NewPlane()
+	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-4, 0, 0))
+	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
+	p.Material().SetPattern(pp)
+	p.Material().Specular = 0
+
+	return p
+}
+func sphere() *tracer.Sphere {
+	s := tracer.NewUnitSphere()
+	s.SetTransform(tracer.IdentityMatrix().Translate(0, 1.5, 0))
+	s.Material().Ambient = 0
+	s.Material().Diffuse = 0
+	s.Material().Reflective = 1
+	return s
+}
+func scene() {
+	w := env()
+
+	w.AddObject(sphere())
+	w.AddObject(floor())
+	w.AddObject(ceiling())
+	w.AddObject(backWall())
+	w.AddObject(rightWall())
+	w.AddObject(leftWall())
+
+	tracer.Render(w)
+}
+
+func plane() {
+	w := env()
+	w.AddObject(floor())
+	w.AddObject(rightWall())
+
+	tracer.Render(w)
+}
+
 func main() {
 
 	flag.Parse()
@@ -1028,6 +1123,8 @@ func main() {
 	}
 
 	// scene()
+	plane()
+
 	// colors()
 	// mirrors()
 	// mirror()
@@ -1043,9 +1140,9 @@ func main() {
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 	// csg()
 
-	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "complex-smooth4.obj")
-	objParse(f)
+	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	// f := path.Join(dir, "complex-smooth4.obj")
+	// objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
