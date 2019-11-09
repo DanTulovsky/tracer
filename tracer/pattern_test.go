@@ -479,3 +479,198 @@ func TestCheckerPattern_colorAt(t *testing.T) {
 		})
 	}
 }
+
+func TestNewUVCheckersPattern(t *testing.T) {
+	type args struct {
+		w float64
+		h float64
+		a Color
+		b Color
+		m Mapper
+	}
+	tests := []struct {
+		name string
+		args args
+		want *UVCheckersPattern
+	}{
+		{
+			args: args{
+				a: Black(),
+				b: White(),
+				w: 10,
+				h: 20,
+				m: NewSphericalMap(),
+			},
+			want: &UVCheckersPattern{
+				a: Black(),
+				b: White(),
+				w: 10,
+				h: 20,
+				baseUVPattern: baseUVPattern{
+					mapper: NewSphericalMap(),
+					basePattern: basePattern{
+						transform:        IdentityMatrix(),
+						transformInverse: IdentityMatrix().Inverse(),
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := NewUVCheckersPattern(tt.args.w, tt.args.h, tt.args.a, tt.args.b, tt.args.m)
+			assert.Equal(t, tt.want, got, "should equal")
+
+		})
+	}
+}
+
+func TestUVCheckersPattern_uvColorAt(t *testing.T) {
+	type args struct {
+		u float64
+		v float64
+	}
+	tests := []struct {
+		name string
+		p    *UVCheckersPattern
+		args args
+		want Color
+	}{
+		{
+			p: NewUVCheckersPattern(2, 2, Black(), White(), NewSphericalMap()),
+			args: args{
+				u: 0.0,
+				v: 0.0,
+			},
+			want: Black(),
+		},
+		{
+			p: NewUVCheckersPattern(2, 2, Black(), White(), NewSphericalMap()),
+			args: args{
+				u: 0.5,
+				v: 0.0,
+			},
+			want: White(),
+		},
+		{
+			p: NewUVCheckersPattern(2, 2, Black(), White(), NewSphericalMap()),
+			args: args{
+				u: 0.0,
+				v: 0.5,
+			},
+			want: White(),
+		},
+		{
+			p: NewUVCheckersPattern(2, 2, Black(), White(), NewSphericalMap()),
+			args: args{
+				u: 0.5,
+				v: 0.5,
+			},
+			want: Black(),
+		},
+		{
+			p: NewUVCheckersPattern(2, 2, Black(), White(), NewSphericalMap()),
+			args: args{
+				u: 1.0,
+				v: 1.0,
+			},
+			want: Black(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.p.uvColorAt(tt.args.u, tt.args.v)
+			assert.Equal(t, tt.want, got, "should equal")
+		})
+	}
+}
+
+func TestUVCheckersPattern_colorAt(t *testing.T) {
+	type args struct {
+		p Point
+	}
+	tests := []struct {
+		name   string
+		args   args
+		mapper Mapper
+		want   Color
+	}{
+		{
+			args: args{
+				p: NewPoint(0.4315, 0.4670, 0.7719),
+			},
+			mapper: NewSphericalMap(),
+			want:   White(),
+		},
+		{
+			args: args{
+				p: NewPoint(-0.9654, 0.2552, -0.0534),
+			},
+			mapper: NewSphericalMap(),
+			want:   Black(),
+		},
+		{
+			args: args{
+				p: NewPoint(0.1039, 0.7090, 0.6975),
+			},
+			mapper: NewSphericalMap(),
+			want:   White(),
+		},
+		{
+			args: args{
+				p: NewPoint(-0.4986, -0.7856, -0.3663),
+			},
+			mapper: NewSphericalMap(),
+			want:   Black(),
+		},
+		{
+			args: args{
+				p: NewPoint(-0.0317, -0.9395, 0.3411),
+			},
+			mapper: NewSphericalMap(),
+			want:   Black(),
+		},
+		{
+			args: args{
+				p: NewPoint(0.4809, -0.7721, 0.4154),
+			},
+			mapper: NewSphericalMap(),
+			want:   Black(),
+		},
+		{
+			args: args{
+				p: NewPoint(0.0285, -0.9612, -0.2745),
+			},
+			mapper: NewSphericalMap(),
+			want:   Black(),
+		},
+		{
+			args: args{
+				p: NewPoint(-0.5734, -0.2162, -0.7903),
+			},
+			mapper: NewSphericalMap(),
+			want:   White(),
+		},
+		{
+			args: args{
+				p: NewPoint(0.7688, -0.1470, 0.6223),
+			},
+			mapper: NewSphericalMap(),
+			want:   Black(),
+		},
+		{
+			args: args{
+				p: NewPoint(-0.7652, 0.2175, 0.6060),
+			},
+			mapper: NewSphericalMap(),
+			want:   Black(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			uvcp := NewUVCheckersPattern(16, 8, Black(), White(), tt.mapper)
+			got := uvcp.colorAt(tt.args.p)
+			assert.Equal(t, tt.want, got, "should equal")
+		})
+	}
+}

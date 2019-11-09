@@ -51,7 +51,63 @@ func (bp *basePattern) objectSpacePoint(o Shaper, p Point) Point {
 	return op.TimesMatrix(bp.TransformInverse())
 }
 
-// StripedPattern is a patternt at overlays stripes
+type baseUVPattern struct {
+	mapper Mapper
+	basePattern
+}
+
+// UVCheckersPattern maps checks to the surface of the object
+type UVCheckersPattern struct {
+	baseUVPattern
+	a, b Color
+	w, h float64 // how many squares along width and height
+}
+
+// NewUVCheckersPattern returns a new UV mapped checkers pattern
+// If you want your checkers to look "square" on the sphere,
+// be sure and set the width to twice the height. This is because of
+// how the spherical map is implemented. While both u and v go from 0 to 1,
+// v maps 1 to π, but u maps 1 to 2π.
+func NewUVCheckersPattern(w, h float64, a, b Color, m Mapper) *UVCheckersPattern {
+	return &UVCheckersPattern{
+		a: a,
+		b: b,
+		w: w,
+		h: h,
+		baseUVPattern: baseUVPattern{
+			mapper: m,
+			basePattern: basePattern{
+				transform:        IdentityMatrix(),
+				transformInverse: IdentityMatrix().Inverse(),
+			},
+		},
+	}
+}
+
+// ColorAtObject returns the color for the given pattern on the given object
+func (ucp *UVCheckersPattern) ColorAtObject(o Shaper, p Point) Color {
+	return ucp.colorAt(ucp.objectSpacePoint(o, p))
+}
+
+// uvColorAt returns the color at the 2D coordinate (u, v)
+func (ucp *UVCheckersPattern) uvColorAt(u, v float64) Color {
+	u2 := math.Floor(u * ucp.w)
+	v2 := math.Floor(v * ucp.h)
+
+	if math.Mod((u2+v2), 2) == 0 {
+		return ucp.a
+	}
+
+	return ucp.b
+}
+
+// ColorAt implements Patterner
+func (ucp *UVCheckersPattern) colorAt(p Point) Color {
+	u, v := ucp.mapper.Map(p)
+	return ucp.uvColorAt(u, v)
+}
+
+// StripedPattern is a pattern that overlays stripes
 type StripedPattern struct {
 	basePattern
 	a, b Color

@@ -1018,7 +1018,7 @@ func env() *tracer.World {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(0, 4, -1), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(3, 4, -3), tracer.NewColor(1, 1, 1)),
 		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
 	})
 
@@ -1106,14 +1106,36 @@ func plane() {
 	tracer.Render(w)
 }
 
+func simplecone() {
+	w := env()
+
+	cone1 := tracer.NewClosedCone(-2, 0)
+	cone1.SetTransform(tracer.IdentityMatrix().Scale(1, 3, 1).Translate(0, 2, 2))
+
+	w.AddObject(cone1)
+	w.AddObject(floor())
+	tracer.Render(w)
+}
+
+func simplecylinder() {
+	w := env()
+
+	cylinder1 := tracer.NewClosedCylinder(0, 2)
+	cylinder1.SetTransform(tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(0, 0, 0))
+
+	w.AddObject(cylinder1)
+	w.AddObject(floor())
+	tracer.Render(w)
+}
+
 func shapes() {
 
 	w := env()
 	sphere1 := tracer.NewUnitSphere()
-	sphere1.SetTransform(tracer.IdentityMatrix().Translate(-3, 1, 5))
+	sphere1.SetTransform(tracer.IdentityMatrix().Translate(-3.5, 1, 5))
 
 	cube1 := tracer.NewUnitCube()
-	cube1.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/4).Translate(3, 1, 6))
+	cube1.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/4).Translate(4, 1, 6))
 
 	cylinder1 := tracer.NewClosedCylinder(-4, 4)
 	cylinder1.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).RotateZ(math.Pi/2).Translate(0, 0.5, 0))
@@ -1122,12 +1144,13 @@ func shapes() {
 	backWall1.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 40))
 
 	cone1 := tracer.NewClosedCone(-2, 0)
-	cone1.SetTransform(tracer.IdentityMatrix().Scale(1, 2, 1).Translate(0, 1.5, 7))
+	cone1.SetTransform(tracer.IdentityMatrix().Scale(1, 2, 1).Translate(-2.3, 1.5, 7))
 
 	csgMember1 := tracer.NewUnitCube()
 	csgMember2 := tracer.NewUnitSphere()
-	csg1 := tracer.NewCSG(csgMember1, csgMember2, tracer.Difference)
-	csg1.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 8))
+	csgMember2.SetTransform(tracer.IdentityMatrix().Translate(0, 0.2, 0))
+	csg1 := tracer.NewCSG(csgMember1, csgMember2, tracer.Intersect)
+	csg1.SetTransform(tracer.IdentityMatrix().Translate(0.5, 1, 2))
 
 	w.AddObject(csg1)
 	w.AddObject(cone1)
@@ -1173,10 +1196,12 @@ func main() {
 	// spherewarp()
 	// cylinder()
 	// cone()
+	simplecone()
+	// simplecylinder()
 	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
-	csg()
+	// csg()
 
 	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// f := path.Join(dir, "complex-smooth4.obj")
