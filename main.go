@@ -1001,6 +1001,7 @@ func csg() {
 
 	op := tracer.Difference
 	csg := tracer.NewCSG(s1, s2, op)
+	csg.SetTransform(tracer.IdentityMatrix().Scale(1, 0.5, 1).Translate(0, 2, 0))
 
 	w.AddObject(csg)
 
@@ -1105,6 +1106,42 @@ func plane() {
 	tracer.Render(w)
 }
 
+func shapes() {
+
+	w := env()
+	sphere1 := tracer.NewUnitSphere()
+	sphere1.SetTransform(tracer.IdentityMatrix().Translate(-3, 1, 5))
+
+	cube1 := tracer.NewUnitCube()
+	cube1.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/4).Translate(3, 1, 6))
+
+	cylinder1 := tracer.NewClosedCylinder(-4, 4)
+	cylinder1.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).RotateZ(math.Pi/2).Translate(0, 0.5, 0))
+
+	backWall1 := backWall()
+	backWall1.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 40))
+
+	cone1 := tracer.NewClosedCone(-2, 0)
+	cone1.SetTransform(tracer.IdentityMatrix().Scale(1, 2, 1).Translate(0, 1.5, 7))
+
+	csgMember1 := tracer.NewUnitCube()
+	csgMember2 := tracer.NewUnitSphere()
+	csg1 := tracer.NewCSG(csgMember1, csgMember2, tracer.Difference)
+	csg1.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 8))
+
+	w.AddObject(csg1)
+	w.AddObject(cone1)
+	w.AddObject(sphere1)
+	w.AddObject(cube1)
+	w.AddObject(cylinder1)
+	w.AddObject(floor())
+	w.AddObject(ceiling())
+	w.AddObject(backWall1)
+
+	tracer.Render(w)
+
+}
+
 func main() {
 
 	flag.Parse()
@@ -1123,7 +1160,8 @@ func main() {
 	}
 
 	// scene()
-	plane()
+	// plane()
+	// shapes()
 
 	// colors()
 	// mirrors()
@@ -1138,7 +1176,7 @@ func main() {
 	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
-	// csg()
+	csg()
 
 	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// f := path.Join(dir, "complex-smooth4.obj")
