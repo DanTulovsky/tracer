@@ -3,6 +3,7 @@ package tracer
 import (
 	"math"
 	"sort"
+	"sync"
 
 	"github.com/DanTulovsky/tracer/constants"
 )
@@ -14,17 +15,21 @@ type Triangle struct {
 	// edge1, edge2 and the normal
 	E1, E2, Normal Vector
 
+	// Cache of Ray transform
+	RayTransformCache sync.Map
+
 	Shape
 }
 
 // NewTriangle returns a new triangle
 func NewTriangle(p1, p2, p3 Point) *Triangle {
 	t := &Triangle{
-		P1: p1,
-		P2: p2,
-		P3: p3,
-		E1: p2.SubPoint(p1),
-		E2: p3.SubPoint(p1),
+		P1:                p1,
+		P2:                p2,
+		P3:                p3,
+		E1:                p2.SubPoint(p1),
+		E2:                p3.SubPoint(p1),
+		RayTransformCache: sync.Map{},
 		Shape: Shape{
 			transform:        IdentityMatrix(),
 			transformInverse: IdentityMatrix().Inverse(),
@@ -80,6 +85,8 @@ func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, bool) 
 // IntersectWith returns the 't' value of Ray r intersecting with the triangle in sorted order
 func (t *Triangle) IntersectWith(r Ray, xs Intersections) Intersections {
 	r = r.Transform(t.transformInverse)
+	// rval, _ := t.RayTransformCache.LoadOrStore(r, r.Transform(t.transformInverse))
+	// r = rval.(Ray)
 
 	// u, v not used here
 	tval, _, _, found := t.sharedIntersectWith(r)
