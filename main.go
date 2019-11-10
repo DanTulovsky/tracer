@@ -1175,7 +1175,8 @@ func pedestal() *tracer.Cube {
 
 func shapes() {
 
-	w := envxy(1200, 1000)
+	w := envxy(800, 600)
+	w.Camera().SetFoV(math.Pi / 2.5)
 
 	floory := -3.3
 
@@ -1239,6 +1240,8 @@ func shapes() {
 
 	backWall1 := glassplane()
 	// backWall1 := floor()
+	// backWall1.Material().Specular = 0
+	// backWall1.Material().Diffuse = 1
 	backWall1.SetTransform(
 		tracer.IdentityMatrix().RotateX(math.Pi/2).Translate(0, 0, 20))
 	mapper4 := tracer.NewPlaneMap()
@@ -1250,7 +1253,7 @@ func shapes() {
 
 	cone1 := tracer.NewClosedCone(-2, 0)
 	cone1.SetTransform(
-		tracer.IdentityMatrix().Scale(0.3, 1, 0.3).Translate(-2.3, 2, 7))
+		tracer.IdentityMatrix().Scale(0.3, 1, 0.3).Translate(-2.8, 2, 7))
 	mapper5 := tracer.NewCylinderMap()
 	uvpattern5 := tracer.NewUVCheckersPattern(2, 2,
 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Goldenrod))
@@ -1289,25 +1292,27 @@ func shapes() {
 	flr := floor()
 	flr.SetTransform(tracer.IdentityMatrix().Translate(0, floory, 0))
 
+	// mirror on the left
+	lwall := tracer.NewUnitCube()
+	lwall.SetTransform(tracer.IdentityMatrix().Scale(0.1, 20, 10).Translate(-7, 0, 10))
+	lwall.Material().Color = tracer.ColorName(colornames.Black)
+	lwall.Material().Reflective = 0.7
+
 	g := tracer.NewGroup()
 	g.AddMembers(csg1, cone1, sphere1, cube1, cylinder1)
 	g.SetTransform(tracer.IdentityMatrix().Translate(0, floory, 4))
 
 	g2 := tracer.NewGroup()
 	g2.AddMembers(glasssphere(), pedestal())
-	g2.SetTransform(tracer.IdentityMatrix().Translate(0, 0, 4))
+	g2.SetTransform(tracer.IdentityMatrix().Scale(2, 2, 2).RotateY(math.Pi/4).Translate(0, floory, 7))
 
 	// skybox
 	w.AddObject(skyboxcube("field1"))
 	w.AddObject(earth)
 	w.AddObject(g)
 	w.AddObject(g2)
-	// w.AddObject(csg1)
-	// w.AddObject(cone1)
-	// w.AddObject(sphere1)
-	// w.AddObject(cube1)
-	// w.AddObject(cylinder1)
 	w.AddObject(flr)
+	w.AddObject(lwall)
 	// w.AddObject(ceiling())
 	w.AddObject(backWall1)
 
@@ -1494,6 +1499,22 @@ func skyboxsphere1(input string) {
 	tracer.Render(w)
 }
 
+func movedgroup() {
+
+	w := envxy(800, 600)
+
+	g := tracer.NewGroup()
+
+	g.AddMembers(glasssphere(), pedestal())
+	g.SetTransform(tracer.IdentityMatrix().Translate(-2, 0, 4))
+
+	w.AddObject(floor())
+	w.AddObject(g)
+
+	tracer.Render(w)
+
+}
+
 func envxy(width, height float64) *tracer.World {
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1519,6 +1540,7 @@ func main() {
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
+	// movedgroup()
 	// skyboxcube1("field1")
 	// skyboxsphere1("shanghai_bund_4k.hdr")
 	// image1()

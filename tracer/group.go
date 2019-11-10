@@ -59,16 +59,6 @@ func (g *Group) HasMembers() bool {
 	return len(g.members) > 0
 }
 
-// // Includes returns true if the Shaper is part of this group
-// func (g *Group) Includes(s Shaper) bool {
-// 	for _, m := range g.members {
-// 		if m == s {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
-
 // Includes implements includes logic
 func (g *Group) Includes(s Shaper) bool {
 	for _, m := range g.members {
