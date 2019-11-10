@@ -1229,6 +1229,19 @@ func shapes() {
 	csg1 := tracer.NewCSG(csgMember1, csgMember2, tracer.Intersect)
 	csg1.SetTransform(tracer.IdentityMatrix().Translate(0.5, 1, 2))
 
+	// earth
+	earth := tracer.NewUnitSphere()
+	earth.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/2).Translate(-1, 2.5, 4.5))
+	image := "images/earthmap1k.jpg"
+	earthup, err := tracer.NewUVImagePattern(image)
+	if err != nil {
+		log.Fatal(err)
+	}
+	mapperearth := tracer.NewSphericalMap()
+	p := tracer.NewTextureMapPattern(earthup, mapperearth)
+	earth.Material().SetPattern(p)
+
+	w.AddObject(earth)
 	w.AddObject(csg1)
 	w.AddObject(cone1)
 	w.AddObject(sphere1)
@@ -1326,7 +1339,7 @@ func cubeMap() {
 func image1() {
 	w := env()
 	s := tracer.NewUnitSphere()
-	s.SetTransform(tracer.IdentityMatrix().Translate(0, 2, 0))
+	s.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/2).Translate(0, 2, 0))
 
 	image := "images/earthmap1k.jpg"
 
@@ -1359,13 +1372,13 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	image1()
+	// image1()
 	// textureMap()
 	// cubeMap()
 
 	// scene()
 	// plane()
-	// shapes()
+	shapes()
 
 	// colors()
 	// mirrors()
