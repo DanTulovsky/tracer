@@ -139,7 +139,8 @@ type TextureMapPattern struct {
 	mapper  Mapper
 }
 
-// NewTextureMapPattern returns a new ...
+// NewTextureMapPattern returns a new texture map pattern
+// For cubes, use NewCubeMapPattern, this one works for planes, spheres, cylinders and cones
 func NewTextureMapPattern(p UVPatterner, m Mapper) *TextureMapPattern {
 	return &TextureMapPattern{
 		pattern: p,
