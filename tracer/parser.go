@@ -110,10 +110,8 @@ func convertMaterial(mat *mtl.Material, dir string) *Material {
 	m := NewDefaultMaterial()
 
 	d := mat.DiffuseColor
-	if mat.DiffuseTexture == "" {
-		// For now set the diffuse color as the color of the object
-		m.Color = NewColor(d.R, d.G, d.B)
-	} else {
+	m.Color = NewColor(d.R, d.G, d.B)
+	if mat.DiffuseTexture != "" {
 		// Use texture
 		log.Println("Reading in material textures...")
 		// multiply the material diffuse by the texture value
