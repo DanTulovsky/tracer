@@ -3,10 +3,6 @@ package tracer
 import (
 	"flag"
 	"fmt"
-<<<<<<< HEAD
-	"log"
-=======
->>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	"math"
 )
 
@@ -16,10 +12,6 @@ var (
 
 // Render runs the render
 func Render(w *World) {
-<<<<<<< HEAD
-	log.Println(*output)
-=======
->>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	if *output != "" {
 		RenderToFile(w, *output)
 	} else {
