@@ -31,6 +31,18 @@ func imageToCanvas(m image.Image) *Canvas {
 	return canvas
 }
 
+// NewUVImagePatternImage returns a new image pattern, input is an image.Image interface
+func NewUVImagePatternImage(m image.Image) (*UVImagePattern, error) {
+	// convert to canvas
+	canvas := imageToCanvas(m)
+
+	p := &UVImagePattern{
+		canvas: canvas,
+	}
+
+	return p, nil
+}
+
 // NewUVImagePattern returns a new image pattern
 func NewUVImagePattern(filename string) (*UVImagePattern, error) {
 	// read in image

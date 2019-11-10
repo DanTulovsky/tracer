@@ -2,15 +2,23 @@ package main
 
 import (
 	"flag"
+	"image"
 	"log"
 	"math"
 	"os"
+	"path"
 	"runtime"
 	"runtime/pprof"
+
+	"github.com/mdouchement/hdr"
 
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
+
+	_ "github.com/mdouchement/hdr/codec/rgbe"
+	"github.com/mdouchement/hdr/tmo"
+
 	_ "net/http/pprof"
 
 	"github.com/lucasb-eyer/go-colorful"
@@ -1355,30 +1363,123 @@ func image1() {
 	tracer.Render(w)
 }
 
-func main() {
+func skyboxcube1(folder string) {
+	w := envxy(1000, 1000)
 
-	flag.Parse()
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	sb := tracer.NewUnitCube()
+	left, _ := tracer.NewUVImagePattern(path.Join("images/skybox/", folder, "negx.jpg"))
+	right, _ := tracer.NewUVImagePattern(path.Join("images/skybox/", folder, "posx.jpg"))
+	front, _ := tracer.NewUVImagePattern(path.Join("images/skybox", folder, "negz.jpg"))
+	back, _ := tracer.NewUVImagePattern(path.Join("images/skybox/", folder, "posz.jpg"))
+	up, _ := tracer.NewUVImagePattern(path.Join("images/skybox", folder, "posy.jpg"))
+	down, _ := tracer.NewUVImagePattern(path.Join("images/skybox", folder, "negy.jpg"))
 
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal("could not create CPU profile: ", err)
-		}
-		defer f.Close()
-		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal("could not start CPU profile: ", err)
-		}
-		defer pprof.StopCPUProfile()
+	p := tracer.NewCubeMapPattern(left, front, right, back, up, down)
+	sb.Material().Ambient = 1
+	sb.Material().Specular = 0
+	sb.Material().Diffuse = 0
+	sb.Material().SetPattern(p)
+	sb.SetTransform(tracer.IdentityMatrix().Scale(10, 10, 10))
+
+	sphere := tracer.NewGlassSphere()
+	sphere.Material().Diffuse = 0.1
+	sphere.Material().Reflective = 0.5
+	sphere.Material().Color = tracer.Black()
+	sphere.SetTransform(tracer.IdentityMatrix().Translate(0, 2, 0))
+
+	w.AddObject(sphere)
+	w.AddObject(sb)
+
+	tracer.Render(w)
+}
+
+func hdrToImage(filename string) image.Image {
+	fi, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
 	}
 
+	m, format, err := image.Decode(fi)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("decoded image format: %v", format)
+
+	if hdrm, ok := m.(hdr.Image); ok {
+		// t := tmo.NewLinear(hdrm)
+		// t := tmo.NewLogarithmic(hdrm)
+		// t := tmo.NewDefaultDrago03(hdrm)
+		// t := tmo.NewDefaultDurand(hdrm)
+		// t := tmo.NewDefaultCustomReinhard05(hdrm)
+		t := tmo.NewDefaultReinhard05(hdrm)
+		// t := tmo.NewDefaultICam06(hdrm)
+		m = t.Perform()
+	}
+
+	return m
+}
+
+func skyboxsphere1(input string) {
+	w := envxy(1000, 1000)
+
+	sb := tracer.NewUnitSphere()
+	sb.Material().Ambient = 1
+	sb.Material().Specular = 0
+	sb.Material().Diffuse = 0
+	sb.SetTransform(tracer.IdentityMatrix().Scale(20, 20, 20))
+
+	filename := path.Join("images/hdri", input)
+	m := hdrToImage(filename)
+
+	up, err := tracer.NewUVImagePatternImage(m)
+	if err != nil {
+		log.Fatal(err)
+	}
+	p := tracer.NewTextureMapPattern(up, tracer.NewSphericalMap())
+	sb.Material().SetPattern(p)
+
+	sphere := tracer.NewGlassSphere()
+	sphere.Material().Diffuse = 0.1
+	sphere.Material().Reflective = 0.5
+	sphere.Material().Color = tracer.Black()
+	sphere.SetTransform(tracer.IdentityMatrix().Translate(0, 2, 0))
+
+	w.AddObject(sphere)
+	w.AddObject(sb)
+	tracer.Render(w)
+}
+
+func envxy(width, height float64) *tracer.World {
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(3, 10, -3), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 3, -4)
+	to := tracer.NewPoint(0, -1, 10)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	return w
+}
+func main() {
+
+	// skyboxcube1("sf")
+	skyboxsphere1("carpentry_shop_02_4k.hdr")
 	// image1()
 	// textureMap()
 	// cubeMap()
 
 	// scene()
 	// plane()
-	shapes()
+	// shapes()
 
 	// colors()
 	// mirrors()
@@ -1401,6 +1502,21 @@ func main() {
 	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// f := path.Join(dir, "complex-smooth4.obj")
 	// objParse(f)
+
+	flag.Parse()
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close()
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
