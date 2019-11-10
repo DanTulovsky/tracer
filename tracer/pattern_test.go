@@ -3,6 +3,8 @@ package tracer
 import (
 	"testing"
 
+	"golang.org/x/image/colornames"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -670,6 +672,133 @@ func TestUVCheckersPattern_colorAt(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			uvcp := NewUVCheckersPattern(16, 8, Black(), White(), tt.mapper)
 			got := uvcp.colorAt(tt.args.p)
+			assert.Equal(t, tt.want, got, "should equal")
+		})
+	}
+}
+
+func TestUVAlignCheckPattern_uvColorAt(t *testing.T) {
+	type args struct {
+		u, v float64
+	}
+	tests := []struct {
+		name    string
+		pattern *UVAlignCheckPattern
+		args    args
+		want    Color
+	}{
+		{
+			name: "lmain",
+			pattern: NewUVAlignCheckPattern(
+				NewColor(1, 1, 1),
+				NewColor(1, 0, 0),
+				NewColor(1, 1, 0),
+				NewColor(0, 1, 0),
+				NewColor(0, 1, 1),
+				nil),
+			args: args{
+				u: 0.5,
+				v: 0.5,
+			},
+			want: NewColor(1, 1, 1),
+		},
+		{
+			name: "ul",
+			pattern: NewUVAlignCheckPattern(
+				NewColor(1, 1, 1),
+				NewColor(1, 0, 0),
+				NewColor(1, 1, 0),
+				NewColor(0, 1, 0),
+				NewColor(0, 1, 1),
+				nil),
+			args: args{
+				u: 0.1,
+				v: 0.9,
+			},
+			want: NewColor(1, 0, 0),
+		},
+		{
+			name: "ur",
+			pattern: NewUVAlignCheckPattern(
+				NewColor(1, 1, 1),
+				NewColor(1, 0, 0),
+				NewColor(1, 1, 0),
+				NewColor(0, 1, 0),
+				NewColor(0, 1, 1),
+				nil),
+			args: args{
+				u: 0.9,
+				v: 0.9,
+			},
+			want: NewColor(1, 1, 0),
+		},
+		{
+			name: "bl",
+			pattern: NewUVAlignCheckPattern(
+				NewColor(1, 1, 1),
+				NewColor(1, 0, 0),
+				NewColor(1, 1, 0),
+				NewColor(0, 1, 0),
+				NewColor(0, 1, 1),
+				nil),
+			args: args{
+				u: 0.1,
+				v: 0.1,
+			},
+			want: NewColor(0, 1, 0),
+		},
+		{
+			name: "br",
+			pattern: NewUVAlignCheckPattern(
+				NewColor(1, 1, 1),
+				NewColor(1, 0, 0),
+				NewColor(1, 1, 0),
+				NewColor(0, 1, 0),
+				NewColor(0, 1, 1),
+				nil),
+			args: args{
+				u: 0.9,
+				v: 0.1,
+			},
+			want: NewColor(0, 1, 1),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.pattern.uvColorAt(tt.args.u, tt.args.v)
+			assert.Equal(t, tt.want, got, "should equal")
+		})
+	}
+}
+
+func TestUVAlignCheckPattern_colorAt(t *testing.T) {
+	type args struct {
+		p Point
+	}
+	tests := []struct {
+		name string
+		uap  *UVAlignCheckPattern
+		args args
+		want Color
+	}{
+		{
+			uap: NewUVAlignCheckPattern(
+				ColorName(colornames.Yellow),
+				ColorName(colornames.Cyan),
+				ColorName(colornames.Red),
+				ColorName(colornames.Blue),
+				ColorName(colornames.Brown),
+				NewCubeMap(),
+			),
+			args: args{
+				p: NewPoint(-1, 0, 0),
+			},
+			want: ColorName(colornames.Yellow),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.uap.colorAt(tt.args.p)
 			assert.Equal(t, tt.want, got, "should equal")
 		})
 	}
