@@ -1,10 +1,72 @@
 package tracer
 
-import "math"
+import (
+	"image"
+	"log"
+	"math"
+	"os"
+)
 
 // UVPatterner is a pattern that acceps UV coordinates
 type UVPatterner interface {
 	UVColorAt(float64, float64) Color
+}
+
+// UVImagePattern maps an image to the surface of an object
+type UVImagePattern struct {
+	canvas *Canvas
+}
+
+// imageToCanvas converts an image in
+func imageToCanvas(m image.Image) *Canvas {
+
+	bounds := m.Bounds()
+	canvas := NewCanvas(bounds.Max.X, bounds.Max.Y)
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			clr := ColorName(m.At(x, y))
+			canvas.Set(x, y, clr)
+		}
+	}
+	return canvas
+}
+
+// NewUVImagePattern returns a new image pattern
+func NewUVImagePattern(filename string) (*UVImagePattern, error) {
+	// read in image
+	reader, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+
+	// Decode image
+	m, _, err := image.Decode(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	// convert to canvas
+	canvas := imageToCanvas(m)
+
+	p := &UVImagePattern{
+		canvas: canvas,
+	}
+	return p, nil
+}
+
+// UVColorAt returns the color at the 2D coordinate (u, v)
+func (uvip *UVImagePattern) UVColorAt(u, v float64) Color {
+	v = 1 - v
+
+	x := int(u) * (uvip.canvas.Width - 1)
+	y := int(v) * (uvip.canvas.Height - 1)
+
+	c, err := uvip.canvas.Get(x, y)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return c
 }
 
 // UVCheckersPattern maps checkers to the surface of the object

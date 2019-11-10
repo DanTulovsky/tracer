@@ -8,6 +8,9 @@ import (
 	"runtime"
 	"runtime/pprof"
 
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	_ "net/http/pprof"
 
 	"github.com/lucasb-eyer/go-colorful"
@@ -1320,6 +1323,25 @@ func cubeMap() {
 	tracer.Render(w)
 }
 
+func image1() {
+	w := env()
+	s := tracer.NewUnitSphere()
+	s.SetTransform(tracer.IdentityMatrix().Translate(0, 2, 0))
+
+	image := "images/earthmap1k.jpg"
+
+	up, err := tracer.NewUVImagePattern(image)
+	if err != nil {
+		log.Fatal(err)
+	}
+	mapper := tracer.NewSphericalMap()
+	p := tracer.NewTextureMapPattern(up, mapper)
+	s.Material().SetPattern(p)
+
+	w.AddObject(s)
+	tracer.Render(w)
+}
+
 func main() {
 
 	flag.Parse()
@@ -1337,12 +1359,13 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	image1()
 	// textureMap()
 	// cubeMap()
 
 	// scene()
 	// plane()
-	shapes()
+	// shapes()
 
 	// colors()
 	// mirrors()
