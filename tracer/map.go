@@ -26,7 +26,6 @@ type CubeMap struct {
 	facepatterns map[cubeFace]UVPatterner
 }
 
-<<<<<<< HEAD
 // NewCubeMapSame returns a new cube map that applies the same UVPattern to all faces
 func NewCubeMapSame(p UVPatterner) *CubeMap {
 	return &CubeMap{
@@ -42,9 +41,6 @@ func NewCubeMapSame(p UVPatterner) *CubeMap {
 }
 
 // NewCubeMap returns a new cube map
-=======
-// NewCubeMap returns a new plane map
->>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 func NewCubeMap(left, front, right, back, up, down UVPatterner) *CubeMap {
 	return &CubeMap{
 		facepatterns: map[cubeFace]UVPatterner{
