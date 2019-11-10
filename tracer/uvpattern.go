@@ -52,6 +52,7 @@ func NewUVImagePattern(filename string) (*UVImagePattern, error) {
 	p := &UVImagePattern{
 		canvas: canvas,
 	}
+
 	return p, nil
 }
 
@@ -59,10 +60,10 @@ func NewUVImagePattern(filename string) (*UVImagePattern, error) {
 func (uvip *UVImagePattern) UVColorAt(u, v float64) Color {
 	v = 1 - v
 
-	x := int(u) * (uvip.canvas.Width - 1)
-	y := int(v) * (uvip.canvas.Height - 1)
+	x := u * (float64(uvip.canvas.Width) - 1)
+	y := v * (float64(uvip.canvas.Height) - 1)
 
-	c, err := uvip.canvas.Get(x, y)
+	c, err := uvip.canvas.Get(int(x), int(y))
 	if err != nil {
 		log.Fatal(err)
 	}
