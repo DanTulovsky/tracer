@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"image"
 	"log"
 	"math"
 	"os"
@@ -10,14 +9,9 @@ import (
 	"runtime"
 	"runtime/pprof"
 
-	"github.com/mdouchement/hdr"
-
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-
-	_ "github.com/mdouchement/hdr/codec/rgbe"
-	"github.com/mdouchement/hdr/tmo"
 
 	_ "net/http/pprof"
 
@@ -1393,43 +1387,17 @@ func skyboxcube1(folder string) {
 	tracer.Render(w)
 }
 
-func hdrToImage(filename string) image.Image {
-	fi, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	m, format, err := image.Decode(fi)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("decoded image format: %v", format)
-
-	if hdrm, ok := m.(hdr.Image); ok {
-		// t := tmo.NewLinear(hdrm)
-		// t := tmo.NewLogarithmic(hdrm)
-		// t := tmo.NewDefaultDrago03(hdrm)
-		// t := tmo.NewDefaultDurand(hdrm)
-		// t := tmo.NewDefaultCustomReinhard05(hdrm)
-		t := tmo.NewDefaultReinhard05(hdrm)
-		// t := tmo.NewDefaultICam06(hdrm)
-		m = t.Perform()
-	}
-
-	return m
-}
-
 func skyboxsphere1(input string) {
-	w := envxy(1000, 1000)
+	w := envxy(1600, 1000)
 
 	sb := tracer.NewUnitSphere()
 	sb.Material().Ambient = 1
 	sb.Material().Specular = 0
 	sb.Material().Diffuse = 0
-	sb.SetTransform(tracer.IdentityMatrix().Scale(20, 20, 20))
+	sb.SetTransform(tracer.IdentityMatrix().Scale(10, 10, 10))
 
 	filename := path.Join("images/hdri", input)
-	m := hdrToImage(filename)
+	m := tracer.HDRToImage(filename)
 
 	up, err := tracer.NewUVImagePatternImage(m)
 	if err != nil {
@@ -1471,8 +1439,11 @@ func envxy(width, height float64) *tracer.World {
 }
 func main() {
 
-	// skyboxcube1("sf")
-	skyboxsphere1("carpentry_shop_02_4k.hdr")
+	flag.Parse()
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	// skyboxcube1("field1")
+	skyboxsphere1("shanghai_bund_4k.hdr")
 	// image1()
 	// textureMap()
 	// cubeMap()
@@ -1502,9 +1473,6 @@ func main() {
 	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// f := path.Join(dir, "complex-smooth4.obj")
 	// objParse(f)
-
-	flag.Parse()
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)

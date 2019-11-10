@@ -3,6 +3,7 @@ package tracer
 import (
 	"flag"
 	"fmt"
+	"log"
 	"math"
 )
 
@@ -12,6 +13,7 @@ var (
 
 // Render runs the render
 func Render(w *World) {
+	log.Println(*output)
 	if *output != "" {
 		RenderToFile(w, *output)
 	} else {
