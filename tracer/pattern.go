@@ -51,60 +51,115 @@ func (bp *basePattern) objectSpacePoint(o Shaper, p Point) Point {
 	return op.TimesMatrix(bp.TransformInverse())
 }
 
-type baseUVPattern struct {
-	mapper Mapper
+// CubeMapPattern ...
+type CubeMapPattern struct {
 	basePattern
+	// The uv patterner to use for each face
+	left, front, right, back, up, down UVPatterner
+	mapper                             Mapper
 }
 
-// UVCheckersPattern maps checks to the surface of the object
-type UVCheckersPattern struct {
-	baseUVPattern
-	a, b Color
-	w, h float64 // how many squares along width and height
+// NewCubeMapPattern maps a texture onto a cube
+func NewCubeMapPattern(left, front, right, back, up, down UVPatterner) *CubeMapPattern {
+	return &CubeMapPattern{
+		left:   left,
+		front:  front,
+		right:  right,
+		back:   back,
+		up:     up,
+		down:   down,
+		mapper: NewCubeMap(left, front, right, back, up, down),
+		basePattern: basePattern{
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+		},
+	}
 }
 
-// NewUVCheckersPattern returns a new UV mapped checkers pattern
-// If you want your checkers to look "square" on the sphere,
-// be sure and set the width to twice the height. This is because of
-// how the spherical map is implemented. While both u and v go from 0 to 1,
-// v maps 1 to π, but u maps 1 to 2π.
-func NewUVCheckersPattern(w, h float64, a, b Color, m Mapper) *UVCheckersPattern {
-	return &UVCheckersPattern{
-		a: a,
-		b: b,
-		w: w,
-		h: h,
-		baseUVPattern: baseUVPattern{
-			mapper: m,
-			basePattern: basePattern{
-				transform:        IdentityMatrix(),
-				transformInverse: IdentityMatrix().Inverse(),
-			},
+// faceFromPoint returns the face that the point is on
+func (cm *CubeMapPattern) faceFromPoint(p Point) cubeFace {
+	coord := math.Max(math.Max(math.Abs(p.x), math.Abs(p.y)), math.Abs(p.z))
+
+	switch coord {
+	case p.x:
+		return cubeFaceRight
+	case -p.x:
+		return cubeFaceLeft
+	case p.y:
+		return cubeFaceUp
+	case -p.y:
+		return cubeFaceDown
+	case p.z:
+		return cubeFaceFront
+	}
+	return cubeFaceBack
+}
+
+// ColorAtObject returns the color for the given pattern on the given object
+func (cm *CubeMapPattern) ColorAtObject(o Shaper, p Point) Color {
+	return cm.colorAt(cm.objectSpacePoint(o, p))
+}
+
+// uvColorAt returns the color at the 2D coordinate (u, v)
+func (cm *CubeMapPattern) uvColorAt(u, v float64) Color {
+	return White()
+}
+
+// ColorAt implements Patterner
+func (cm *CubeMapPattern) colorAt(p Point) Color {
+	// The correct face is calculated by this function
+	u, v := cm.mapper.Map(p)
+
+	// find the face the point is on
+	face := cm.faceFromPoint(p)
+
+	switch face {
+	case cubeFaceFront:
+		return cm.front.UVColorAt(u, v)
+	case cubeFaceBack:
+		return cm.back.UVColorAt(u, v)
+	case cubeFaceLeft:
+		return cm.left.UVColorAt(u, v)
+	case cubeFaceRight:
+		return cm.right.UVColorAt(u, v)
+	case cubeFaceUp:
+		return cm.up.UVColorAt(u, v)
+	case cubeFaceDown:
+		return cm.down.UVColorAt(u, v)
+	}
+
+	// should never happen
+	return Black()
+}
+
+// TextureMapPattern maps the child pattern using the provided map
+type TextureMapPattern struct {
+	basePattern
+	pattern UVPatterner
+	mapper  Mapper
+}
+
+// NewTextureMapPattern returns a new ...
+func NewTextureMapPattern(p UVPatterner, m Mapper) *TextureMapPattern {
+	return &TextureMapPattern{
+		pattern: p,
+		mapper:  m,
+		basePattern: basePattern{
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
 		},
 	}
 }
 
 // ColorAtObject returns the color for the given pattern on the given object
-func (ucp *UVCheckersPattern) ColorAtObject(o Shaper, p Point) Color {
-	return ucp.colorAt(ucp.objectSpacePoint(o, p))
-}
-
-// uvColorAt returns the color at the 2D coordinate (u, v)
-func (ucp *UVCheckersPattern) uvColorAt(u, v float64) Color {
-	u2 := math.Floor(u * ucp.w)
-	v2 := math.Floor(v * ucp.h)
-
-	if math.Mod((u2+v2), 2) == 0 {
-		return ucp.a
-	}
-
-	return ucp.b
+func (tmp *TextureMapPattern) ColorAtObject(o Shaper, p Point) Color {
+	return tmp.colorAt(tmp.objectSpacePoint(o, p))
 }
 
 // ColorAt implements Patterner
-func (ucp *UVCheckersPattern) colorAt(p Point) Color {
-	u, v := ucp.mapper.Map(p)
-	return ucp.uvColorAt(u, v)
+func (tmp *TextureMapPattern) colorAt(p Point) Color {
+	u, v := tmp.mapper.Map(p)
+	return tmp.pattern.UVColorAt(u, v)
 }
 
 // StripedPattern is a pattern that overlays stripes
