@@ -2,6 +2,10 @@ package main
 
 import (
 	"flag"
+<<<<<<< HEAD
+=======
+	"image"
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	"log"
 	"math"
 	"os"
@@ -9,10 +13,21 @@ import (
 	"runtime"
 	"runtime/pprof"
 
+<<<<<<< HEAD
+=======
+	"github.com/mdouchement/hdr"
+
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 
+<<<<<<< HEAD
+=======
+	_ "github.com/mdouchement/hdr/codec/rgbe"
+	"github.com/mdouchement/hdr/tmo"
+
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	_ "net/http/pprof"
 
 	"github.com/lucasb-eyer/go-colorful"
@@ -1045,6 +1060,7 @@ func floor() *tracer.Plane {
 	return p
 }
 
+<<<<<<< HEAD
 func glassplane() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.Material().Specular = 0.0
@@ -1059,6 +1075,8 @@ func glassplane() *tracer.Plane {
 	return p
 }
 
+=======
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 func ceiling() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().Translate(0, 5, 0))
@@ -1147,6 +1165,7 @@ func simplecylinder() {
 	tracer.Render(w)
 }
 
+<<<<<<< HEAD
 func glasssphere() *tracer.Sphere {
 	s := tracer.NewUnitSphere()
 	s.SetTransform(tracer.IdentityMatrix().Scale(.75, .75, .75).Translate(0, 1.75, 0))
@@ -1181,6 +1200,13 @@ func shapes() {
 
 	sphere1 := tracer.NewUnitSphere()
 	sphere1.SetTransform(tracer.IdentityMatrix().Translate(-4.5, 1, 5))
+=======
+func shapes() {
+
+	w := env()
+	sphere1 := tracer.NewUnitSphere()
+	sphere1.SetTransform(tracer.IdentityMatrix().Translate(-3.5, 1, 5))
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	mapper := tracer.NewSphericalMap()
 	uvpattern := tracer.NewUVCheckersPattern(20, 10,
 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Black))
@@ -1188,7 +1214,11 @@ func shapes() {
 	sphere1.Material().SetPattern(pattern)
 
 	cube1 := tracer.NewUnitCube()
+<<<<<<< HEAD
 	cube1.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/4).Translate(5.8, 1, 9))
+=======
+	cube1.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/4).Translate(4, 1, 6))
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	left := tracer.NewUVAlignCheckPattern(
 		tracer.ColorName(colornames.Yellow),
 		tracer.ColorName(colornames.Cyan),
@@ -1229,18 +1259,27 @@ func shapes() {
 	cube1.Material().SetPattern(pattern2)
 
 	cylinder1 := tracer.NewClosedCylinder(-4, 4)
+<<<<<<< HEAD
 	cylinder1.SetTransform(
 		tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).RotateZ(math.Pi/2).Translate(0, 0.5, 0))
+=======
+	cylinder1.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).RotateZ(math.Pi/2).Translate(0, 0.5, 0))
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	mapper3 := tracer.NewCylinderMap()
 	uvpattern3 := tracer.NewUVCheckersPattern(10, 2,
 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Blue))
 	pattern3 := tracer.NewTextureMapPattern(uvpattern3, mapper3)
 	cylinder1.Material().SetPattern(pattern3)
 
+<<<<<<< HEAD
 	backWall1 := glassplane()
 	// backWall1 := floor()
 	backWall1.SetTransform(
 		tracer.IdentityMatrix().RotateX(math.Pi/2).Translate(0, 0, 20))
+=======
+	backWall1 := backWall()
+	backWall1.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 40))
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	mapper4 := tracer.NewPlaneMap()
 	uvpattern4 := tracer.NewUVCheckersPattern(2, 2,
 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Orange))
@@ -1249,8 +1288,12 @@ func shapes() {
 	backWall1.Material().SetPattern(pattern4)
 
 	cone1 := tracer.NewClosedCone(-2, 0)
+<<<<<<< HEAD
 	cone1.SetTransform(
 		tracer.IdentityMatrix().Scale(0.3, 1, 0.3).Translate(-2.3, 2, 7))
+=======
+	cone1.SetTransform(tracer.IdentityMatrix().Scale(1, 2, 1).Translate(-2.3, 1.5, 7))
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	mapper5 := tracer.NewCylinderMap()
 	uvpattern5 := tracer.NewUVCheckersPattern(2, 2,
 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Goldenrod))
@@ -1259,7 +1302,15 @@ func shapes() {
 	cone1.Material().SetPattern(pattern5)
 
 	csgMember1 := tracer.NewUnitCube()
+<<<<<<< HEAD
 	pattern6 := tracer.NewCubeMapPattern(left, front, right, back, up, down)
+=======
+	mapper6 := tracer.NewCylinderMap() // TODO: Fix
+	uvpattern6 := tracer.NewUVCheckersPattern(2, 2,
+		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Goldenrod))
+	pattern6 := tracer.NewTextureMapPattern(uvpattern6, mapper6)
+	pattern6.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5))
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	csgMember1.Material().SetPattern(pattern6)
 
 	csgMember2 := tracer.NewUnitSphere()
@@ -1272,11 +1323,19 @@ func shapes() {
 	csgMember2.Material().SetPattern(pattern7)
 
 	csg1 := tracer.NewCSG(csgMember1, csgMember2, tracer.Intersect)
+<<<<<<< HEAD
 	csg1.SetTransform(tracer.IdentityMatrix().Translate(4.0, 1, 2))
 
 	// earth
 	earth := tracer.NewUnitSphere()
 	earth.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/2).Translate(-4, 3.5, 25))
+=======
+	csg1.SetTransform(tracer.IdentityMatrix().Translate(0.5, 1, 2))
+
+	// earth
+	earth := tracer.NewUnitSphere()
+	earth.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/2).Translate(-1, 2.5, 4.5))
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	image := "images/earthmap1k.jpg"
 	earthup, err := tracer.NewUVImagePattern(image)
 	if err != nil {
@@ -1286,6 +1345,7 @@ func shapes() {
 	p := tracer.NewTextureMapPattern(earthup, mapperearth)
 	earth.Material().SetPattern(p)
 
+<<<<<<< HEAD
 	flr := floor()
 	flr.SetTransform(tracer.IdentityMatrix().Translate(0, floory, 0))
 
@@ -1309,6 +1369,16 @@ func shapes() {
 	// w.AddObject(cylinder1)
 	w.AddObject(flr)
 	// w.AddObject(ceiling())
+=======
+	w.AddObject(earth)
+	w.AddObject(csg1)
+	w.AddObject(cone1)
+	w.AddObject(sphere1)
+	w.AddObject(cube1)
+	w.AddObject(cylinder1)
+	w.AddObject(floor())
+	w.AddObject(ceiling())
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	w.AddObject(backWall1)
 
 	tracer.Render(w)
@@ -1415,6 +1485,7 @@ func image1() {
 	tracer.Render(w)
 }
 
+<<<<<<< HEAD
 func skyboxcube(folder string) *tracer.Cube {
 
 	sb := tracer.NewUnitCube()
@@ -1434,6 +1505,8 @@ func skyboxcube(folder string) *tracer.Cube {
 	return sb
 }
 
+=======
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 func skyboxcube1(folder string) {
 	w := envxy(1000, 1000)
 
@@ -1464,17 +1537,55 @@ func skyboxcube1(folder string) {
 	tracer.Render(w)
 }
 
+<<<<<<< HEAD
 func skyboxsphere1(input string) {
 	w := envxy(1600, 1000)
+=======
+func hdrToImage(filename string) image.Image {
+	fi, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	m, format, err := image.Decode(fi)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("decoded image format: %v", format)
+
+	if hdrm, ok := m.(hdr.Image); ok {
+		// t := tmo.NewLinear(hdrm)
+		// t := tmo.NewLogarithmic(hdrm)
+		// t := tmo.NewDefaultDrago03(hdrm)
+		// t := tmo.NewDefaultDurand(hdrm)
+		// t := tmo.NewDefaultCustomReinhard05(hdrm)
+		t := tmo.NewDefaultReinhard05(hdrm)
+		// t := tmo.NewDefaultICam06(hdrm)
+		m = t.Perform()
+	}
+
+	return m
+}
+
+func skyboxsphere1(input string) {
+	w := envxy(1000, 1000)
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 
 	sb := tracer.NewUnitSphere()
 	sb.Material().Ambient = 1
 	sb.Material().Specular = 0
 	sb.Material().Diffuse = 0
+<<<<<<< HEAD
 	sb.SetTransform(tracer.IdentityMatrix().Scale(10, 10, 10))
 
 	filename := path.Join("images/hdri", input)
 	m := tracer.HDRToImage(filename)
+=======
+	sb.SetTransform(tracer.IdentityMatrix().Scale(20, 20, 20))
+
+	filename := path.Join("images/hdri", input)
+	m := hdrToImage(filename)
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 
 	up, err := tracer.NewUVImagePatternImage(m)
 	if err != nil {
@@ -1516,18 +1627,27 @@ func envxy(width, height float64) *tracer.World {
 }
 func main() {
 
+<<<<<<< HEAD
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	// skyboxcube1("field1")
 	// skyboxsphere1("shanghai_bund_4k.hdr")
+=======
+	// skyboxcube1("sf")
+	skyboxsphere1("carpentry_shop_02_4k.hdr")
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	// image1()
 	// textureMap()
 	// cubeMap()
 
 	// scene()
 	// plane()
+<<<<<<< HEAD
 	shapes()
+=======
+	// shapes()
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 
 	// colors()
 	// mirrors()
@@ -1551,6 +1671,12 @@ func main() {
 	// f := path.Join(dir, "complex-smooth4.obj")
 	// objParse(f)
 
+<<<<<<< HEAD
+=======
+	flag.Parse()
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+>>>>>>> 4b3cd7fcf042bee4bff311887865678d8f7940ba
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
