@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"math"
 	"os"
@@ -19,6 +20,7 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
+	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -944,20 +946,20 @@ func triangle() {
 
 func objParse(f string) {
 
-	width, height := 640.0, 480.0
-	// width, height := 1400.0, 1000.0
+	// width, height := 640.0, 480.0
+	width, height := 1200.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(0, 3, -10), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 30, -10), tracer.NewColor(1, 1, 1)),
 		// tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 2, -8)
+	from := tracer.NewPoint(0, 7, -8)
 	to := tracer.NewPoint(0, 0, 4)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -969,7 +971,7 @@ func objParse(f string) {
 		log.Fatalln(err)
 	}
 
-	g.SetTransform(tracer.IdentityMatrix().Translate(0, 2, 0))
+	g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/4).Translate(0, 2, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
@@ -1515,6 +1517,56 @@ func movedgroup() {
 
 }
 
+func texturetri() {
+	w := envxy(1024, 768)
+
+	floor := tracer.NewPlane()
+	floor.SetTransform(tracer.IdentityMatrix().Translate(0, -3, 0))
+	floorp := tracer.NewRingPattern(tracer.ColorName(colornames.Red), tracer.White())
+	floor.Material().SetPattern(floorp)
+	w.AddObject(floor)
+
+	backWall := tracer.NewPlane()
+	backWall.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).Translate(0, 0, 40))
+	backWallp := tracer.NewStripedPattern(tracer.ColorName(colornames.Blue), tracer.White())
+	backWall.Material().SetPattern(backWallp)
+	backWall.Material().Specular = 0.2
+	w.AddObject(backWall)
+
+	g1 := tracer.NewGroup()
+	g1.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/8).Translate(0.7, 0.4, 0))
+	w.AddObject(g1)
+
+	t1 := tracer.NewTriangle(tracer.NewPoint(0, 0, 0), tracer.NewPoint(2, 0, 0), tracer.NewPoint(1, 2, 0))
+	t1.Material().Color = tracer.ColorName(colornames.Darkred)
+
+	t2 := tracer.NewTriangle(tracer.NewPoint(0, 0, 0), tracer.NewPoint(-2, 0, 0), tracer.NewPoint(-1, 2, 0))
+	t2.Material().Color = tracer.ColorName(colornames.Darkblue)
+	// t2.Material().Transparency = 0.5
+	// t2.Material().Diffuse = 0.1
+	// t2.Material().Ambient = 0.1
+	// t2.Material().ShadowCaster = false
+
+	t3 := tracer.NewTriangle(tracer.NewPoint(0, 0, 0), tracer.NewPoint(-1, 2, 0), tracer.NewPoint(1, 2, 0))
+	t3.Material().Color = tracer.ColorName(colornames.Darkgreen)
+	// t3.Material().Transparency = 1
+	// t3.Material().Diffuse = 0.1
+	// t3.Material().Ambient = 0.1
+	// t3.Material().ShadowCaster = false
+
+	g1.AddMembers(t1, t2, t3)
+	image := "images/earthmap1k.jpg"
+	up, err := tracer.NewUVImagePattern(image)
+	if err != nil {
+		log.Fatal(err)
+	}
+	mapper := tracer.NewSphericalMap()
+	p := tracer.NewTextureMapPattern(up, mapper)
+	g1.Material().SetPattern(p)
+
+	tracer.Render(w)
+}
+
 func envxy(width, height float64) *tracer.World {
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1540,17 +1592,17 @@ func main() {
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
+	// texturetri()
+
+	// shapes()
 	// movedgroup()
 	// skyboxcube1("field1")
 	// skyboxsphere1("shanghai_bund_4k.hdr")
 	// image1()
 	// textureMap()
 	// cubeMap()
-
 	// scene()
 	// plane()
-	shapes()
-
 	// colors()
 	// mirrors()
 	// mirror()
@@ -1569,9 +1621,9 @@ func main() {
 	// csg()
 	// simplesphere()
 
-	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	// f := path.Join(dir, "complex-smooth4.obj")
-	// objParse(f)
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	f := path.Join(dir, "texture2.obj")
+	objParse(f)
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)

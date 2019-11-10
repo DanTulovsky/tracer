@@ -7,6 +7,7 @@ package tracer
 
 import (
 	"fmt"
+	"image"
 	"log"
 	"os"
 	"path"
@@ -97,25 +98,46 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 }
 
 // convertMaterial converts OBJ material to *Material
-func convertMaterial(mat *mtl.Material) *Material {
+func convertMaterial(mat *mtl.Material, dir string) *Material {
 	// TODO: Implement this
 
 	log.Printf("    %v\n", mat.Name)
 	log.Printf("    Diffuse: %v\n", mat.DiffuseColor)
+	log.Printf("    Diffuse texture: %v\n", mat.DiffuseTexture)
 	log.Printf("    Ambient: %v\n", mat.AmbientColor)
 	log.Printf("    Specular: %v\n", mat.SpecularColor)
 	log.Printf("    Specular Exp: %v\n", mat.SpecularExponent)
 	m := NewDefaultMaterial()
 
-	// For now set the diffuse color as the color of the object
 	d := mat.DiffuseColor
-	m.Color = NewColor(d.R, d.G, d.B)
+	if mat.DiffuseTexture == "" {
+		// For now set the diffuse color as the color of the object
+		m.Color = NewColor(d.R, d.G, d.B)
+	} else {
+		// Use texture
+		log.Println("Reading in material textures...")
+		// multiply the material diffuse by the texture value
+		imageFile := path.Join(dir, mat.DiffuseTexture)
+		f, err := os.Open(imageFile)
+		if err != nil {
+			log.Fatal(err) // TODO: change to returning error
+		}
+
+		decode, format, err := image.Decode(f)
+		if err != nil {
+			log.Fatal(err) // TODO: change to returning error
+		}
+		log.Printf("decoded image format %v", format)
+
+		// store the texture in the material
+		m.AddTexture(mat.Name, decode)
+	}
 
 	return m
 }
 
 // convertData converts the parsed model to *Group instance
-func convertData(model *obj.Model, lib *mtl.Library) (*Group, error) {
+func convertData(model *obj.Model, lib *mtl.Library, dir string) (*Group, error) {
 	g := NewGroup()
 
 	for _, o := range model.Objects {
@@ -127,7 +149,7 @@ func convertData(model *obj.Model, lib *mtl.Library) (*Group, error) {
 				return nil, fmt.Errorf("Unable to find material %v in lib", m.MaterialName)
 			}
 
-			omat := convertMaterial(mat)
+			omat := convertMaterial(mat, dir)
 
 			log.Println("  Faces:")
 			for _, f := range m.Faces {
@@ -152,7 +174,7 @@ func ParseOBJ(f string) (*Group, error) {
 		return nil, err
 	}
 
-	g, err := convertData(model, lib)
+	g, err := convertData(model, lib, filepath.Dir(f))
 	if err != nil {
 		return nil, err
 	}

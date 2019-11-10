@@ -17,7 +17,7 @@ type UVImagePattern struct {
 	canvas *Canvas
 }
 
-// imageToCanvas converts an image in
+// imageToCanvas converts an image to a Canvas
 func imageToCanvas(m image.Image) *Canvas {
 
 	bounds := m.Bounds()

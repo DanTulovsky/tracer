@@ -1,6 +1,9 @@
 package tracer
 
 import (
+	"image"
+	"log"
+
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -12,6 +15,10 @@ type Material struct {
 
 	// Some objects should not cast shadows (e.g. water in a pond)
 	ShadowCaster bool
+
+	// Some materials have textures associated with them, this is an image file read in and stored as a canvas
+	// Support multiple textures, indexed by the Material name
+	textures map[string]*Canvas
 }
 
 // NewMaterial returns a new material
@@ -60,6 +67,16 @@ func NewDefaultGlassMaterial() *Material {
 		RefractiveIndex: 1.5,
 		ShadowCaster:    false,
 	}
+}
+
+// AddTexture adds a texture mapped to a Canvas
+func (m *Material) AddTexture(name string, i image.Image) error {
+	log.Println("converting image  (texture) to canvas...")
+	canvas := imageToCanvas(i)
+
+	m.textures[name] = canvas
+
+	return nil
 }
 
 // HasPattern returns true if a material has a pattern attached to it
