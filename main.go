@@ -1271,7 +1271,7 @@ func pattern1() {
 	tracer.Render(w)
 }
 
-func pattern2() {
+func cubeMap() {
 
 	w := env()
 
@@ -1339,7 +1339,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	pattern2()
+	cubeMap()
 	// pattern1()
 
 	// scene()
