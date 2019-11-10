@@ -335,7 +335,7 @@ func TestCubeMap_faceFromPoint(t *testing.T) {
 	}{
 		{
 			name: "left",
-			cm:   NewCubeMap(),
+			cm:   &CubeMap{},
 			args: args{
 				p: NewPoint(-1, 0.5, -0.25),
 			},
@@ -343,7 +343,7 @@ func TestCubeMap_faceFromPoint(t *testing.T) {
 		},
 		{
 			name: "right",
-			cm:   NewCubeMap(),
+			cm:   &CubeMap{},
 			args: args{
 				p: NewPoint(1.1, -0.75, 0.8),
 			},
@@ -351,7 +351,7 @@ func TestCubeMap_faceFromPoint(t *testing.T) {
 		},
 		{
 			name: "front",
-			cm:   NewCubeMap(),
+			cm:   &CubeMap{},
 			args: args{
 				p: NewPoint(0.1, 0.6, 0.9),
 			},
@@ -359,7 +359,7 @@ func TestCubeMap_faceFromPoint(t *testing.T) {
 		},
 		{
 			name: "back",
-			cm:   NewCubeMap(),
+			cm:   &CubeMap{},
 			args: args{
 				p: NewPoint(-0.7, 0, -2),
 			},
@@ -367,7 +367,7 @@ func TestCubeMap_faceFromPoint(t *testing.T) {
 		},
 		{
 			name: "up",
-			cm:   NewCubeMap(),
+			cm:   &CubeMap{},
 			args: args{
 				p: NewPoint(0.5, 1, 0.9),
 			},
@@ -375,7 +375,7 @@ func TestCubeMap_faceFromPoint(t *testing.T) {
 		},
 		{
 			name: "down",
-			cm:   NewCubeMap(),
+			cm:   &CubeMap{},
 			args: args{
 				p: NewPoint(-0.2, -1.3, 1.1),
 			},
@@ -402,7 +402,7 @@ func TestCubeMap_uvFront(t *testing.T) {
 		wantV float64
 	}{
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(-0.5, 0.5, 1),
 			},
@@ -410,7 +410,7 @@ func TestCubeMap_uvFront(t *testing.T) {
 			wantV: 0.75,
 		},
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(0.5, -0.5, 1),
 			},
@@ -439,7 +439,7 @@ func TestCubeMap_uvBack(t *testing.T) {
 		wantV float64
 	}{
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(0.5, 0.5, -1),
 			},
@@ -447,7 +447,7 @@ func TestCubeMap_uvBack(t *testing.T) {
 			wantV: 0.75,
 		},
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(-0.5, -0.5, -1),
 			},
@@ -476,7 +476,7 @@ func TestCubeMap_uvLeft(t *testing.T) {
 		wantV float64
 	}{
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(-1, 0.5, -0.5),
 			},
@@ -484,7 +484,7 @@ func TestCubeMap_uvLeft(t *testing.T) {
 			wantV: 0.75,
 		},
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(-1, -0.5, 0.5),
 			},
@@ -513,7 +513,7 @@ func TestCubeMap_uvRight(t *testing.T) {
 		wantV float64
 	}{
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(1, 0.5, 0.5),
 			},
@@ -521,7 +521,7 @@ func TestCubeMap_uvRight(t *testing.T) {
 			wantV: 0.75,
 		},
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(1, -0.5, -0.5),
 			},
@@ -550,7 +550,7 @@ func TestCubeMap_uvUp(t *testing.T) {
 		wantV float64
 	}{
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(-0.5, 1, -0.5),
 			},
@@ -558,7 +558,7 @@ func TestCubeMap_uvUp(t *testing.T) {
 			wantV: 0.75,
 		},
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(0.5, 1, 0.5),
 			},
@@ -587,7 +587,7 @@ func TestCubeMap_uvDown(t *testing.T) {
 		wantV float64
 	}{
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(-0.5, -1, 0.5),
 			},
@@ -595,7 +595,7 @@ func TestCubeMap_uvDown(t *testing.T) {
 			wantV: 0.75,
 		},
 		{
-			cm: NewCubeMap(),
+			cm: &CubeMap{},
 			args: args{
 				p: NewPoint(0.5, -1, -0.5),
 			},
