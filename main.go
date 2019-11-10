@@ -1128,145 +1128,143 @@ func simplecylinder() {
 	tracer.Render(w)
 }
 
-// func shapes() {
-
-// 	w := env()
-// 	sphere1 := tracer.NewUnitSphere()
-// 	sphere1.SetTransform(tracer.IdentityMatrix().Translate(-3.5, 1, 5))
-// 	mapper := tracer.NewSphericalMap()
-// 	pattern := tracer.NewUVCheckersPattern(20, 10,
-// 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Black), mapper)
-// 	sphere1.Material().SetPattern(pattern)
-
-// 	cube1 := tracer.NewUnitCube()
-// 	cube1.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/4).Translate(4, 1, 6))
-// 	mapper2 := tracer.NewSphericalMap() // TODO: Fix
-// 	pattern2 := tracer.NewUVCheckersPattern(20, 10,
-// 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Purple), mapper2)
-// 	cube1.Material().SetPattern(pattern2)
-
-// 	cylinder1 := tracer.NewClosedCylinder(-4, 4)
-// 	cylinder1.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).RotateZ(math.Pi/2).Translate(0, 0.5, 0))
-// 	mapper3 := tracer.NewCylinderMap()
-// 	pattern3 := tracer.NewUVCheckersPattern(10, 2,
-// 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Blue), mapper3)
-// 	cylinder1.Material().SetPattern(pattern3)
-
-// 	backWall1 := backWall()
-// 	backWall1.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 40))
-// 	mapper4 := tracer.NewPlaneMap()
-// 	pattern4 := tracer.NewUVCheckersPattern(2, 2,
-// 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Orange), mapper4)
-// 	pattern4.SetTransform(tracer.IdentityMatrix().Scale(5, 5, 5))
-// 	backWall1.Material().SetPattern(pattern4)
-
-// 	cone1 := tracer.NewClosedCone(-2, 0)
-// 	cone1.SetTransform(tracer.IdentityMatrix().Scale(1, 2, 1).Translate(-2.3, 1.5, 7))
-// 	mapper5 := tracer.NewCylinderMap()
-// 	pattern5 := tracer.NewUVCheckersPattern(2, 2,
-// 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Goldenrod), mapper5)
-// 	pattern5.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5))
-// 	cone1.Material().SetPattern(pattern5)
-
-// 	csgMember1 := tracer.NewUnitCube()
-// 	mapper6 := tracer.NewCylinderMap() // TODO: Fix
-// 	pattern6 := tracer.NewUVCheckersPattern(2, 2,
-// 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Goldenrod), mapper6)
-// 	pattern6.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5))
-// 	csgMember1.Material().SetPattern(pattern6)
-
-// 	csgMember2 := tracer.NewUnitSphere()
-// 	csgMember2.SetTransform(tracer.IdentityMatrix().Translate(0, 0.2, 0))
-// 	mapper7 := tracer.NewSphericalMap()
-// 	pattern7 := tracer.NewUVCheckersPattern(30, 15,
-// 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Goldenrod), mapper7)
-// 	pattern7.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi / 4))
-// 	csgMember2.Material().SetPattern(pattern7)
-
-// 	csg1 := tracer.NewCSG(csgMember1, csgMember2, tracer.Intersect)
-// 	csg1.SetTransform(tracer.IdentityMatrix().Translate(0.5, 1, 2))
-
-// 	w.AddObject(csg1)
-// 	w.AddObject(cone1)
-// 	w.AddObject(sphere1)
-// 	w.AddObject(cube1)
-// 	w.AddObject(cylinder1)
-// 	w.AddObject(floor())
-// 	w.AddObject(ceiling())
-// 	w.AddObject(backWall1)
-
-// 	tracer.Render(w)
-
-// }
-
-// func simplesphere() {
-// 	w := env()
-
-// 	sphere1 := tracer.NewUnitSphere()
-// 	sphere1.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 1))
-// 	mapper := tracer.NewSphericalMap()
-// 	pattern := tracer.NewUVCheckersPattern(20, 10,
-// 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Black), mapper)
-// 	sphere1.Material().SetPattern(pattern)
-
-// 	floor := tracer.NewPlane()
-// 	mapper2 := tracer.NewPlaneMap()
-// 	pattern2 := tracer.NewUVCheckersPattern(2, 2,
-// 		tracer.ColorName(colornames.Red), tracer.ColorName(colornames.Blue), mapper2)
-// 	floor.Material().SetPattern(pattern2)
-
-// 	w.AddObject(sphere1)
-// 	w.AddObject(floor)
-// 	tracer.Render(w)
-// }
-
-func pattern1() {
+func shapes() {
 
 	w := env()
-	cube := tracer.NewUnitCube()
-	cube.SetTransform(
-		tracer.IdentityMatrix().Scale(0.8, 0.8, 0.8).RotateX(math.Pi/2).RotateY(math.Pi/6).RotateZ(math.Pi/6).Translate(0, 1.7, 0))
+	sphere1 := tracer.NewUnitSphere()
+	sphere1.SetTransform(tracer.IdentityMatrix().Translate(-3.5, 1, 5))
+	mapper := tracer.NewSphericalMap()
+	uvpattern := tracer.NewUVCheckersPattern(20, 10,
+		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Black))
+	pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
+	sphere1.Material().SetPattern(pattern)
 
-	// left := tracer.NewUVAlignCheckPattern(
-	// 	tracer.ColorName(colornames.Yellow),
-	// 	tracer.ColorName(colornames.Cyan),
-	// 	tracer.ColorName(colornames.Red),
-	// 	tracer.ColorName(colornames.Blue),
-	// 	tracer.ColorName(colornames.Brown))
-	// front := tracer.NewUVAlignCheckPattern(
-	// 	tracer.ColorName(colornames.Cyan),
-	// 	tracer.ColorName(colornames.Red),
-	// 	tracer.ColorName(colornames.Yellow),
-	// 	tracer.ColorName(colornames.Brown),
-	// 	tracer.ColorName(colornames.Green))
-	// right := tracer.NewUVAlignCheckPattern(
-	// 	tracer.ColorName(colornames.Red),
-	// 	tracer.ColorName(colornames.Yellow),
-	// 	tracer.ColorName(colornames.Purple),
-	// 	tracer.ColorName(colornames.Green),
-	// 	tracer.ColorName(colornames.White))
-	// back := tracer.NewUVAlignCheckPattern(
-	// 	tracer.ColorName(colornames.Green),
-	// 	tracer.ColorName(colornames.Purple),
-	// 	tracer.ColorName(colornames.Cyan),
-	// 	tracer.ColorName(colornames.White),
-	// 	tracer.ColorName(colornames.Blue))
-	// up := tracer.NewUVAlignCheckPattern(
-	// 	tracer.ColorName(colornames.Brown),
-	// 	tracer.ColorName(colornames.Cyan),
-	// 	tracer.ColorName(colornames.Purple),
-	// 	tracer.ColorName(colornames.Red),
-	// 	tracer.ColorName(colornames.Yellow))
-	// down := tracer.NewUVAlignCheckPattern(
-	// 	tracer.ColorName(colornames.Purple),
-	// 	tracer.ColorName(colornames.Brown),
-	// 	tracer.ColorName(colornames.Green),
-	// 	tracer.ColorName(colornames.Blue),
-	// 	tracer.ColorName(colornames.White))
-	// pattern := tracer.NewUVCubeMapPattern(left, front, right, back, up, down)
+	cube1 := tracer.NewUnitCube()
+	cube1.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/4).Translate(4, 1, 6))
+	left := tracer.NewUVAlignCheckPattern(
+		tracer.ColorName(colornames.Yellow),
+		tracer.ColorName(colornames.Cyan),
+		tracer.ColorName(colornames.Red),
+		tracer.ColorName(colornames.Blue),
+		tracer.ColorName(colornames.Brown))
+	front := tracer.NewUVAlignCheckPattern(
+		tracer.ColorName(colornames.Cyan),
+		tracer.ColorName(colornames.Red),
+		tracer.ColorName(colornames.Yellow),
+		tracer.ColorName(colornames.Brown),
+		tracer.ColorName(colornames.Green))
+	right := tracer.NewUVAlignCheckPattern(
+		tracer.ColorName(colornames.Red),
+		tracer.ColorName(colornames.Yellow),
+		tracer.ColorName(colornames.Purple),
+		tracer.ColorName(colornames.Green),
+		tracer.ColorName(colornames.White))
+	back := tracer.NewUVAlignCheckPattern(
+		tracer.ColorName(colornames.Green),
+		tracer.ColorName(colornames.Purple),
+		tracer.ColorName(colornames.Cyan),
+		tracer.ColorName(colornames.White),
+		tracer.ColorName(colornames.Blue))
+	up := tracer.NewUVAlignCheckPattern(
+		tracer.ColorName(colornames.Brown),
+		tracer.ColorName(colornames.Cyan),
+		tracer.ColorName(colornames.Purple),
+		tracer.ColorName(colornames.Red),
+		tracer.ColorName(colornames.Yellow))
+	down := tracer.NewUVAlignCheckPattern(
+		tracer.ColorName(colornames.Purple),
+		tracer.ColorName(colornames.Brown),
+		tracer.ColorName(colornames.Green),
+		tracer.ColorName(colornames.Blue),
+		tracer.ColorName(colornames.White))
+	pattern2 := tracer.NewCubeMapPattern(left, front, right, back, up, down)
+	cube1.Material().SetPattern(pattern2)
 
-	// cube.Material().SetPattern(pattern)
-	w.AddObject(cube)
+	cylinder1 := tracer.NewClosedCylinder(-4, 4)
+	cylinder1.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).RotateZ(math.Pi/2).Translate(0, 0.5, 0))
+	mapper3 := tracer.NewCylinderMap()
+	uvpattern3 := tracer.NewUVCheckersPattern(10, 2,
+		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Blue))
+	pattern3 := tracer.NewTextureMapPattern(uvpattern3, mapper3)
+	cylinder1.Material().SetPattern(pattern3)
+
+	backWall1 := backWall()
+	backWall1.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 40))
+	mapper4 := tracer.NewPlaneMap()
+	uvpattern4 := tracer.NewUVCheckersPattern(2, 2,
+		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Orange))
+	pattern4 := tracer.NewTextureMapPattern(uvpattern4, mapper4)
+	pattern4.SetTransform(tracer.IdentityMatrix().Scale(5, 5, 5))
+	backWall1.Material().SetPattern(pattern4)
+
+	cone1 := tracer.NewClosedCone(-2, 0)
+	cone1.SetTransform(tracer.IdentityMatrix().Scale(1, 2, 1).Translate(-2.3, 1.5, 7))
+	mapper5 := tracer.NewCylinderMap()
+	uvpattern5 := tracer.NewUVCheckersPattern(2, 2,
+		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Goldenrod))
+	pattern5 := tracer.NewTextureMapPattern(uvpattern5, mapper5)
+	pattern5.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5))
+	cone1.Material().SetPattern(pattern5)
+
+	csgMember1 := tracer.NewUnitCube()
+	mapper6 := tracer.NewCylinderMap() // TODO: Fix
+	uvpattern6 := tracer.NewUVCheckersPattern(2, 2,
+		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Goldenrod))
+	pattern6 := tracer.NewTextureMapPattern(uvpattern6, mapper6)
+	pattern6.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5))
+	csgMember1.Material().SetPattern(pattern6)
+
+	csgMember2 := tracer.NewUnitSphere()
+	csgMember2.SetTransform(tracer.IdentityMatrix().Translate(0, 0.2, 0))
+	mapper7 := tracer.NewSphericalMap()
+	uvpattern7 := tracer.NewUVCheckersPattern(30, 15,
+		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Goldenrod))
+	pattern7 := tracer.NewTextureMapPattern(uvpattern7, mapper7)
+	pattern7.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi / 4))
+	csgMember2.Material().SetPattern(pattern7)
+
+	csg1 := tracer.NewCSG(csgMember1, csgMember2, tracer.Intersect)
+	csg1.SetTransform(tracer.IdentityMatrix().Translate(0.5, 1, 2))
+
+	w.AddObject(csg1)
+	w.AddObject(cone1)
+	w.AddObject(sphere1)
+	w.AddObject(cube1)
+	w.AddObject(cylinder1)
+	w.AddObject(floor())
+	w.AddObject(ceiling())
+	w.AddObject(backWall1)
+
+	tracer.Render(w)
+
+}
+
+func simplesphere() {
+	w := env()
+
+	sphere1 := tracer.NewUnitSphere()
+	sphere1.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 1))
+	mapper := tracer.NewSphericalMap()
+	uvpattern := tracer.NewUVCheckersPattern(20, 10,
+		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Black))
+	pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
+	sphere1.Material().SetPattern(pattern)
+
+	floor := tracer.NewPlane()
+	mapper2 := tracer.NewPlaneMap()
+	uvpattern2 := tracer.NewUVCheckersPattern(2, 2,
+		tracer.ColorName(colornames.Red), tracer.ColorName(colornames.Blue))
+	pattern2 := tracer.NewTextureMapPattern(uvpattern2, mapper2)
+	floor.Material().SetPattern(pattern2)
+
+	w.AddObject(sphere1)
+	w.AddObject(floor)
+	tracer.Render(w)
+}
+
+func texttureMap() {
+
+	w := env()
 
 	tracer.Render(w)
 }
@@ -1339,12 +1337,12 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	cubeMap()
-	// pattern1()
+	// textureMap()
+	// cubeMap()
 
 	// scene()
 	// plane()
-	// shapes()
+	shapes()
 
 	// colors()
 	// mirrors()
