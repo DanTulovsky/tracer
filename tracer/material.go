@@ -4,6 +4,8 @@ import (
 	"image"
 	"log"
 
+	"golang.org/x/image/colornames"
+
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -17,8 +19,7 @@ type Material struct {
 	ShadowCaster bool
 
 	// Some materials have textures associated with them, this is an image file read in and stored as a canvas
-	// Support multiple textures, indexed by the Material name
-	textures map[string]*Canvas
+	texture *Canvas
 }
 
 // NewMaterial returns a new material
@@ -69,12 +70,34 @@ func NewDefaultGlassMaterial() *Material {
 	}
 }
 
+// ColorAtTexture returns the color at the point based on the texture attached to the material
+// u,v are per trriangle
+func (m *Material) ColorAtTexture(o Shaper, p Point, u, v float64) Color {
+	if m.texture == nil {
+		return ColorName(colornames.Purple) // highly visible, texture emissing
+	}
+
+	t := o.(*SmoothTriangle)
+
+	w := 1 - u - v
+	x := (u*t.VT2.x + v*t.VT3.x + w*t.VT1.x) * float64((m.texture.Width - 1))
+	y := (u*t.VT2.y + v*t.VT3.y + w*t.VT1.y) * float64((m.texture.Height - 1))
+
+	clr, err := m.texture.Get(int(x), int(y))
+	if err != nil {
+		log.Println(err)
+		return ColorName(colornames.Purple) // highly visible, texture emissing
+	}
+
+	return clr
+}
+
 // AddTexture adds a texture mapped to a Canvas
 func (m *Material) AddTexture(name string, i image.Image) error {
-	log.Println("converting image  (texture) to canvas...")
+	log.Println("converting image (texture) to canvas...")
 	canvas := imageToCanvas(i)
 
-	m.textures[name] = canvas
+	m.texture = canvas
 
 	return nil
 }
@@ -82,6 +105,11 @@ func (m *Material) AddTexture(name string, i image.Image) error {
 // HasPattern returns true if a material has a pattern attached to it
 func (m *Material) HasPattern() bool {
 	return m.Pattern != nil
+}
+
+// HasTexture returns true if a material has a texture attached to it
+func (m *Material) HasTexture() bool {
+	return m.texture != nil
 }
 
 // SetPattern sets a pattern on a material

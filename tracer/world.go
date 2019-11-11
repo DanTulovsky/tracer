@@ -194,7 +194,9 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 			l,
 			state.EyeV,
 			state.NormalV,
-			isShadowed)
+			isShadowed,
+			state.U,
+			state.V)
 
 		reflected := w.ReflectedColor(state, remaining, xs)
 		refracted := w.RefractedColor(state, remaining, xs)

@@ -955,7 +955,7 @@ func objParse(f string) {
 	// override light here
 	w.SetLights([]tracer.Light{
 		tracer.NewPointLight(tracer.NewPoint(0, 30, -10), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -971,7 +971,8 @@ func objParse(f string) {
 		log.Fatalln(err)
 	}
 
-	g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/4).Translate(0, 2, 0))
+	// g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/5).RotateX(math.Pi/3).Translate(0, 2, 0))
+	g.SetTransform(tracer.IdentityMatrix().Scale(2.5, 2.5, 2.5).RotateY(math.Pi/7).Translate(0, 2, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
@@ -1622,7 +1623,8 @@ func main() {
 	// simplesphere()
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "texture2.obj")
+	f := path.Join(dir, "monkey-smooth2.obj")
+	// f := path.Join(dir, "texture2.obj")
 	objParse(f)
 
 	if *cpuprofile != "" {

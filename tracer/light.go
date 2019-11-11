@@ -34,15 +34,23 @@ func (pl *PointLight) Position() Point {
 }
 
 // lighting returns the color for a given point
-func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow bool) Color {
+func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow bool, u, v float64) Color {
 	var ambient, diffuse, specular Color
 
 	var clr Color
 
-	if m.HasPattern() {
+	switch {
+	case m.HasPattern():
 		clr = m.Pattern.ColorAtObject(o, p)
-	} else {
+	default:
 		clr = m.Color
+	}
+
+	switch {
+	case m.HasTexture():
+		// Blend with material color
+		clr = m.ColorAtTexture(o, p, u, v)
+		// clr = clr.Blend(tclr)
 	}
 
 	// combine surface color with light's color/intensity
@@ -88,6 +96,6 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 }
 
 // ColorAtPoint returns the clamped color at the given point
-func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow bool) Color {
-	return lighting(m, o, p, l, eye, normal, inShadow).Clamp()
-}
+// func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow bool) Color {
+// 	return lighting(m, o, p, l, eye, normal, inShadow).Clamp()
+// }

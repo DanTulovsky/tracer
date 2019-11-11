@@ -9,15 +9,21 @@ type SmoothTriangle struct {
 	// Normals at each point
 	N1, N2, N3 Vector
 
+	// Texture vectors at each point
+	VT1, VT2, VT3 Vector
+
 	Triangle
 }
 
 // NewSmoothTriangle returns a new triangle
-func NewSmoothTriangle(p1, p2, p3 Point, n1, n2, n3 Vector) *SmoothTriangle {
+func NewSmoothTriangle(p1, p2, p3 Point, n1, n2, n3 Vector, vt1, vt2, vt3 Vector) *SmoothTriangle {
 	t := &SmoothTriangle{
-		N1: n1,
-		N2: n2,
-		N3: n3,
+		N1:  n1,
+		N2:  n2,
+		N3:  n3,
+		VT1: vt1,
+		VT2: vt2,
+		VT3: vt3,
 
 		Triangle: Triangle{
 			P1: p1,

@@ -92,6 +92,7 @@ type IntersectionState struct {
 	OverPoint, UnderPoint Point   // offset to properly render shadows and refraction due to floating point errors
 	ReflectV              Vector  // reflection vector
 	N1, N2                float64 // RefractiveIndex of (n1) leaving material and (n2) entering material
+	U, V                  float64 // u,v values for where the intersection occured
 }
 
 func objectInList(o Shaper, list []Shaper) bool {
@@ -190,6 +191,8 @@ func PrepareComputations(hit *Intersection, r Ray, xs Intersections) *Intersecti
 		ReflectV:   reflectv,
 		N1:         n1,
 		N2:         n2,
+		U:          hit.u,
+		V:          hit.v,
 	}
 }
 

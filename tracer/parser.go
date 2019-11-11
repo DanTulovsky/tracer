@@ -77,6 +77,7 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 	var tri []Shaper
 	var vertecies []Point
 	var normals []Vector
+	var textures []Vector
 
 	for _, r := range f.References {
 		v := model.GetVertexFromReference(r)
@@ -85,10 +86,16 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 
 		n := model.GetNormalFromReference(r)
 		normals = append(normals, NewVector(n.X, n.Y, -n.Z))
+
+		t := model.GetTexCoordFromReference(r)
+		textures = append(textures, NewVector(t.U, 1-t.V, t.W))
 	}
 
 	for i := 1; i < len(vertecies)-1; i++ {
-		t := NewSmoothTriangle(vertecies[0], vertecies[i], vertecies[i+1], normals[0], normals[i], normals[i+1])
+		t := NewSmoothTriangle(
+			vertecies[0], vertecies[i], vertecies[i+1],
+			normals[0], normals[i], normals[i+1],
+			textures[0], textures[i], textures[i+1])
 		t.SetMaterial(mat)
 		tri = append(tri, t)
 	}
@@ -111,10 +118,10 @@ func convertMaterial(mat *mtl.Material, dir string) *Material {
 
 	d := mat.DiffuseColor
 	m.Color = NewColor(d.R, d.G, d.B)
+
 	if mat.DiffuseTexture != "" {
-		// Use texture
 		log.Println("Reading in material textures...")
-		// multiply the material diffuse by the texture value
+
 		imageFile := path.Join(dir, mat.DiffuseTexture)
 		f, err := os.Open(imageFile)
 		if err != nil {
