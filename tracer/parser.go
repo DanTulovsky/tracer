@@ -13,15 +13,15 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/mokiat/go-data-front/decoder/mtl"
-	"github.com/mokiat/go-data-front/decoder/obj"
+	"github.com/DanTulovsky/go-data-front/decoder/mtl"
+	"github.com/DanTulovsky/go-data-front/decoder/obj"
 )
 
 const (
 	maxMaterials = 10
 )
 
-func parseMaterials(model *obj.Model, dir string) (*mtl.Library, error) {
+func parseMTL(model *obj.Model, dir string) (*mtl.Library, error) {
 
 	lib := &mtl.Library{
 		Materials: []*mtl.Material{},
@@ -64,7 +64,7 @@ func parseOBJ(f *os.File, dir string) (*obj.Model, *mtl.Library, error) {
 		log.Printf("  %v", ml)
 	}
 
-	lib, err := parseMaterials(model, dir)
+	lib, err := parseMTL(model, dir)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -105,32 +105,62 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 }
 
 // convertMaterial converts OBJ material to *Material
-func convertMaterial(mat *mtl.Material, dir string) *Material {
-	// TODO: Implement this
+func convertMaterial(mat *mtl.Material, dir string) (*Material, error) {
+	// https://people.sc.fsu.edu/~jburkardt/data/mtl/mtl.html
+
+	// defines the ambient color of the material to be (r,g,b).
+	ka := mat.AmbientColor
+	// defines the diffuse color of the material to be (r,g,b)
+	kd := mat.DiffuseColor
+	// defines the specular color of the material to be (r,g,b). This color shows up in highlights.
+	ks := mat.SpecularColor
+
+	kaColor := NewColor(ka.R, ka.G, ka.B)
+	kdColor := NewColor(kd.R, kd.G, kd.B)
+	ksColor := NewColor(ks.R, ks.G, ks.B)
+	// ke := mat.EmissiveCoefficient  // not implemented in library
+
+	// Dissolve indicates how much an object should blend.
+	// The value should range between 0.0 (fully transparent)
+	// and 1.0 (opaque).  In Blender this is the Alpha value in the BSDF shader.
+	d := 1 - mat.Dissolve
+
+	// defines the shininess of the material to be s. The default is 0.0;
+	ns := mat.SpecularExponent
+
+	illum := mat.Illum
 
 	log.Printf("    %v\n", mat.Name)
-	log.Printf("    Diffuse: %v\n", mat.DiffuseColor)
+	log.Printf("    Diffuse: %v\n", kdColor)
 	log.Printf("    Diffuse texture: %v\n", mat.DiffuseTexture)
-	log.Printf("    Ambient: %v\n", mat.AmbientColor)
-	log.Printf("    Specular: %v\n", mat.SpecularColor)
-	log.Printf("    Specular Exp: %v\n", mat.SpecularExponent)
+	log.Printf("    Ambient: %v\n", kaColor)
+	log.Printf("    Specular: %v\n", ksColor)
+	log.Printf("    Specular Exp: %v\n", ns)
+	log.Printf("    Transparency: %v\n", d)
+	log.Printf("    Illumination: %v\n", illum)
+
 	m := NewDefaultMaterial()
+	m.Color = kdColor
+	m.Shininess = ns
+	// d = 0 is fully transparent; the reverse of what we use
+	m.Transparency = d
+	if m.Transparency > 0 {
+		m.ShadowCaster = false
+	}
 
-	d := mat.DiffuseColor
-	m.Color = NewColor(d.R, d.G, d.B)
-
+	// If there is a texture present, use it
 	if mat.DiffuseTexture != "" {
 		log.Println("Reading in material textures...")
 
 		imageFile := path.Join(dir, mat.DiffuseTexture)
 		f, err := os.Open(imageFile)
 		if err != nil {
-			log.Fatal(err) // TODO: change to returning error
+			return nil, err
 		}
 
 		decode, format, err := image.Decode(f)
 		if err != nil {
-			log.Fatal(err) // TODO: change to returning error
+			return nil, err
 		}
 		log.Printf("decoded image format %v", format)
 
@@ -138,7 +168,7 @@ func convertMaterial(mat *mtl.Material, dir string) *Material {
 		m.AddTexture(mat.Name, decode)
 	}
 
-	return m
+	return m, nil
 }
 
 // convertData converts the parsed model to *Group instance
@@ -154,7 +184,10 @@ func convertData(model *obj.Model, lib *mtl.Library, dir string) (*Group, error)
 				return nil, fmt.Errorf("Unable to find material %v in lib", m.MaterialName)
 			}
 
-			omat := convertMaterial(mat, dir)
+			omat, err := convertMaterial(mat, dir)
+			if err != nil {
+				return nil, err
+			}
 
 			log.Println("  Faces:")
 			for _, f := range m.Faces {

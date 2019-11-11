@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "/Users/dant/go/src/github.com/DanTulovsky/go-data-front"
 		}
 	]
 }

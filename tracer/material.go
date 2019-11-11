@@ -70,9 +70,8 @@ func NewDefaultGlassMaterial() *Material {
 	}
 }
 
-// ColorAtTexture returns the color at the point based on the texture attached to the material
-// u,v are per trriangle
-func (m *Material) ColorAtTexture(o Shaper, p Point, u, v float64) Color {
+// ColorAtTexture returns the color at the u,v point based on the texture attached to the material
+func (m *Material) ColorAtTexture(o Shaper, u, v float64) Color {
 	if m.texture == nil {
 		return ColorName(colornames.Purple) // highly visible, texture emissing
 	}

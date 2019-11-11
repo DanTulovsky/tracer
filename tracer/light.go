@@ -49,7 +49,7 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 	switch {
 	case m.HasTexture():
 		// Blend with material color
-		clr = m.ColorAtTexture(o, p, u, v)
+		clr = m.ColorAtTexture(o, u, v)
 		// clr = clr.Blend(tclr)
 	}
 
