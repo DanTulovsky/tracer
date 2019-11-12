@@ -959,7 +959,7 @@ func objParse(f string) {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 7, -8)
+	from := tracer.NewPoint(1, 7, -14)
 	to := tracer.NewPoint(0, 0, 4)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -972,7 +972,7 @@ func objParse(f string) {
 	}
 
 	// g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/5).RotateX(math.Pi/3).Translate(0, 2, 0))
-	g.SetTransform(tracer.IdentityMatrix().Scale(1, 1, 1).RotateY(math.Pi/3).Translate(0, 2, 0))
+	// g.SetTransform(tracer.IdentityMatrix().Scale(2, 2, 2).RotateY(math.Pi/7).Translate(0, 2, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
@@ -1625,6 +1625,7 @@ func main() {
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	f := path.Join(dir, "cubes2.obj")
 	// f := path.Join(dir, "monkey-smooth2.obj")
+	// f := path.Join(dir, "monkey-cube.obj")
 	// f := path.Join(dir, "texture2.obj")
 	objParse(f)
 
