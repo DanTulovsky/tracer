@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"math"
 	"os"
@@ -20,7 +19,6 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
-	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -1143,13 +1141,48 @@ func simplecylinder() {
 	w := env()
 
 	cylinder1 := tracer.NewClosedCylinder(0, 2)
-	cylinder1.SetTransform(tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(0, 0, 0))
+	cylinder1.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(0, 0, 1))
+	uvp := tracer.NewUVCheckersPattern(12, 6, tracer.Black(), tracer.White())
+	p := tracer.NewTextureMapPattern(uvp, tracer.NewCylinderMap())
+	cylinder1.Material().SetPattern(p)
 
 	w.AddObject(cylinder1)
 	w.AddObject(floor())
 	tracer.Render(w)
 }
 
+func cylindertextures() {
+	w := env()
+
+	cylinder1 := tracer.NewClosedCylinder(0, 2)
+	cylinder1.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(0, 0, 1))
+	uvp1, _ := tracer.NewUVImagePattern("images/checker.jpg")
+	p1 := tracer.NewTextureMapPattern(uvp1, tracer.NewCylinderMap())
+	cylinder1.Material().SetPattern(p1)
+
+	cylinder2 := tracer.NewClosedCylinder(0, 2)
+	cylinder2.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(-1.5, 0, 1))
+	uvp2 := tracer.NewUVCheckersPattern(12, 6, tracer.ColorName(colornames.Green), tracer.White())
+	p2 := tracer.NewTextureMapPattern(uvp2, tracer.NewSphericalMap())
+	cylinder2.Material().SetPattern(p2)
+
+	cylinder3 := tracer.NewClosedCylinder(0, 2)
+	cylinder3.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(1.5, 0, 1))
+	uvp3 := tracer.NewUVCheckersPattern(2, 2, tracer.ColorName(colornames.Blue), tracer.White())
+	p3 := tracer.NewTextureMapPattern(uvp3, tracer.NewPlaneMap())
+	cylinder3.Material().SetPattern(p3)
+
+	w.AddObject(cylinder1)
+	w.AddObject(cylinder2)
+	w.AddObject(cylinder3)
+	w.AddObject(floor())
+
+	tracer.Render(w)
+}
 func glasssphere() *tracer.Sphere {
 	s := tracer.NewUnitSphere()
 	s.SetTransform(tracer.IdentityMatrix().Scale(.75, .75, .75).Translate(0, 1.75, 0))
@@ -1627,17 +1660,18 @@ func main() {
 	// cone()
 	// simplecone()
 	// simplecylinder()
+	cylindertextures()
 	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 	// csg()
 	// simplesphere()
 
-	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	// f := path.Join(dir, "cubes2.obj")
-	f := path.Join(dir, "monkey-smooth2.obj")
-	// f := path.Join(dir, "texture2.obj")
-	objParse(f)
+	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	// // f := path.Join(dir, "cubes2.obj")
+	// f := path.Join(dir, "monkey-smooth2.obj")
+	// // f := path.Join(dir, "texture2.obj")
+	// objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
