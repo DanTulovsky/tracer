@@ -955,7 +955,7 @@ func objParse(f string) {
 	// override light here
 	w.SetLights([]tracer.Light{
 		tracer.NewPointLight(tracer.NewPoint(10, 50, -30), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -972,7 +972,7 @@ func objParse(f string) {
 	}
 
 	// g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/5).RotateX(math.Pi/3).Translate(0, 2, 0))
-	g.SetTransform(tracer.IdentityMatrix().Scale(1, 1, 1).RotateY(math.Pi/3).Translate(0, 2, 0))
+	g.SetTransform(tracer.IdentityMatrix().Scale(2.5, 2.5, 2.5).RotateY(math.Pi/7).Translate(0, 2, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
@@ -1593,6 +1593,17 @@ func main() {
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close()
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 	// texturetri()
 
 	// shapes()
@@ -1623,22 +1634,10 @@ func main() {
 	// simplesphere()
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	f := path.Join(dir, "cubes2.obj")
-	// f := path.Join(dir, "monkey-smooth2.obj")
+	// f := path.Join(dir, "cubes2.obj")
+	f := path.Join(dir, "monkey-smooth2.obj")
 	// f := path.Join(dir, "texture2.obj")
 	objParse(f)
-
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal("could not create CPU profile: ", err)
-		}
-		defer f.Close()
-		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal("could not start CPU profile: ", err)
-		}
-		defer pprof.StopCPUProfile()
-	}
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
