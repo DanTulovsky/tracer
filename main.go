@@ -1072,8 +1072,9 @@ func ceiling() *tracer.Plane {
 func backWall() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
-	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
-	p.Material().SetPattern(pp)
+	// pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
+	// p.Material().SetPattern(pp)
+	p.Material().Color = tracer.ColorName(colornames.Lightcyan)
 	p.Material().Specular = 0
 
 	return p
@@ -1601,6 +1602,20 @@ func texturetri() {
 	tracer.Render(w)
 }
 
+func antialias1() {
+	w := envxy(1024, 768)
+	w.Camera().SetFoV(math.Pi / 5)
+	w.Config.Antialias = 2
+
+	s1 := tracer.NewUnitSphere()
+	s1.SetTransform(tracer.IdentityMatrix().Translate(0, 1.5, 0))
+
+	w.AddObject(s1)
+	w.AddObject(backWall())
+
+	tracer.Render(w)
+}
+
 func envxy(width, height float64) *tracer.World {
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1621,6 +1636,7 @@ func envxy(width, height float64) *tracer.World {
 
 	return w
 }
+
 func main() {
 
 	flag.Parse()
@@ -1637,8 +1653,9 @@ func main() {
 		}
 		defer pprof.StopCPUProfile()
 	}
-	// texturetri()
 
+	antialias1()
+	// texturetri()
 	// shapes()
 	// movedgroup()
 	// skyboxcube1("field1")
@@ -1660,7 +1677,7 @@ func main() {
 	// cone()
 	// simplecone()
 	// simplecylinder()
-	cylindertextures()
+	// cylindertextures()
 	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
@@ -1670,26 +1687,8 @@ func main() {
 	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// // f := path.Join(dir, "cubes2.obj")
 	// f := path.Join(dir, "monkey-smooth2.obj")
-<<<<<<< HEAD
-	// f := path.Join(dir, "monkey-cube.obj")
-	// f := path.Join(dir, "texture2.obj")
-	objParse(f)
-
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal("could not create CPU profile: ", err)
-		}
-		defer f.Close()
-		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal("could not start CPU profile: ", err)
-		}
-		defer pprof.StopCPUProfile()
-	}
-=======
 	// // f := path.Join(dir, "texture2.obj")
 	// objParse(f)
->>>>>>> 53c489c55278bb62f362db0a7e6d70cd8d67f2a6
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

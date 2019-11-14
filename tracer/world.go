@@ -14,12 +14,20 @@ import (
 type WorldConfig struct {
 	// How many times to allow the ray to bounce between two objects (controls reflections of reflections)
 	MaxRecusions int
+
+	// Antialiasing support
+	Antialias int
+
+	// Parallelism, how many pixels to render at the same time
+	Parallelism int
 }
 
 // NewWorldConfig returns a new world config with default settings
 func NewWorldConfig() *WorldConfig {
 	return &WorldConfig{
+		Antialias:    1,
 		MaxRecusions: 4,
+		Parallelism:  runtime.NumCPU(),
 	}
 }
 
@@ -260,13 +268,24 @@ type pixel struct {
 }
 
 // Render is the work done by the renderWorker, renders one pixel
-func (p *pixel) Render(w *World, canvas *Canvas, xs Intersections) {
+func (p *pixel) Render(w *World, canvas *Canvas, xs Intersections, offset, l float64) {
+	clrs := Colors{}
 
-	ray := w.Camera().RayForPixel(p.x, p.y)
-	clr := w.ColorAt(ray, w.Config.MaxRecusions, xs)
-	// TODO: There is a race condition here, as canvas is also read by the GPU
+	// Collect colors for each sub-pixel and average them
+	for sx := 1.0; sx < l+1; sx++ {
+		for sy := 1.0; sy < l+1; sy++ {
+			a := p.x + offset*(sx*2-1)
+			b := p.y + offset*(sy*2-1)
+
+			ray := w.Camera().RayForPixel(a, b)
+			clr := w.ColorAt(ray, w.Config.MaxRecusions, xs)
+			clrs = append(clrs, clr)
+		}
+	}
+
+	// There is a race condition here, as canvas is also read by the GPU
 	// Only true when using GPU to display the render live.
-	canvas.SetFloat(p.x, p.y, clr)
+	canvas.SetFloat(p.x, p.y, clrs.Average())
 }
 
 // renderWorker processes a single pixel at a time
@@ -274,9 +293,15 @@ func (w *World) renderWorker(in chan *pixel, canvas *Canvas) {
 	// One intersections list per worker, making these per pixel is very expensive
 	xs := NewIntersections()
 
+	// antialias config
+	aa := float64(w.Config.Antialias)
+	numSquares := math.Pow(4, aa-1)
+	offset := 1.0 / (2 * aa)
+	rowLength := math.Sqrt(numSquares)
+
 	for p := range in {
 		// render the pixel
-		p.Render(w, canvas, xs)
+		p.Render(w, canvas, xs, offset, rowLength)
 		// clear intersections for next pixel
 		xs = xs[:0]
 	}
@@ -287,7 +312,7 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 	log.Println("Running render...")
 
 	// allow this many renders to run at once
-	max := runtime.NumCPU()
+	max := w.Config.Parallelism
 	log.Printf("Parallelism: %v", max)
 
 	// total := (camera.Vsize - 1) * (camera.Hsize - 1)

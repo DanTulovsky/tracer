@@ -101,3 +101,20 @@ func (c Color) Equal(c2 Color) bool {
 	}
 	return false
 }
+
+// Colors is a list of Color
+type Colors []Color
+
+// Average returns the average of all the colors in the list
+func (cl Colors) Average() Color {
+	var r, g, b float64
+
+	for _, c := range cl {
+		r = r + c.R
+		g = g + c.G
+		b = b + c.B
+	}
+
+	l := float64(len(cl))
+	return NewColor(r/l, g/l, b/l)
+}

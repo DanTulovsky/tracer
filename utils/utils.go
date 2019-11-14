@@ -50,3 +50,8 @@ func AT(x, a, b, c, d float64) float64 {
 	}
 	return (x-a)*((d-c)/(b-a)) + c
 }
+
+// IsPowerOf2 returns true if i is a power of 2
+func IsPowerOf2(i int) bool {
+	return (math.Ceil(math.Log2(float64(i)))) == (math.Floor(math.Log2(float64(i))))
+}
