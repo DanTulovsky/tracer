@@ -1610,9 +1610,9 @@ func antialias1() {
 	w.Camera().SetFoV(math.Pi / 5)
 	w.Config.Antialias = 3
 
-	// s1 := tracer.NewUnitSphere()
-	s1 := glasssphere()
-	s1.SetTransform(tracer.IdentityMatrix().Translate(0, 1.7, 0))
+	s1 := tracer.NewUnitSphere()
+	// s1 := glasssphere()
+	s1.SetTransform(tracer.IdentityMatrix().Translate(0, 1.85, 0))
 
 	w.AddObject(s1)
 	w.AddObject(backWall())
