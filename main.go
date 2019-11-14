@@ -1608,7 +1608,7 @@ func texturetri() {
 func antialias1() {
 	w := envxy(1024, 768)
 	w.Camera().SetFoV(math.Pi / 5)
-	w.Config.Antialias = 2
+	w.Config.Antialias = 3
 
 	s1 := tracer.NewUnitSphere()
 	s1.SetTransform(tracer.IdentityMatrix().Translate(0, 1.5, 0))
@@ -1657,11 +1657,11 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	// antialias1()
+	antialias1()
 	// texturetri()
 	// shapes()
 	// movedgroup()
-	skyboxcube1("field1")
+	// skyboxcube1("field1")
 	// skyboxsphere1("rooitou_park_4k.hdr")
 	// image1()
 	// textureMap()

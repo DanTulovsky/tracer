@@ -295,7 +295,7 @@ func (w *World) renderWorker(in chan *pixel, canvas *Canvas) {
 
 	// antialias config
 	aa := float64(w.Config.Antialias)
-	numSquares := math.Pow(4, aa-1)
+	numSquares := math.Pow(2, aa)
 	offset := 1.0 / (2 * aa)
 	rowLength := math.Sqrt(numSquares)
 
