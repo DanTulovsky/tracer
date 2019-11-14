@@ -970,11 +970,7 @@ func objParse(f string) {
 	}
 
 	// g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/5).RotateX(math.Pi/3).Translate(0, 2, 0))
-<<<<<<< HEAD
-	// g.SetTransform(tracer.IdentityMatrix().Scale(2, 2, 2).RotateY(math.Pi/7).Translate(0, 2, 0))
-=======
 	g.SetTransform(tracer.IdentityMatrix().Scale(2.5, 2.5, 2.5).RotateY(math.Pi/7).Translate(0, 2, 0))
->>>>>>> 53c489c55278bb62f362db0a7e6d70cd8d67f2a6
 
 	w.AddObject(g)
 	tracer.Render(w)
