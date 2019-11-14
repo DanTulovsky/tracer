@@ -1478,6 +1478,7 @@ func skyboxcube(folder string) *tracer.Cube {
 
 func skyboxcube1(folder string) {
 	w := envxy(1000, 1000)
+	w.Config.Antialias = 4
 
 	sb := tracer.NewUnitCube()
 	left, _ := tracer.NewUVImagePattern(path.Join("images/skybox/", folder, "negx.jpg"))
@@ -1508,6 +1509,7 @@ func skyboxcube1(folder string) {
 
 func skyboxsphere1(input string) {
 	w := envxy(1600, 1000)
+	w.Config.Antialias = 2
 
 	sb := tracer.NewUnitSphere()
 	sb.Material().Ambient = 1
@@ -1554,6 +1556,7 @@ func movedgroup() {
 
 func texturetri() {
 	w := envxy(1024, 768)
+	w.Config.Antialias = 2
 
 	floor := tracer.NewPlane()
 	floor.SetTransform(tracer.IdentityMatrix().Translate(0, -3, 0))
@@ -1654,12 +1657,12 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	antialias1()
+	// antialias1()
 	// texturetri()
 	// shapes()
 	// movedgroup()
-	// skyboxcube1("field1")
-	// skyboxsphere1("shanghai_bund_4k.hdr")
+	skyboxcube1("field1")
+	// skyboxsphere1("rooitou_park_4k.hdr")
 	// image1()
 	// textureMap()
 	// cubeMap()

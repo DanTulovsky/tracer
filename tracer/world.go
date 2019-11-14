@@ -271,7 +271,7 @@ type pixel struct {
 func (p *pixel) Render(w *World, canvas *Canvas, xs Intersections, offset, l float64) {
 	clrs := Colors{}
 
-	// Collect colors for each sub-pixel and average them
+	// Collect colors for each sub-pixel and average them (antialias), slow and naive implementation
 	for sx := 1.0; sx < l+1; sx++ {
 		for sy := 1.0; sy < l+1; sy++ {
 			a := p.x + offset*(sx*2-1)
