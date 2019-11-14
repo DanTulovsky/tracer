@@ -128,7 +128,9 @@ func Test_lighting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equal(lighting(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)))
+			assert.True(t, tt.want.Equal(
+				lighting(tt.args.m, tt.o, tt.args.p, tt.args.l,
+					tt.args.eye, tt.args.normal, tt.args.inShadow, 0, 0)))
 		})
 	}
 }

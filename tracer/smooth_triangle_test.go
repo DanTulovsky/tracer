@@ -17,16 +17,22 @@ func newTestTriangle() *SmoothTriangle {
 		NewVector(0, 1, 0),
 		NewVector(-1, 0, 0),
 		NewVector(1, 0, 0),
+		NewVector(0, 1, 0),
+		NewVector(-1, 0, 0),
+		NewVector(1, 0, 0),
 	)
 }
 func TestNewSmoothTriangle(t *testing.T) {
 	type args struct {
-		p1 Point
-		p2 Point
-		p3 Point
-		n1 Vector
-		n2 Vector
-		n3 Vector
+		p1  Point
+		p2  Point
+		p3  Point
+		n1  Vector
+		n2  Vector
+		n3  Vector
+		vt1 Vector
+		vt2 Vector
+		vt3 Vector
 	}
 	tests := []struct {
 		name string
@@ -35,17 +41,23 @@ func TestNewSmoothTriangle(t *testing.T) {
 	}{
 		{
 			args: args{
-				p1: NewPoint(0, 1, 0),
-				p2: NewPoint(-1, 0, 0),
-				p3: NewPoint(1, 0, 0),
-				n1: NewVector(0, 1, 0),
-				n2: NewVector(-1, 0, 0),
-				n3: NewVector(1, 0, 0),
+				p1:  NewPoint(0, 1, 0),
+				p2:  NewPoint(-1, 0, 0),
+				p3:  NewPoint(1, 0, 0),
+				n1:  NewVector(0, 1, 0),
+				n2:  NewVector(-1, 0, 0),
+				n3:  NewVector(1, 0, 0),
+				vt1: NewVector(0, 1, 0),
+				vt2: NewVector(-1, 0, 0),
+				vt3: NewVector(1, 0, 0),
 			},
 			want: &SmoothTriangle{
-				N1: NewVector(0, 1, 0),
-				N2: NewVector(-1, 0, 0),
-				N3: NewVector(1, 0, 0),
+				N1:  NewVector(0, 1, 0),
+				N2:  NewVector(-1, 0, 0),
+				N3:  NewVector(1, 0, 0),
+				VT1: NewVector(0, 1, 0),
+				VT2: NewVector(-1, 0, 0),
+				VT3: NewVector(1, 0, 0),
 				Triangle: Triangle{
 					P1: NewPoint(0, 1, 0),
 					P2: NewPoint(-1, 0, 0),
@@ -65,7 +77,10 @@ func TestNewSmoothTriangle(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.Shape.lna = tt.want.localNormalAt
-			got := NewSmoothTriangle(tt.args.p1, tt.args.p2, tt.args.p3, tt.args.n1, tt.args.n2, tt.args.n3)
+			got := NewSmoothTriangle(
+				tt.args.p1, tt.args.p2, tt.args.p3,
+				tt.args.n1, tt.args.n2, tt.args.n3,
+				tt.args.vt1, tt.args.vt2, tt.args.vt3)
 			diff := cmp.Diff(tt.want, got)
 			assert.Equal(t, "", fmt.Sprint(diff))
 		})

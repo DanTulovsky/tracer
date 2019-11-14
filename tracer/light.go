@@ -96,6 +96,6 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 }
 
 // ColorAtPoint returns the clamped color at the given point
-// func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow bool) Color {
-// 	return lighting(m, o, p, l, eye, normal, inShadow).Clamp()
-// }
+func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow bool) Color {
+	return lighting(m, o, p, l, eye, normal, inShadow, 0, 0).Clamp()
+}

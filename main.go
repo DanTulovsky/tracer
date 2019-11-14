@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"math"
 	"os"
@@ -20,7 +19,6 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
-	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -955,11 +953,11 @@ func objParse(f string) {
 	// override light here
 	w.SetLights([]tracer.Light{
 		tracer.NewPointLight(tracer.NewPoint(10, 50, -30), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 7, -8)
+	from := tracer.NewPoint(1, 7, -14)
 	to := tracer.NewPoint(0, 0, 4)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -972,7 +970,7 @@ func objParse(f string) {
 	}
 
 	// g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/5).RotateX(math.Pi/3).Translate(0, 2, 0))
-	g.SetTransform(tracer.IdentityMatrix().Scale(2.8, 2.8, 2.8).RotateY(math.Pi/7).Translate(0, 2, 0))
+	g.SetTransform(tracer.IdentityMatrix().Scale(2.5, 2.5, 2.5).RotateY(math.Pi/7).Translate(0, 2, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
@@ -1074,8 +1072,9 @@ func ceiling() *tracer.Plane {
 func backWall() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
-	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
-	p.Material().SetPattern(pp)
+	// pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
+	// p.Material().SetPattern(pp)
+	p.Material().Color = tracer.ColorName(colornames.Lightcyan)
 	p.Material().Specular = 0
 
 	return p
@@ -1143,13 +1142,48 @@ func simplecylinder() {
 	w := env()
 
 	cylinder1 := tracer.NewClosedCylinder(0, 2)
-	cylinder1.SetTransform(tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(0, 0, 0))
+	cylinder1.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(0, 0, 1))
+	uvp := tracer.NewUVCheckersPattern(12, 6, tracer.Black(), tracer.White())
+	p := tracer.NewTextureMapPattern(uvp, tracer.NewCylinderMap())
+	cylinder1.Material().SetPattern(p)
 
 	w.AddObject(cylinder1)
 	w.AddObject(floor())
 	tracer.Render(w)
 }
 
+func cylindertextures() {
+	w := env()
+
+	cylinder1 := tracer.NewClosedCylinder(0, 2)
+	cylinder1.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(0, 0, 1))
+	uvp1, _ := tracer.NewUVImagePattern("images/checker.jpg")
+	p1 := tracer.NewTextureMapPattern(uvp1, tracer.NewCylinderMap())
+	cylinder1.Material().SetPattern(p1)
+
+	cylinder2 := tracer.NewClosedCylinder(0, 2)
+	cylinder2.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(-1.5, 0, 1))
+	uvp2 := tracer.NewUVCheckersPattern(12, 6, tracer.ColorName(colornames.Green), tracer.White())
+	p2 := tracer.NewTextureMapPattern(uvp2, tracer.NewSphericalMap())
+	cylinder2.Material().SetPattern(p2)
+
+	cylinder3 := tracer.NewClosedCylinder(0, 2)
+	cylinder3.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 1, 0.5).RotateY(math.Pi/2).Translate(1.5, 0, 1))
+	uvp3 := tracer.NewUVCheckersPattern(2, 2, tracer.ColorName(colornames.Blue), tracer.White())
+	p3 := tracer.NewTextureMapPattern(uvp3, tracer.NewPlaneMap())
+	cylinder3.Material().SetPattern(p3)
+
+	w.AddObject(cylinder1)
+	w.AddObject(cylinder2)
+	w.AddObject(cylinder3)
+	w.AddObject(floor())
+
+	tracer.Render(w)
+}
 func glasssphere() *tracer.Sphere {
 	s := tracer.NewUnitSphere()
 	s.SetTransform(tracer.IdentityMatrix().Scale(.75, .75, .75).Translate(0, 1.75, 0))
@@ -1444,6 +1478,7 @@ func skyboxcube(folder string) *tracer.Cube {
 
 func skyboxcube1(folder string) {
 	w := envxy(1000, 1000)
+	w.Config.Antialias = 4
 
 	sb := tracer.NewUnitCube()
 	left, _ := tracer.NewUVImagePattern(path.Join("images/skybox/", folder, "negx.jpg"))
@@ -1474,6 +1509,7 @@ func skyboxcube1(folder string) {
 
 func skyboxsphere1(input string) {
 	w := envxy(1600, 1000)
+	w.Config.Antialias = 2
 
 	sb := tracer.NewUnitSphere()
 	sb.Material().Ambient = 1
@@ -1520,6 +1556,7 @@ func movedgroup() {
 
 func texturetri() {
 	w := envxy(1024, 768)
+	w.Config.Antialias = 2
 
 	floor := tracer.NewPlane()
 	floor.SetTransform(tracer.IdentityMatrix().Translate(0, -3, 0))
@@ -1568,6 +1605,21 @@ func texturetri() {
 	tracer.Render(w)
 }
 
+func antialias1() {
+	w := envxy(1024, 768)
+	w.Camera().SetFoV(math.Pi / 5)
+	w.Config.Antialias = 3
+
+	s1 := tracer.NewUnitSphere()
+	// s1 := glasssphere()
+	s1.SetTransform(tracer.IdentityMatrix().Translate(0, 1.85, 0))
+
+	w.AddObject(s1)
+	w.AddObject(backWall())
+
+	tracer.Render(w)
+}
+
 func envxy(width, height float64) *tracer.World {
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1588,17 +1640,30 @@ func envxy(width, height float64) *tracer.World {
 
 	return w
 }
+
 func main() {
 
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	// texturetri()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close()
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 
+	antialias1()
+	// texturetri()
 	// shapes()
 	// movedgroup()
 	// skyboxcube1("field1")
-	// skyboxsphere1("shanghai_bund_4k.hdr")
+	// skyboxsphere1("rooitou_park_4k.hdr")
 	// image1()
 	// textureMap()
 	// cubeMap()
@@ -1616,29 +1681,18 @@ func main() {
 	// cone()
 	// simplecone()
 	// simplecylinder()
+	// cylindertextures()
 	// group()
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 	// csg()
 	// simplesphere()
 
-	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	// f := path.Join(dir, "cubes2.obj")
-	f := path.Join(dir, "monkey-smooth2.obj")
-	// f := path.Join(dir, "texture2.obj")
-	objParse(f)
-
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal("could not create CPU profile: ", err)
-		}
-		defer f.Close()
-		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal("could not start CPU profile: ", err)
-		}
-		defer pprof.StopCPUProfile()
-	}
+	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	// // f := path.Join(dir, "cubes2.obj")
+	// f := path.Join(dir, "monkey-smooth2.obj")
+	// // f := path.Join(dir, "texture2.obj")
+	// objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

@@ -80,3 +80,52 @@ func TestRandomFloat(t *testing.T) {
 		})
 	}
 }
+
+func TestIsPowerOf2(t *testing.T) {
+	type args struct {
+		i int
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			args: args{
+				i: 2,
+			},
+			want: true,
+		},
+		{
+			args: args{
+				i: 3,
+			},
+			want: false,
+		},
+		{
+			args: args{
+				i: 16,
+			},
+			want: true,
+		},
+		{
+			args: args{
+				i: 18,
+			},
+			want: false,
+		},
+		{
+			args: args{
+				i: 2,
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsPowerOf2(tt.args.i); got != tt.want {
+				t.Errorf("IsPowerOf2() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

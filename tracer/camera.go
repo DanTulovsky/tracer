@@ -76,10 +76,9 @@ func (c *Camera) setPixelSize() {
 
 // RayForPixel returns a ray that starts at the camera and passes through x,y on the canvas
 func (c *Camera) RayForPixel(x, y float64) Ray {
-
-	// the offset from the edge of the canvas to the pixel's center
-	xoffset := (x + 0.5) * c.PixelSize
-	yoffset := (y + 0.5) * c.PixelSize
+	// due to antialiasing, the passed in x,y is already offset
+	xoffset := x * c.PixelSize
+	yoffset := y * c.PixelSize
 
 	// untransformed coordinates of the pixel in world space
 	// camera looks toward -z, so +x is to the left
@@ -92,5 +91,4 @@ func (c *Camera) RayForPixel(x, y float64) Ray {
 	direction := pixel.SubPoint(origin).Normalize()
 
 	return NewRay(origin, direction)
-
 }

@@ -145,8 +145,8 @@ func TestCamera_RayForPixel(t *testing.T) {
 			name:   "through center of canvas",
 			camera: NewCamera(201, 101, math.Pi/2),
 			args: args{
-				x: 100,
-				y: 50,
+				x: 100.5,
+				y: 50.5,
 			},
 			transform: IdentityMatrix(),
 			want:      NewRay(NewPoint(0, 0, 0), NewVector(0, 0, -1)),
@@ -155,8 +155,8 @@ func TestCamera_RayForPixel(t *testing.T) {
 			name:   "through corner of canvas",
 			camera: NewCamera(201, 101, math.Pi/2),
 			args: args{
-				x: 0,
-				y: 0,
+				x: 0.5,
+				y: 0.5,
 			},
 			transform: IdentityMatrix(),
 			want:      NewRay(NewPoint(0, 0, 0), NewVector(0.66519, 0.33259, -0.66851)),
@@ -165,8 +165,8 @@ func TestCamera_RayForPixel(t *testing.T) {
 			name:   "ray through transformed camera",
 			camera: NewCamera(201, 101, math.Pi/2),
 			args: args{
-				x: 100,
-				y: 50,
+				x: 100.5,
+				y: 50.5,
 			},
 			// transform: IdentityMatrix().RotateY(math.Pi/4).Translate(0, -2, 5),
 			transform: IdentityMatrix().Translate(0, -2, 5).RotateY(math.Pi / 4),
