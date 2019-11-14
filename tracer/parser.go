@@ -13,8 +13,8 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/DanTulovsky/go-data-front/decoder/mtl"
-	"github.com/DanTulovsky/go-data-front/decoder/obj"
+	"github.com/mokiat/go-data-front/decoder/mtl"
+	"github.com/mokiat/go-data-front/decoder/obj"
 )
 
 const (
