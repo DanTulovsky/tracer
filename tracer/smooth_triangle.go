@@ -40,7 +40,7 @@ func NewSmoothTriangle(p1, p2, p3 Point, n1, n2, n3 Vector, vt1, vt2, vt3 Vector
 		},
 	}
 	t.lna = t.localNormalAt
-
+	t.calculateBounds()
 	return t
 }
 

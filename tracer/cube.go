@@ -23,6 +23,7 @@ func NewUnitCube() *Cube {
 		},
 	}
 	c.lna = c.localNormalAt
+	c.calculateBounds()
 	return c
 }
 
@@ -109,7 +110,7 @@ func (c *Cube) calculateBounds() {
 // PrecomputeValues precomputes some values for render speedup
 func (c *Cube) PrecomputeValues() {
 	// calculate group bounding box
-	c.calculateBounds()
+	// c.calculateBounds()
 }
 
 // Includes implements includes logic

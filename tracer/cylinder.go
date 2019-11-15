@@ -32,6 +32,7 @@ func NewDefaultCylinder() *Cylinder {
 		},
 	}
 	c.lna = c.localNormalAt
+	c.calculateBounds()
 	return c
 }
 
@@ -171,7 +172,7 @@ func (c *Cylinder) calculateBounds() {
 // PrecomputeValues precomputes some values for render speedup
 func (c *Cylinder) PrecomputeValues() {
 	// calculate group bounding box
-	c.calculateBounds()
+	// c.calculateBounds()
 }
 
 // Includes implements includes logic

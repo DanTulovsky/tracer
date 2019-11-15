@@ -1072,8 +1072,8 @@ func ceiling() *tracer.Plane {
 func backWall() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
-	// pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
-	// p.Material().SetPattern(pp)
+	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
+	p.Material().SetPattern(pp)
 	p.Material().Color = tracer.ColorName(colornames.Lightcyan)
 	p.Material().Specular = 0
 
@@ -1554,6 +1554,24 @@ func movedgroup() {
 
 }
 
+func groupingroup() {
+
+	w := envxy(800, 600)
+
+	g := tracer.NewGroup()
+
+	g.AddMembers(glasssphere(), pedestal())
+	g.SetTransform(tracer.IdentityMatrix().Translate(-2, 0, 4))
+
+	gouter := tracer.NewGroup()
+	gouter.AddMember(g)
+
+	w.AddObject(floor())
+	w.AddObject(gouter)
+
+	tracer.Render(w)
+
+}
 func texturetri() {
 	w := envxy(1024, 768)
 	w.Config.Antialias = 2
@@ -1610,11 +1628,67 @@ func antialias1() {
 	w.Camera().SetFoV(math.Pi / 5)
 	w.Config.Antialias = 3
 
-	s1 := tracer.NewUnitSphere()
-	// s1 := glasssphere()
+	// s1 := tracer.NewUnitSphere()
+	s1 := glasssphere()
 	s1.SetTransform(tracer.IdentityMatrix().Translate(0, 1.85, 0))
 
 	w.AddObject(s1)
+	w.AddObject(backWall())
+
+	tracer.Render(w)
+}
+
+func hollowsphere(wallWidth float64) *tracer.Group {
+	outer := tracer.NewUnitSphere()
+	outer.Material().Transparency = 0.9
+	outer.Material().Reflective = 0.9
+	outer.Material().ShadowCaster = false
+	// outer.Material().Color = tracer.ColorName(colornames.Black)
+	outer.Material().RefractiveIndex = 1.55
+	outer.Material().Diffuse = 0
+	outer.Material().Specular = 0.8
+
+	inner := tracer.NewUnitSphere()
+	inner.SetTransform(tracer.IdentityMatrix().Scale(1-wallWidth, 1-wallWidth, 1-wallWidth))
+	inner.Material().Transparency = 0.9
+	// inner.Material().Reflective = 0.9
+	inner.Material().ShadowCaster = false
+	// inner.Material().Color = tracer.ColorName(colornames.Black)
+	inner.Material().RefractiveIndex = 1.0
+	inner.Material().Diffuse = 0
+	inner.Material().Specular = 0.8
+
+	g := tracer.NewGroup()
+	g.AddMembers(inner, outer)
+
+	return g
+}
+
+func hollowsphere1() {
+	w := envxy(1024, 768)
+	w.Config.Antialias = 1
+
+	// width of the sphere wall: (0, 1)
+	wallWidth := 0.02
+	sphere := hollowsphere(wallWidth)
+
+	innercube := tracer.NewUnitCube()
+	innercube.SetTransform(
+		tracer.IdentityMatrix().Scale(0.4, 0.4, 0.4).RotateX(math.Pi / 4).RotateZ(math.Pi / 4).RotateY(math.Pi / 4))
+	// innercube.Material().Color = tracer.ColorName(colornames.Blue)
+	icuvp := tracer.NewUVCheckersPattern(4, 4,
+		tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Yellow))
+	icp := tracer.NewCubeMapPatternSame(icuvp)
+	innercube.Material().SetPattern(icp)
+
+	g := tracer.NewGroup()
+	g.AddMembers(sphere, innercube)
+	g.SetTransform(tracer.IdentityMatrix().Scale(1.7, 1.7, 1.7).Translate(0, 1.7, 2))
+
+	w.AddObject(g)
+	// w.AddObject(sphere)
+
+	w.AddObject(floor())
 	w.AddObject(backWall())
 
 	tracer.Render(w)
@@ -1627,7 +1701,7 @@ func envxy(width, height float64) *tracer.World {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(3, 10, -3), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(3, 20, -3), tracer.NewColor(1, 1, 1)),
 		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
 	})
 
@@ -1658,7 +1732,9 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	antialias1()
+	hollowsphere1()
+	// groupingroup()
+	// antialias1()
 	// texturetri()
 	// shapes()
 	// movedgroup()
