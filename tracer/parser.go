@@ -104,6 +104,11 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 
 }
 
+// processIllum sets various material settings based on the illum parameter
+func processIllum(mat *mtl.Material, illum int64) *mtl.Material {
+	return mat
+}
+
 // convertMaterial converts OBJ material to *Material
 func convertMaterial(mat *mtl.Material, dir string) (*Material, error) {
 	// https://people.sc.fsu.edu/~jburkardt/data/mtl/mtl.html
@@ -147,6 +152,7 @@ func convertMaterial(mat *mtl.Material, dir string) (*Material, error) {
 	if m.Transparency > 0 {
 		m.ShadowCaster = false
 	}
+	mat = processIllum(mat, illum)
 
 	// If there is a texture present, use it
 	if mat.DiffuseTexture != "" {

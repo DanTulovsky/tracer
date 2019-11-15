@@ -1643,7 +1643,7 @@ func hollowsphere(wallWidth float64) *tracer.Group {
 	outer.Material().Transparency = 0.9
 	outer.Material().Reflective = 0.9
 	outer.Material().ShadowCaster = false
-	// outer.Material().Color = tracer.ColorName(colornames.Black)
+	// outer.Material().Color = tracer.ColorName(colornames.Red)
 	outer.Material().RefractiveIndex = 1.55
 	outer.Material().Diffuse = 0
 	outer.Material().Specular = 0.8
@@ -1675,18 +1675,19 @@ func hollowsphere1() {
 	innercube := tracer.NewUnitCube()
 	innercube.SetTransform(
 		tracer.IdentityMatrix().Scale(0.4, 0.4, 0.4).RotateX(math.Pi / 4).RotateZ(math.Pi / 4).RotateY(math.Pi / 4))
-	// innercube.Material().Color = tracer.ColorName(colornames.Blue)
-	icuvp := tracer.NewUVCheckersPattern(4, 4,
-		tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Yellow))
-	icp := tracer.NewCubeMapPatternSame(icuvp)
-	innercube.Material().SetPattern(icp)
+	// icuvp := tracer.NewUVCheckersPattern(4, 4,
+	// 	tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Yellow))
+	// icp := tracer.NewCubeMapPatternSame(icuvp)
+	// innercube.Material().SetPattern(icp)
+	innercube.Material().Ambient = 0
+	innercube.Material().Diffuse = 0
+	innercube.Material().Reflective = 0.9
 
 	g := tracer.NewGroup()
 	g.AddMembers(sphere, innercube)
 	g.SetTransform(tracer.IdentityMatrix().Scale(1.7, 1.7, 1.7).Translate(0, 1.7, 2))
 
 	w.AddObject(g)
-	// w.AddObject(sphere)
 
 	w.AddObject(floor())
 	w.AddObject(backWall())
