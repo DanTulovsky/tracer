@@ -38,6 +38,7 @@ func (g *Group) Equal(g2 *Group) bool {
 func (g *Group) AddMember(m Shaper) {
 	g.members = append(g.members, m)
 	m.SetParent(g)
+	g.calculateBounds()
 }
 
 // AddMembers adds a new member to this group
@@ -47,6 +48,7 @@ func (g *Group) AddMembers(m ...Shaper) {
 		g.members = append(g.members, mem)
 		mem.SetParent(g)
 	}
+	g.calculateBounds()
 }
 
 // Members returns all the direct members of this group
@@ -199,7 +201,7 @@ func (g *Group) boundBoxFromBoundingBoxes(boxes []Bound) Bound {
 // PrecomputeValues precomputes some values for render speedup
 func (g *Group) PrecomputeValues() {
 	// calculate group bounding box
-	g.calculateBounds()
+	// g.calculateBounds()
 }
 
 // calculateBounds sets the g.bound variable

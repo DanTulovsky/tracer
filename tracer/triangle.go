@@ -39,7 +39,7 @@ func NewTriangle(p1, p2, p3 Point) *Triangle {
 	}
 
 	t.Normal = t.E2.Cross(t.E1).Normalize()
-
+	t.calculateBounds()
 	return t
 }
 
@@ -131,7 +131,7 @@ func (t *Triangle) calculateBounds() {
 // PrecomputeValues precomputes some values for render speedup
 func (t *Triangle) PrecomputeValues() {
 	// calculate group bounding box
-	t.calculateBounds()
+	// t.calculateBounds()
 }
 
 // Includes implements includes logic

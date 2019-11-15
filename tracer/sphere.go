@@ -25,6 +25,7 @@ func NewUnitSphere() *Sphere {
 		},
 	}
 	s.lna = s.localNormalAt
+	s.calculateBounds()
 	return s
 }
 
@@ -88,7 +89,7 @@ func (s *Sphere) calculateBounds() {
 // PrecomputeValues precomputes some values for render speedup
 func (s *Sphere) PrecomputeValues() {
 	// calculate group bounding box
-	s.calculateBounds()
+	// s.calculateBounds()
 }
 
 // Includes implements includes logic

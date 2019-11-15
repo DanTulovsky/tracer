@@ -76,6 +76,23 @@ func NewCubeMapPattern(left, front, right, back, up, down UVPatterner) *CubeMapP
 	}
 }
 
+// NewCubeMapPatternSame maps a texture onto a cube
+func NewCubeMapPatternSame(p UVPatterner) *CubeMapPattern {
+	return &CubeMapPattern{
+		left:   p,
+		front:  p,
+		right:  p,
+		back:   p,
+		up:     p,
+		down:   p,
+		mapper: NewCubeMapSame(p),
+		basePattern: basePattern{
+			transform:        IdentityMatrix(),
+			transformInverse: IdentityMatrix().Inverse(),
+		},
+	}
+}
+
 // faceFromPoint returns the face that the point is on
 func (cm *CubeMapPattern) faceFromPoint(p Point) cubeFace {
 	coord := math.Max(math.Max(math.Abs(p.x), math.Abs(p.y)), math.Abs(p.z))

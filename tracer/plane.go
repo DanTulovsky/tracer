@@ -24,6 +24,7 @@ func NewPlane() *Plane {
 		},
 	}
 	pl.lna = pl.NormalAt
+	pl.calculateBounds()
 	return pl
 }
 
@@ -69,7 +70,7 @@ func (pl *Plane) calculateBounds() {
 // PrecomputeValues precomputes some values for render speedup
 func (pl *Plane) PrecomputeValues() {
 	// calculate group bounding box
-	pl.calculateBounds()
+	// pl.calculateBounds()
 }
 
 // Includes implements includes logic

@@ -30,6 +30,7 @@ func NewDefaultCone() *Cone {
 		},
 	}
 	c.lna = c.localNormalAt
+	c.calculateBounds()
 	return c
 }
 
@@ -184,7 +185,7 @@ func (c *Cone) calculateBounds() {
 // PrecomputeValues precomputes some values for render speedup
 func (c *Cone) PrecomputeValues() {
 	// calculate group bounding box
-	c.calculateBounds()
+	// c.calculateBounds()
 }
 
 // Includes implements includes logic
