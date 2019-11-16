@@ -1,7 +1,6 @@
 package tracer
 
 import (
-	"log"
 	"math"
 
 	"golang.org/x/image/colornames"
@@ -53,7 +52,6 @@ func (al *AreaLight) Intensity() Color {
 func (al *AreaLight) Position() Point {
 	// TODO: Fix this
 	p := al.Shaper.Bounds().Center().ToWorldSpace(al.Shaper)
-	// log.Println(p)
 	return p
 }
 
@@ -111,7 +109,6 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 
 	// light not visible, ignore diffuse and specular components
 	if inShadow {
-		log.Println("shadow")
 		return ambient.Add(emissive)
 	}
 

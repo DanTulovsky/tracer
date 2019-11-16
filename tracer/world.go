@@ -192,36 +192,49 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 
 	xs = xs[:0] // clear intersections
 	var result Color
+	// intensity of the light; average number of rays that were
+	// not blocked by any surfaces
+	var intensity float64 = 1
+
+	maxShadowRays := 1.0
+	blockedShadowRays := 0.0
 
 	for _, l := range w.Lights {
-		isShadowed := w.IsShadowed(state.OverPoint, l, xs)
+		for try := 0.0; try < maxShadowRays; try++ {
+			isShadowed := w.IsShadowed(state.OverPoint, l, xs)
+			if isShadowed {
+				blockedShadowRays++
+			}
 
-		surface := lighting(
-			state.Object.Material(),
-			state.Object,
-			state.OverPoint,
-			l,
-			state.EyeV,
-			state.NormalV,
-			isShadowed,
-			state.U,
-			state.V)
+			surface := lighting(
+				state.Object.Material(),
+				state.Object,
+				state.OverPoint,
+				l,
+				state.EyeV,
+				state.NormalV,
+				isShadowed,
+				state.U,
+				state.V)
 
-		reflected := w.ReflectedColor(state, remaining, xs)
-		refracted := w.RefractedColor(state, remaining, xs)
+			reflected := w.ReflectedColor(state, remaining, xs)
+			refracted := w.RefractedColor(state, remaining, xs)
 
-		m := state.Object.Material()
-		if m.Reflective > 0 && m.Transparency > 0 {
-			// Use Schlick approximation for the Fresnel Effect
-			reflectance := Schlick(state)
+			m := state.Object.Material()
+			if m.Reflective > 0 && m.Transparency > 0 {
+				// Use Schlick approximation for the Fresnel Effect
+				reflectance := Schlick(state)
 
-			result = surface.Add(reflected.Scale(reflectance)).Add(refracted.Scale((1 - reflectance)))
-		} else {
-			result = result.Add(surface.Add(reflected.Add(refracted)))
+				result = surface.Add(reflected.Scale(reflectance)).Add(refracted.Scale((1 - reflectance)))
+			} else {
+				result = result.Add(surface.Add(reflected.Add(refracted)))
+			}
 		}
 	}
 
-	return result
+	intensity = 1 - blockedShadowRays/maxShadowRays
+	log.Println(intensity)
+	return result.Scale(intensity)
 }
 
 // IsShadowed returns true if p is in a shadow from the given light
@@ -242,7 +255,6 @@ func (w *World) IsShadowed(p Point, l Light, xs Intersections) bool {
 		if it.t >= 0 {
 
 			if it.t < distance && it.Object().Material().ShadowCaster {
-				log.Println(it.Object())
 				return true
 			}
 		}
