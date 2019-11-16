@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"log"
 	"math"
 
 	"golang.org/x/image/colornames"
@@ -10,7 +11,11 @@ import (
 type Light interface {
 	Intensity() Color
 	Position() Point
+	Shape() Shaper
 }
+
+// Lights is a collection of Light
+type Lights []Light
 
 // PointLight implements the light interface and is a single point light with no size
 type PointLight struct {
@@ -18,16 +23,43 @@ type PointLight struct {
 	intensity Color
 }
 
-// AreaLight shines in all directions, but is a sphere with size radius
+// AreaLight shines in all directions and is a shape
 type AreaLight struct {
-	radius    float64 // size of the area light
-	center    Point
+	Shaper
 	intensity Color
 }
 
 // NewAreaLight returns a new area light
-func NewAreaLight(p Point, i Color, r float64) *AreaLight {
-	return &AreaLight{}
+func NewAreaLight(s Shaper, i Color) *AreaLight {
+	s.Material().Emissive = i
+	s.Material().ShadowCaster = false
+	s.Material().Diffuse = 0
+	s.Material().Specular = 0
+	s.Material().Reflective = 0
+	s.Material().Transparency = 1
+
+	return &AreaLight{
+		Shaper:    s,
+		intensity: i,
+	}
+}
+
+// Intensity implements the Light interface
+func (al *AreaLight) Intensity() Color {
+	return al.intensity
+}
+
+// Position implements the Light interface
+func (al *AreaLight) Position() Point {
+	// TODO: Fix this
+	p := al.Shaper.Bounds().Center().ToWorldSpace(al.Shaper)
+	// log.Println(p)
+	return p
+}
+
+// Shape returns the Shaper object of this light
+func (al *AreaLight) Shape() Shaper {
+	return al.Shaper
 }
 
 // NewPointLight returns a new point light
@@ -43,6 +75,11 @@ func (pl *PointLight) Intensity() Color {
 // Position returns the position of the light
 func (pl *PointLight) Position() Point {
 	return pl.position
+}
+
+// Shape returns the Shaper object of this light, point lights have no shape
+func (pl *PointLight) Shape() Shaper {
+	return nil
 }
 
 // lighting returns the color for a given point
@@ -66,9 +103,6 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 	// combine surface color with light's color/intensity
 	effectiveColor := clr.Blend(l.Intensity())
 
-	// find the direction to the light source
-	lightv := l.Position().SubPoint(p).Normalize()
-
 	// compute ambient contribution
 	ambient = effectiveColor.Scale(m.Ambient)
 
@@ -77,8 +111,12 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 
 	// light not visible, ignore diffuse and specular components
 	if inShadow {
+		log.Println("shadow")
 		return ambient.Add(emissive)
 	}
+
+	// find the direction to the light source
+	lightv := l.Position().SubPoint(p).Normalize()
 
 	// lightDotNormal represents the cosine of the angle between the light vector and the normal vector
 	// a negaive number means the light is on the other side of the surface

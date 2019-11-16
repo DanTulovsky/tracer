@@ -242,6 +242,7 @@ func (w *World) IsShadowed(p Point, l Light, xs Intersections) bool {
 		if it.t >= 0 {
 
 			if it.t < distance && it.Object().Material().ShadowCaster {
+				log.Println(it.Object())
 				return true
 			}
 		}

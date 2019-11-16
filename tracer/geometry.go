@@ -164,3 +164,8 @@ func (s *Shape) Bounds() Bound {
 type Bound struct {
 	Min, Max Point
 }
+
+// Center returns the center of the bounding box
+func (b Bound) Center() Point {
+	return NewPoint((b.Max.x+b.Min.x)/2, (b.Max.y+b.Min.y)/2, (b.Max.z+b.Min.z)/2)
+}

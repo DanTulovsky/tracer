@@ -152,3 +152,33 @@ func TestShape_HasParent(t *testing.T) {
 		})
 	}
 }
+
+func TestBound_Center(t *testing.T) {
+	type fields struct {
+		Min Point
+		Max Point
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   Point
+	}{
+		{
+			fields: fields{
+				Min: NewPoint(-1, -1, -1),
+				Max: NewPoint(1, 1, 1),
+			},
+			want: NewPoint(0, 0, 0),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := Bound{
+				Min: tt.fields.Min,
+				Max: tt.fields.Max,
+			}
+			got := b.Center()
+			assert.Equal(t, tt.want, got, "should equal")
+		})
+	}
+}

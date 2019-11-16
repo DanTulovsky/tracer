@@ -1698,11 +1698,12 @@ func hollowsphere1() {
 func emissive() {
 	w := envxy(1025, 768)
 
-	s := tracer.NewUnitSphere()
-	s.SetTransform(tracer.IdentityMatrix().Scale(0.7, 0.7, 0.7).Translate(0, 2, 2))
-	s.Material().Emissive = tracer.ColorName(colornames.White)
+	l := tracer.NewAreaLight(tracer.NewUnitCube(),
+		tracer.ColorName(colornames.Lightgoldenrodyellow))
+	l.SetTransform(tracer.IdentityMatrix().Scale(0.7, 0.7, 0.7).Translate(0, 2, 4))
 
-	w.AddObject(s)
+	w.SetLights(tracer.Lights{l})
+	w.AddObject(l)
 	w.AddObject(floor())
 	w.AddObject(backWall())
 
