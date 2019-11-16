@@ -1128,13 +1128,15 @@ func plane() {
 }
 
 func simplecone() {
-	w := env()
+	w := envxy(640, 480)
+	w.Config.SoftShadows = true
 
 	cone1 := tracer.NewClosedCone(-2, 0)
 	cone1.SetTransform(tracer.IdentityMatrix().Scale(1, 3, 1).Translate(0, 2, 2))
 
 	w.AddObject(cone1)
 	w.AddObject(floor())
+	w.AddObject(backWall())
 	tracer.Render(w)
 }
 
@@ -1696,16 +1698,17 @@ func hollowsphere1() {
 }
 
 func emissive() {
-	w := envxy(1025, 768)
+	w := envxy(640, 480)
 	w.Config.Antialias = 0
 
 	l := tracer.NewAreaLight(tracer.NewUnitCube(),
 		tracer.ColorName(colornames.Lightgoldenrodyellow))
-	l.SetTransform(tracer.IdentityMatrix().Scale(0.7, 0.1, 0.7).Translate(0, 3, 2))
+	l.SetTransform(tracer.IdentityMatrix().Scale(0.2, 0.01, 0.2).Translate(0, 3, 2))
 	w.SetLights(tracer.Lights{l})
 
 	c := tracer.NewUnitCube()
-	c.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(-2, 0.5, 3))
+	c.SetTransform(
+		tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(-1, 0.5, 1))
 	c.Material().Color = tracer.ColorName(colornames.Red)
 
 	w.AddObject(c)
@@ -1723,7 +1726,7 @@ func envxy(width, height float64) *tracer.World {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(3, 20, -3), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(3, 4, -1), tracer.NewColor(1, 1, 1)),
 		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
 	})
 

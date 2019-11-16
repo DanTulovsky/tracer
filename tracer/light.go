@@ -3,13 +3,18 @@ package tracer
 import (
 	"math"
 
+	"github.com/DanTulovsky/tracer/utils"
+
 	"golang.org/x/image/colornames"
 )
 
 // Light is the interface all the lights use
 type Light interface {
 	Intensity() Color
+	// Center position on the light
 	Position() Point
+	// Random postion on the light
+	RandomPosition() Point
 	Shape() Shaper
 }
 
@@ -50,8 +55,23 @@ func (al *AreaLight) Intensity() Color {
 
 // Position implements the Light interface
 func (al *AreaLight) Position() Point {
-	// TODO: Fix this
-	p := al.Shaper.Bounds().Center().ToWorldSpace(al.Shaper)
+	return al.Shaper.Bounds().Center().ToWorldSpace(al.Shaper)
+}
+
+// RandomPosition implements the Light interface
+func (al *AreaLight) RandomPosition() Point {
+	minx := al.Shaper.Bounds().Min.X()
+	miny := al.Shaper.Bounds().Min.Y()
+	minz := al.Shaper.Bounds().Min.Z()
+	maxx := al.Shaper.Bounds().Max.X()
+	maxy := al.Shaper.Bounds().Max.Y()
+	maxz := al.Shaper.Bounds().Min.Z()
+
+	rx := utils.RandomFloat(minx, maxx)
+	ry := utils.RandomFloat(miny, maxy)
+	rz := utils.RandomFloat(minz, maxz)
+
+	p := NewPoint(rx, ry, rz).ToWorldSpace(al.Shaper)
 	return p
 }
 
@@ -75,13 +95,18 @@ func (pl *PointLight) Position() Point {
 	return pl.position
 }
 
+// RandomPosition returns the position of the light
+func (pl *PointLight) RandomPosition() Point {
+	return pl.position
+}
+
 // Shape returns the Shaper object of this light, point lights have no shape
 func (pl *PointLight) Shape() Shaper {
 	return nil
 }
 
 // lighting returns the color for a given point
-func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow bool, u, v float64) Color {
+func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, shadowFactor float64, u, v float64) Color {
 	var ambient, diffuse, specular Color
 
 	var clr Color
@@ -108,9 +133,13 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 	emissive := m.Emissive
 
 	// light not visible, ignore diffuse and specular components
-	if inShadow {
+	// log.Println(shadowFactor)
+	if shadowFactor == 1 { // total shadow
+		// log.Println("total shadow")
 		return ambient.Add(emissive)
 	}
+
+	// shadow = ambient.Scale(shadowFactor)
 
 	// find the direction to the light source
 	lightv := l.Position().SubPoint(p).Normalize()
@@ -140,10 +169,17 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 		}
 	}
 
-	return emissive.Add(ambient).Add(diffuse).Add(specular)
+	// return emissive.Add(ambient).Add(diffuse).Add(specular)
+	var result Color
+	if shadowFactor == 0 {
+		result = emissive.Add(ambient).Add(diffuse).Add(specular)
+	} else {
+		result = (emissive.Add(ambient).Add(diffuse).Add(specular)).Scale(shadowFactor)
+	}
+	return result
 }
 
 // ColorAtPoint returns the clamped color at the given point
-func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow bool) Color {
+func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow float64) Color {
 	return lighting(m, o, p, l, eye, normal, inShadow, 0, 0).Clamp()
 }

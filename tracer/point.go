@@ -111,12 +111,8 @@ func (p Point) ToWorldSpace(s Shaper) Point {
 		res = p.ToWorldSpace(s.Parent())
 	}
 
-	// log.Println(s.TransformInverse().Transpose())
-	// log.Println(s.TransformInverse())
-
 	res = res.TimesMatrix(s.Transform())
 	res.SetW(1)
-	// log.Println(res)
 
 	return res
 }
