@@ -8,10 +8,6 @@ import (
 func (w *World) LintWorld() {
 	log.Println("Linting the world...")
 
-	// if w.Config.Antialias != 1 && !utils.IsPowerOf2(w.Config.Antialias) {
-	// 	log.Fatalf("world antialias parameter must be a power of 2 (have: %v)", w.Config.Antialias)
-	// }
-
 	for _, o := range w.Objects {
 		LintObject(o)
 	}

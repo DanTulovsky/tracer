@@ -72,10 +72,11 @@ func NewDefaultTestWorld() *World {
 	s2.SetTransform(IdentityMatrix().Scale(0.5, 0.5, 0.5))
 
 	w := NewWorld(NewWorldConfig())
-	w.Objects = []Shaper{s1, s2}
-	w.Lights = []Light{l1}
-	return w
+	w.AddObject(s1)
+	w.AddObject(s2)
+	w.SetLights([]Light{l1})
 
+	return w
 }
 
 // AddObject adds an object into the world
@@ -319,6 +320,7 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 	// allow this many renders to run at once
 	max := w.Config.Parallelism
 	log.Printf("Parallelism: %v", max)
+	log.Printf("Antialiasing: %v", w.Config.Antialias)
 
 	// total := (camera.Vsize - 1) * (camera.Hsize - 1)
 	// last := 0.0

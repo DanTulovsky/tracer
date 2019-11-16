@@ -152,6 +152,9 @@ func convertMaterial(mat *mtl.Material, dir string) (*Material, error) {
 	if m.Transparency > 0 {
 		m.ShadowCaster = false
 	}
+
+	// TODO: Implement support for illum, probably in lighting()
+	// http://paulbourke.net/dataformats/mtl/
 	mat = processIllum(mat, illum)
 
 	// If there is a texture present, use it
