@@ -1695,6 +1695,20 @@ func hollowsphere1() {
 	tracer.Render(w)
 }
 
+func emissive() {
+	w := envxy(1025, 768)
+
+	s := tracer.NewUnitSphere()
+	s.SetTransform(tracer.IdentityMatrix().Scale(0.7, 0.7, 0.7).Translate(0, 2, 2))
+	s.Material().Emissive = tracer.ColorName(colornames.White)
+
+	w.AddObject(s)
+	w.AddObject(floor())
+	w.AddObject(backWall())
+
+	tracer.Render(w)
+}
+
 func envxy(width, height float64) *tracer.World {
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1733,7 +1747,8 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	hollowsphere1()
+	emissive()
+	// hollowsphere1()
 	// groupingroup()
 	// antialias1()
 	// texturetri()

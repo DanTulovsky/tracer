@@ -15,6 +15,9 @@ type Material struct {
 	Pattern                                                                          Patterner
 	Ambient, Diffuse, Specular, Shininess, Reflective, Transparency, RefractiveIndex float64
 
+	// This material emits light
+	Emissive Color
+
 	// Some objects should not cast shadows (e.g. water in a pond)
 	ShadowCaster bool
 

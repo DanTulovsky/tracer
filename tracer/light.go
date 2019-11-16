@@ -18,7 +18,19 @@ type PointLight struct {
 	intensity Color
 }
 
-// NewPointLight returns a nw point light
+// AreaLight shines in all directions, but is a sphere with size radius
+type AreaLight struct {
+	radius    float64 // size of the area light
+	center    Point
+	intensity Color
+}
+
+// NewAreaLight returns a new area light
+func NewAreaLight(p Point, i Color, r float64) *AreaLight {
+	return &AreaLight{}
+}
+
+// NewPointLight returns a new point light
 func NewPointLight(p Point, i Color) *PointLight {
 	return &PointLight{position: p, intensity: i}
 }
@@ -48,9 +60,7 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 
 	switch {
 	case m.HasTexture():
-		// Blend with material color
 		clr = m.ColorAtTexture(o, u, v)
-		// clr = clr.Blend(tclr)
 	}
 
 	// combine surface color with light's color/intensity
@@ -62,12 +72,15 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 	// compute ambient contribution
 	ambient = effectiveColor.Scale(m.Ambient)
 
-	// light not visible, ignore diffuse ans specular components
+	// Compute the emissive contribution
+	emissive := m.Emissive
+
+	// light not visible, ignore diffuse and specular components
 	if inShadow {
-		return ambient
+		return ambient.Add(emissive)
 	}
 
-	// lightDotNormal represnets the cosine of the angle btween the light vector and the normal vector
+	// lightDotNormal represents the cosine of the angle between the light vector and the normal vector
 	// a negaive number means the light is on the other side of the surface
 	lightDotNormal := lightv.Dot(normal)
 
@@ -92,7 +105,7 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inSha
 		}
 	}
 
-	return ambient.Add(diffuse).Add(specular)
+	return emissive.Add(ambient).Add(diffuse).Add(specular)
 }
 
 // ColorAtPoint returns the clamped color at the given point
