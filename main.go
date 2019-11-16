@@ -1701,9 +1701,10 @@ func emissive() {
 	w := envxy(640, 480)
 	w.Config.Antialias = 0
 
-	l := tracer.NewAreaLight(tracer.NewUnitCube(),
-		tracer.ColorName(colornames.Lightgoldenrodyellow))
-	l.SetTransform(tracer.IdentityMatrix().Scale(0.2, 0.01, 0.2).Translate(0, 3, 2))
+	l := tracer.NewAreaLight(tracer.NewUnitSphere(),
+		tracer.ColorName(colornames.Lightgoldenrodyellow), true)
+	l.SetTransform(
+		tracer.IdentityMatrix().Scale(0.2, 0.2, 0.2).Translate(0, 3, 2))
 	w.SetLights(tracer.Lights{l})
 
 	c := tracer.NewUnitCube()
@@ -1712,7 +1713,6 @@ func emissive() {
 	c.Material().Color = tracer.ColorName(colornames.Red)
 
 	w.AddObject(c)
-	w.AddObject(l)
 	w.AddObject(floor())
 	w.AddObject(backWall())
 
@@ -1758,6 +1758,8 @@ func main() {
 	}
 
 	emissive()
+	// simplecone()
+	// simplecylinder()
 	// hollowsphere1()
 	// groupingroup()
 	// antialias1()
@@ -1781,8 +1783,6 @@ func main() {
 	// spherewarp()
 	// cylinder()
 	// cone()
-	// simplecone()
-	// simplecylinder()
 	// cylindertextures()
 	// group()
 	// triangle()

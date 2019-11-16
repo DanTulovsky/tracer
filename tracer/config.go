@@ -15,14 +15,18 @@ type WorldConfig struct {
 
 	// SoftShadow enables soft shadows
 	SoftShadows bool
+
+	// SoftShadowRays specifies how many shadow rays to cast, not used if SoftShadows is false
+	SoftShadowRays int
 }
 
 // NewWorldConfig returns a new world config with default settings
 func NewWorldConfig() *WorldConfig {
 	return &WorldConfig{
-		Antialias:    0,
-		MaxRecusions: 4,
-		Parallelism:  runtime.NumCPU(),
-		SoftShadows:  false,
+		Antialias:      0,
+		MaxRecusions:   4,
+		Parallelism:    runtime.NumCPU(),
+		SoftShadows:    true,
+		SoftShadowRays: 6,
 	}
 }

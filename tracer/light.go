@@ -11,6 +11,7 @@ import (
 // Light is the interface all the lights use
 type Light interface {
 	Intensity() Color
+	IsVisible() bool
 	// Center position on the light
 	Position() Point
 	// Random postion on the light
@@ -31,10 +32,11 @@ type PointLight struct {
 type AreaLight struct {
 	Shaper
 	intensity Color
+	visible   bool
 }
 
 // NewAreaLight returns a new area light
-func NewAreaLight(s Shaper, i Color) *AreaLight {
+func NewAreaLight(s Shaper, i Color, v bool) *AreaLight {
 	s.Material().Emissive = i
 	s.Material().ShadowCaster = false
 	s.Material().Diffuse = 0
@@ -45,6 +47,7 @@ func NewAreaLight(s Shaper, i Color) *AreaLight {
 	return &AreaLight{
 		Shaper:    s,
 		intensity: i,
+		visible:   v,
 	}
 }
 
@@ -60,6 +63,7 @@ func (al *AreaLight) Position() Point {
 
 // RandomPosition implements the Light interface
 func (al *AreaLight) RandomPosition() Point {
+	// TODO: Makes this a call on the Shaper object instead
 	minx := al.Shaper.Bounds().Min.X()
 	miny := al.Shaper.Bounds().Min.Y()
 	minz := al.Shaper.Bounds().Min.Z()
@@ -78,6 +82,11 @@ func (al *AreaLight) RandomPosition() Point {
 // Shape returns the Shaper object of this light
 func (al *AreaLight) Shape() Shaper {
 	return al.Shaper
+}
+
+// IsVisible returns true if light is visible.
+func (al *AreaLight) IsVisible() bool {
+	return al.visible
 }
 
 // NewPointLight returns a new point light
@@ -105,8 +114,13 @@ func (pl *PointLight) Shape() Shaper {
 	return nil
 }
 
+// IsVisible returns true if light is visible, point lights are never visible.
+func (pl *PointLight) IsVisible() bool {
+	return false
+}
+
 // lighting returns the color for a given point
-func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, shadowFactor float64, u, v float64) Color {
+func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, intensity float64, u, v float64) Color {
 	var ambient, diffuse, specular Color
 
 	var clr Color
@@ -134,13 +148,12 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, shado
 
 	// light not visible, ignore diffuse and specular components
 	// log.Println(shadowFactor)
-	if shadowFactor == 1 { // total shadow
-		// log.Println("total shadow")
+	if intensity == 0 { // total shadow
 		return ambient.Add(emissive)
 	}
 
-	// shadow = ambient.Scale(shadowFactor)
-
+	// TODO: For area lights, do this many times at random points
+	// Average the diffuse and specular results from all runs
 	// find the direction to the light source
 	lightv := l.Position().SubPoint(p).Normalize()
 
@@ -169,14 +182,7 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, shado
 		}
 	}
 
-	// return emissive.Add(ambient).Add(diffuse).Add(specular)
-	var result Color
-	if shadowFactor == 0 {
-		result = emissive.Add(ambient).Add(diffuse).Add(specular)
-	} else {
-		result = (emissive.Add(ambient).Add(diffuse).Add(specular)).Scale(shadowFactor)
-	}
-	return result
+	return emissive.Add(ambient).Add(diffuse.Scale(intensity)).Add(specular.Scale(intensity))
 }
 
 // ColorAtPoint returns the clamped color at the given point

@@ -79,6 +79,14 @@ func (w *World) Intersections(r Ray, xs Intersections) Intersections {
 // SetLights sets the world lights
 func (w *World) SetLights(l []Light) {
 	w.Lights = l
+	for _, l := range w.Lights {
+		if l.IsVisible() {
+			switch l.(type) {
+			case *AreaLight:
+				w.AddObject(l.(*AreaLight))
+			}
+		}
+	}
 }
 
 // AddLight adds a new light to the world
@@ -184,7 +192,8 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 		// }
 		// var shadowFactor float64
 		// sFactor := w.IsShadowed(state.OverPoint, l, xs)
-		sFactor := w.shadowFactor(state.OverPoint, l, xs)
+		// inensity := w.shadowFactor(state.OverPoint, l.Position(), xs)
+		inensity := w.IntensityAt(state.OverPoint, l, xs)
 		// for try := 0.0; try < maxShadowRays; try++ {
 		// 	// to a random point on the area light
 		// 	isShadowed := w.IsShadowed(state.OverPoint, l, xs)
@@ -200,7 +209,7 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 			l,
 			state.EyeV,
 			state.NormalV,
-			sFactor,
+			inensity,
 			state.U,
 			state.V)
 
@@ -216,66 +225,45 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 		} else {
 			result = result.Add(surface.Add(reflected.Add(refracted)))
 		}
-
-		// intensity = 1 - blockedShadowRays/maxShadowRays
-		// result = result.Scale(intensity)
 	}
 
 	return result
 }
 
-// shadowFactor returns true if p is in a shadow from the given light
-// 1 = total shadow, 0 = no shadow at all
-func (w *World) shadowFactor(p Point, l Light, xs Intersections) float64 {
-	// var factor float64
-	var blocked float64
-	var unblocked float64
-	maxShadowRays := 200.0
+// IntensityAt returns the intensity of the light at point p
+func (w *World) IntensityAt(p Point, l Light, xs Intersections) float64 {
+	maxShadowRays := w.Config.SoftShadowRays
+	if w.Config.SoftShadows {
+		maxShadowRays = w.Config.SoftShadowRays
+	}
 
-	for try := 0.0; try < maxShadowRays; try++ {
-		v := l.RandomPosition().SubPoint(p)
-		distance := v.Magnitude()
-		direction := v.Normalize()
-
-		r := NewRay(p, direction)
-
-		intersections := w.Intersections(r, xs)
-
-		// Some objects do not cast shadows, so we need to look at all the objects r intersects with
-		sort.Sort(byT(intersections))
-
-		var inShadow bool
-		for _, it := range intersections {
-			if it.t >= 0 {
-
-				if it.t < distance && it.Object().Material().ShadowCaster {
-					inShadow = true
-					break
-				}
+	switch l.(type) {
+	case *PointLight:
+		if w.IsShadowed(p, l.Position(), xs) {
+			return 0
+		}
+		return 1
+	case *AreaLight:
+		if !w.Config.SoftShadows {
+			if w.IsShadowed(p, l.Position(), xs) {
+				return 0
+			}
+			return 1
+		}
+		total := 0.0
+		for try := 0; try < maxShadowRays; try++ {
+			if !w.IsShadowed(p, l.RandomPosition(), xs) {
+				total = total + 1
 			}
 		}
-		if inShadow {
-			blocked++
-		} else {
-			unblocked++
-		}
-
+		return total / float64(maxShadowRays)
 	}
-	// log.Println(unblocked)
-
-	if blocked == maxShadowRays {
-		return 1
-	}
-	if unblocked == maxShadowRays {
-		return 0
-	}
-	return unblocked / maxShadowRays
+	return 0
 }
 
 // IsShadowed returns true if p is in a shadow from the given light
-// 1 = total shadow, 0 = no shadow at all
-func (w *World) IsShadowed(p Point, l Light, xs Intersections) float64 {
-	v := l.Position().SubPoint(p)
+func (w *World) IsShadowed(p Point, lp Point, xs Intersections) bool {
+	v := lp.SubPoint(p)
 	distance := v.Magnitude()
 	direction := v.Normalize()
 
@@ -290,12 +278,12 @@ func (w *World) IsShadowed(p Point, l Light, xs Intersections) float64 {
 		if it.t >= 0 {
 
 			if it.t < distance && it.Object().Material().ShadowCaster {
-				return 1
+				return true
 			}
 		}
 	}
 
-	return 0
+	return false
 }
 
 // PrecomputeValues does some initial promcomputations to speed up render speed
