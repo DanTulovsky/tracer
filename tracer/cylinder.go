@@ -44,6 +44,7 @@ func NewCylinder(min, max float64) *Cylinder {
 	c := NewDefaultCylinder()
 	c.Minimum = min
 	c.Maximum = max
+	c.calculateBounds()
 	return c
 }
 

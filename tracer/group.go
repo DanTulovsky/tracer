@@ -17,7 +17,7 @@ type Group struct {
 
 // NewGroup returns a new, empty group
 func NewGroup() *Group {
-	return &Group{
+	g := &Group{
 		members: []Shaper{},
 		Shape: Shape{
 			transform:        IdentityMatrix(),
@@ -26,6 +26,8 @@ func NewGroup() *Group {
 			shape:            "group",
 		},
 	}
+	g.calculateBounds()
+	return g
 }
 
 // Equal returns true if the groups are equal

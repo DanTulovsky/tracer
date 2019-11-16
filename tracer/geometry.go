@@ -53,7 +53,7 @@ func (s *Shape) Equal(s2 *Shape) bool {
 		s.transform.Equals(s2.Transform()) &&
 		s.transformInverse.Equals(s2.Transform()) &&
 		s.material.Equals(s2.material) &&
-		s.bound == s2.bound &&
+		// s.bound == s2.bound &&
 		s.parent == s2.parent &&
 		(s.lna != nil) == (s2.lna != nil)
 

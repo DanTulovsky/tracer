@@ -25,7 +25,7 @@ type WorldConfig struct {
 // NewWorldConfig returns a new world config with default settings
 func NewWorldConfig() *WorldConfig {
 	return &WorldConfig{
-		Antialias:    1,
+		Antialias:    0,
 		MaxRecusions: 4,
 		Parallelism:  runtime.NumCPU(),
 	}
@@ -295,8 +295,13 @@ func (w *World) renderWorker(in chan *pixel, canvas *Canvas) {
 
 	// antialias config
 	aa := float64(w.Config.Antialias)
-	numSquares := math.Pow(2, aa)
-	offset := 1.0 / (2 * aa)
+	numSquares := 1.0
+	offset := 0.5
+
+	if aa > 0 {
+		numSquares = math.Pow(2, aa)
+		offset = 1.0 / (2 * aa)
+	}
 	rowLength := math.Sqrt(numSquares)
 
 	for p := range in {
