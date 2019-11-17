@@ -1739,7 +1739,7 @@ func hollowsphere1() {
 func emissive() {
 	w := envxy(640, 480)
 	w.Config.Antialias = 0
-	w.Config.SoftShadows = true
+	w.Config.SoftShadows = false
 	w.Config.SoftShadowRays = 64
 
 	l := tracer.NewAreaLight(tracer.NewUnitCube(),
@@ -1749,10 +1749,6 @@ func emissive() {
 	// l := tracer.NewPointLight(tracer.NewPoint(0, 3, 2), tracer.White())
 
 	w.SetLights(tracer.Lights{l})
-	// c := tracer.NewUnitCube()
-	// c.SetTransform(
-	// 	tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(-1, 0.5, 2))
-	// c.Material().Color = tracer.ColorName(colornames.Yellow)
 
 	// g := sphereOnPedestal()
 	g := mirrorSphereOnPedestal()
