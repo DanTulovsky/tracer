@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"math"
 	"os"
@@ -19,6 +20,7 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
+	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -1836,7 +1838,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	emissive()
+	// emissive()
 	// simpletexturewall()
 	// simplecone()
 	// simplecylinder()
@@ -1870,11 +1872,11 @@ func main() {
 	// csg()
 	// simplesphere()
 
-	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	// // f := path.Join(dir, "cubes2.obj")
-	// f := path.Join(dir, "monkey-smooth2.obj")
-	// // f := path.Join(dir, "texture2.obj")
-	// objParse(f)
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	// f := path.Join(dir, "cubes2.obj")
+	f := path.Join(dir, "monkey-smooth2.obj")
+	// f := path.Join(dir, "texture2.obj")
+	objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
