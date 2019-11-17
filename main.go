@@ -1063,7 +1063,8 @@ func glassplane() *tracer.Plane {
 func ceiling() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().Translate(0, 5, 0))
-	pp := tracer.NewCheckerPattern(tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.White))
+	pp := tracer.NewCheckerPattern(
+		tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 
 	return p
@@ -1072,18 +1073,32 @@ func ceiling() *tracer.Plane {
 func backWall() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
-	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
+	pp := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Purple), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
-	p.Material().Color = tracer.ColorName(colornames.Lightcyan)
+	// p.Material().Color = tracer.ColorName(colornames.Purple)
 	p.Material().Specular = 0
 
 	return p
 }
 
+func frontWall() *tracer.Plane {
+	p := tracer.NewPlane()
+	p.SetTransform(
+		tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, -5))
+	pp := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Orange), tracer.ColorName(colornames.White))
+	p.Material().SetPattern(pp)
+	// p.Material().Color = tracer.ColorName(colornames.Lightcyan)
+	p.Material().Specular = 0
+
+	return p
+}
 func rightWall() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(4, 0, 0))
-	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
+	pp := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Yellow), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 
@@ -1092,7 +1107,8 @@ func rightWall() *tracer.Plane {
 func leftWall() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-4, 0, 0))
-	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
+	pp := tracer.NewStripedPattern(
+		tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 
@@ -1186,6 +1202,18 @@ func cylindertextures() {
 
 	tracer.Render(w)
 }
+func mirorsphere() *tracer.Sphere {
+	s := tracer.NewUnitSphere()
+	s.SetTransform(tracer.IdentityMatrix().Scale(.75, .75, .75).Translate(0, 1.75, 0))
+	s.Material().Ambient = 0
+	s.Material().Diffuse = 0
+	s.Material().Reflective = 1.0
+	s.Material().Transparency = 0
+	s.Material().ShadowCaster = true
+	// s.Material().RefractiveIndex = 1.573
+
+	return s
+}
 func glasssphere() *tracer.Sphere {
 	s := tracer.NewUnitSphere()
 	s.SetTransform(tracer.IdentityMatrix().Scale(.75, .75, .75).Translate(0, 1.75, 0))
@@ -1212,6 +1240,17 @@ func pedestal() *tracer.Cube {
 	return s
 }
 
+func sphereOnPedestal() *tracer.Group {
+	g := tracer.NewGroup()
+	g.AddMembers(glasssphere(), pedestal())
+	return g
+}
+
+func mirrorSphereOnPedestal() *tracer.Group {
+	g := tracer.NewGroup()
+	g.AddMembers(mirorsphere(), pedestal())
+	return g
+}
 func shapes() {
 
 	w := envxy(800, 600)
@@ -1700,21 +1739,32 @@ func hollowsphere1() {
 func emissive() {
 	w := envxy(640, 480)
 	w.Config.Antialias = 0
+	w.Config.SoftShadows = true
+	w.Config.SoftShadowRays = 64
 
-	l := tracer.NewAreaLight(tracer.NewUnitSphere(),
-		tracer.ColorName(colornames.Lightgoldenrodyellow), true)
+	l := tracer.NewAreaLight(tracer.NewUnitCube(),
+		tracer.ColorName(colornames.White), true)
 	l.SetTransform(
-		tracer.IdentityMatrix().Scale(0.2, 0.2, 0.2).Translate(0, 3, 2))
+		tracer.IdentityMatrix().Scale(0.2, 1, 0.2).Translate(2, 1, 2))
+	// l := tracer.NewPointLight(tracer.NewPoint(0, 3, 2), tracer.White())
+
 	w.SetLights(tracer.Lights{l})
+	// c := tracer.NewUnitCube()
+	// c.SetTransform(
+	// 	tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(-1, 0.5, 2))
+	// c.Material().Color = tracer.ColorName(colornames.Yellow)
 
-	c := tracer.NewUnitCube()
-	c.SetTransform(
-		tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(-1, 0.5, 1))
-	c.Material().Color = tracer.ColorName(colornames.Red)
+	// g := sphereOnPedestal()
+	g := mirrorSphereOnPedestal()
+	g.SetTransform(tracer.IdentityMatrix().Translate(0, 0, 2.5))
 
-	w.AddObject(c)
+	w.AddObject(g)
 	w.AddObject(floor())
 	w.AddObject(backWall())
+	w.AddObject(leftWall())
+	w.AddObject(rightWall())
+	w.AddObject(frontWall())
+	w.AddObject(ceiling())
 
 	tracer.Render(w)
 }

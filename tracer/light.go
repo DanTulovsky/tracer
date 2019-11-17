@@ -120,7 +120,7 @@ func (pl *PointLight) IsVisible() bool {
 }
 
 // lighting returns the color for a given point
-func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, intensity float64, u, v float64) Color {
+func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, intensity float64, rays int, u, v float64) Color {
 	var ambient, diffuse, specular Color
 
 	var clr Color
@@ -147,45 +147,48 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inten
 	emissive := m.Emissive
 
 	// light not visible, ignore diffuse and specular components
-	// log.Println(shadowFactor)
-	if intensity == 0 { // total shadow
+	if intensity == 0 {
 		return ambient.Add(emissive)
 	}
 
-	// TODO: For area lights, do this many times at random points
-	// Average the diffuse and specular results from all runs
-	// find the direction to the light source
-	lightv := l.Position().SubPoint(p).Normalize()
+	sum := Black()
 
-	// lightDotNormal represents the cosine of the angle between the light vector and the normal vector
-	// a negaive number means the light is on the other side of the surface
-	lightDotNormal := lightv.Dot(normal)
+	for try := 0; try < rays; try++ {
 
-	if lightDotNormal < 0 {
-		diffuse = ColorName(colornames.Black)
-		specular = ColorName(colornames.Black)
-	} else {
-		// compute the diffuse contribution
-		diffuse = effectiveColor.Scale(m.Diffuse).Scale(lightDotNormal)
+		// find the direction to the light source
+		lightv := l.RandomPosition().SubPoint(p).Normalize()
 
-		// reflectDotEye represens the cosine of the angle between the relfection vector and the eye vector
-		// a negative number means the light reflects away from the eye
-		reflectv := lightv.Negate().Reflect(normal)
-		reflectDotEye := reflectv.Dot(eye)
+		// lightDotNormal represents the cosine of the angle between the light vector and the normal vector
+		// a negaive number means the light is on the other side of the surface
+		lightDotNormal := lightv.Dot(normal)
 
-		if reflectDotEye <= 0 {
+		if lightDotNormal < 0 {
+			diffuse = ColorName(colornames.Black)
 			specular = ColorName(colornames.Black)
 		} else {
-			// compute the specular contrbution
-			factor := math.Pow(reflectDotEye, m.Shininess)
-			specular = l.Intensity().Scale(m.Specular).Scale(factor)
-		}
-	}
+			// compute the diffuse contribution
+			diffuse = effectiveColor.Scale(m.Diffuse).Scale(lightDotNormal)
 
-	return emissive.Add(ambient).Add(diffuse.Scale(intensity)).Add(specular.Scale(intensity))
+			// reflectDotEye represens the cosine of the angle between the relfection vector and the eye vector
+			// a negative number means the light reflects away from the eye
+			reflectv := lightv.Negate().Reflect(normal)
+			reflectDotEye := reflectv.Dot(eye)
+
+			if reflectDotEye <= 0 {
+				specular = ColorName(colornames.Black)
+			} else {
+				// compute the specular contrbution
+				factor := math.Pow(reflectDotEye, m.Shininess)
+				specular = l.Intensity().Scale(m.Specular).Scale(factor)
+			}
+		}
+
+		sum = sum.Add(diffuse).Add(specular)
+	}
+	return emissive.Add(ambient).Add(sum.Scale(1.0 / float64(rays)).Scale(intensity))
 }
 
 // ColorAtPoint returns the clamped color at the given point
 func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow float64) Color {
-	return lighting(m, o, p, l, eye, normal, inShadow, 0, 0).Clamp()
+	return lighting(m, o, p, l, eye, normal, inShadow, 1, 0, 0).Clamp()
 }

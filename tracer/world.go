@@ -178,29 +178,9 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 
 	xs = xs[:0] // clear intersections
 	var result Color
-	// intensity of the light; average number of rays that were
-	// not blocked by any surfaces
-	// var intensity float64 = 1
-
-	// maxShadowRays := 1.0
-	// blockedShadowRays := 0.0
 
 	for _, l := range w.Lights {
-		// isShadowed := w.IsShadowed(state.OverPoint, l, xs)
-		// if isShadowed {
-		// 	blockedShadowRays++
-		// }
-		// var shadowFactor float64
-		// sFactor := w.IsShadowed(state.OverPoint, l, xs)
-		// inensity := w.shadowFactor(state.OverPoint, l.Position(), xs)
 		inensity := w.IntensityAt(state.OverPoint, l, xs)
-		// for try := 0.0; try < maxShadowRays; try++ {
-		// 	// to a random point on the area light
-		// 	isShadowed := w.IsShadowed(state.OverPoint, l, xs)
-		// 	if isShadowed {
-		// 		blockedShadowRays++
-		// 	}
-		// }
 
 		surface := lighting(
 			state.Object.Material(),
@@ -210,6 +190,7 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 			state.EyeV,
 			state.NormalV,
 			inensity,
+			w.Config.SoftShadowRays,
 			state.U,
 			state.V)
 
