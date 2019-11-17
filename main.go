@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"math"
 	"os"
@@ -10,6 +9,7 @@ import (
 	"runtime"
 	"runtime/pprof"
 
+	"image/color"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
@@ -20,7 +20,6 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
-	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -1040,14 +1039,6 @@ func env() *tracer.World {
 	return w
 }
 
-func floor() *tracer.Plane {
-	p := tracer.NewPlane()
-	pp := tracer.NewCheckerPattern(tracer.ColorName(colornames.Red), tracer.ColorName(colornames.White))
-	p.Material().SetPattern(pp)
-
-	return p
-}
-
 func glassplane() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.Material().Specular = 0.0
@@ -1062,64 +1053,73 @@ func glassplane() *tracer.Plane {
 	return p
 }
 
-func ceiling() *tracer.Plane {
+func floor(y float64) *tracer.Plane {
 	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().Translate(0, 5, 0))
+	p.SetTransform(tracer.IdentityMatrix().Translate(0, y, 0))
 	pp := tracer.NewCheckerPattern(
-		tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.White))
+		tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 
 	return p
 }
 
-func backWall() *tracer.Plane {
+func ceiling(y float64) *tracer.Plane {
+	p := tracer.NewPlane()
+	p.SetTransform(tracer.IdentityMatrix().Translate(0, y, 0))
+	pp := tracer.NewGradientPattern(
+		tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Red))
+	pp.SetTransform(tracer.IdentityMatrix().Scale(10, 1, 1).Translate(-15, 0, 0))
+	p.Material().SetPattern(pp)
+	p.Material().Specular = 0
+	p.Material().Ambient = 0.15
+
+	return p
+}
+
+func backWall(z float64) *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(
-		tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
+		tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, z))
 	ppuv, err := tracer.NewUVImagePattern("/Users/dant/Downloads/ghost.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	pp := tracer.NewTextureMapPattern(ppuv, tracer.NewPlaneMap())
-	pp.SetTransform(tracer.IdentityMatrix().Scale(8, 4, 4).RotateY(math.Pi / 2))
-	// pp := tracer.NewStripedPattern(
+	pp.SetTransform(tracer.IdentityMatrix().Scale(10, 5, 5).RotateY(math.Pi/2).Translate(0, 0, -3))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 
 	return p
 }
 
-func frontWall() *tracer.Plane {
+func frontWall(z float64) *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(
-		tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, -5))
-	pp := tracer.NewStripedPattern(
+		tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, z))
+	uvpp := tracer.NewUVCheckersPattern(4, 4,
 		tracer.ColorName(colornames.Orange), tracer.ColorName(colornames.White))
-	p.Material().SetPattern(pp)
-	// p.Material().Color = tracer.ColorName(colornames.Lightcyan)
-	p.Material().Specular = 0
-
-	return p
-}
-func rightWall() *tracer.Plane {
-	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(4, 0, 0))
-	ppuv, err := tracer.NewUVImagePattern("/Users/dant/Downloads/ghost.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	pp := tracer.NewTextureMapPattern(ppuv, tracer.NewPlaneMap())
-	pp.SetTransform(tracer.IdentityMatrix().Scale(8, 4, 4).RotateY(math.Pi / 2))
+	pp := tracer.NewTextureMapPattern(uvpp, tracer.NewPlaneMap())
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 
 	return p
 }
-func leftWall() *tracer.Plane {
+func rightWall(x float64) *tracer.Plane {
 	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-4, 0, 0))
+	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(x, 0, 0))
+	pp := tracer.NewGradientPattern(
+		tracer.ColorName(colornames.Orange), tracer.ColorName(colornames.White))
+	pp.SetTransform(tracer.IdentityMatrix().Scale(10, 1, 1).Translate(-5, 0, 0))
+	p.Material().SetPattern(pp)
+	p.Material().Specular = 0
+
+	return p
+}
+func leftWall(x float64) *tracer.Plane {
+	p := tracer.NewPlane()
+	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(x, 0, 0))
 	pp := tracer.NewStripedPattern(
-		tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
+		tracer.ColorName(colornames.Lightskyblue), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 
@@ -1133,26 +1133,6 @@ func sphere() *tracer.Sphere {
 	s.Material().Reflective = 1
 	return s
 }
-func scene() {
-	w := env()
-
-	w.AddObject(sphere())
-	w.AddObject(floor())
-	w.AddObject(ceiling())
-	w.AddObject(backWall())
-	w.AddObject(rightWall())
-	w.AddObject(leftWall())
-
-	tracer.Render(w)
-}
-
-func plane() {
-	w := env()
-	w.AddObject(floor())
-	w.AddObject(rightWall())
-
-	tracer.Render(w)
-}
 
 func simplecone() {
 	w := envxy(640, 480)
@@ -1162,8 +1142,8 @@ func simplecone() {
 	cone1.SetTransform(tracer.IdentityMatrix().Scale(1, 3, 1).Translate(0, 2, 2))
 
 	w.AddObject(cone1)
-	w.AddObject(floor())
-	w.AddObject(backWall())
+	w.AddObject(floor(0))
+	w.AddObject(backWall(10))
 	tracer.Render(w)
 }
 
@@ -1178,7 +1158,7 @@ func simplecylinder() {
 	cylinder1.Material().SetPattern(p)
 
 	w.AddObject(cylinder1)
-	w.AddObject(floor())
+	w.AddObject(floor(0))
 	tracer.Render(w)
 }
 
@@ -1209,7 +1189,7 @@ func cylindertextures() {
 	w.AddObject(cylinder1)
 	w.AddObject(cylinder2)
 	w.AddObject(cylinder3)
-	w.AddObject(floor())
+	w.AddObject(floor(0))
 
 	tracer.Render(w)
 }
@@ -1236,6 +1216,20 @@ func glasssphere() *tracer.Sphere {
 	s.Material().RefractiveIndex = 1.573
 
 	return s
+}
+
+// mirror cube at x,y,z scaled by xs ys, zs and roated by rx, ry, rz
+func mirrorcube(x, y, z, xs, ys, zs, rx, ry, rz float64) tracer.Shaper {
+	c := tracer.NewUnitCube()
+	c.SetTransform(tracer.IdentityMatrix().Scale(xs, ys, zs).RotateX(rx).RotateY(ry).RotateZ(rz).Translate(x, y, z))
+
+	c.Material().Ambient = 0
+	c.Material().Diffuse = 0
+	c.Material().Reflective = 1.0
+	c.Material().Transparency = 0
+	c.Material().ShadowCaster = true
+
+	return c
 }
 
 func pedestal() *tracer.Cube {
@@ -1378,7 +1372,7 @@ func shapes() {
 	p := tracer.NewTextureMapPattern(earthup, mapperearth)
 	earth.Material().SetPattern(p)
 
-	flr := floor()
+	flr := floor(0)
 	flr.SetTransform(tracer.IdentityMatrix().Translate(0, floory, 0))
 
 	// mirror on the left
@@ -1599,7 +1593,7 @@ func movedgroup() {
 	g.AddMembers(glasssphere(), pedestal())
 	g.SetTransform(tracer.IdentityMatrix().Translate(-2, 0, 4))
 
-	w.AddObject(floor())
+	w.AddObject(floor(0))
 	w.AddObject(g)
 
 	tracer.Render(w)
@@ -1618,7 +1612,7 @@ func groupingroup() {
 	gouter := tracer.NewGroup()
 	gouter.AddMember(g)
 
-	w.AddObject(floor())
+	w.AddObject(floor(0))
 	w.AddObject(gouter)
 
 	tracer.Render(w)
@@ -1685,7 +1679,7 @@ func antialias1() {
 	s1.SetTransform(tracer.IdentityMatrix().Translate(0, 1.85, 0))
 
 	w.AddObject(s1)
-	w.AddObject(backWall())
+	w.AddObject(backWall(10))
 
 	tracer.Render(w)
 }
@@ -1741,20 +1735,20 @@ func hollowsphere1() {
 
 	w.AddObject(g)
 
-	w.AddObject(floor())
-	w.AddObject(backWall())
+	w.AddObject(floor(0))
+	w.AddObject(backWall(10))
 
 	tracer.Render(w)
 }
 
 func emissive() {
 	w := envxy(640, 480)
-	w.Config.Antialias = 1
+	w.Config.Antialias = 0
 	w.Config.SoftShadows = false
-	w.Config.SoftShadowRays = 64
+	w.Config.SoftShadowRays = 1
 	// w.Camera().SetFoV(math.Pi / 4)
 
-	l := tracer.NewAreaLight(tracer.NewUnitCube(),
+	l := tracer.NewAreaLight(tracer.NewUnitSphere(),
 		tracer.ColorName(colornames.White), true)
 	l.SetTransform(
 		tracer.IdentityMatrix().Scale(0.2, 1, 0.2).Translate(2, 1, 2))
@@ -1773,15 +1767,70 @@ func emissive() {
 	g.SetTransform(tracer.IdentityMatrix().Translate(0, 0, 2.5))
 
 	w.AddObject(g)
-	w.AddObject(floor())
-	w.AddObject(backWall())
-	w.AddObject(leftWall())
-	w.AddObject(rightWall())
-	w.AddObject(frontWall())
-	w.AddObject(ceiling())
+	w.AddObject(defaultroom())
 
 	tracer.Render(w)
 }
+
+// returns a visible spherical area light set at x,y,z, scaled by s, of intensity i
+func spherearealight(x, y, z, s float64, c color.Color) tracer.Light {
+
+	l := tracer.NewAreaLight(tracer.NewUnitSphere(), tracer.ColorName(c), true)
+	l.SetTransform(tracer.IdentityMatrix().Scale(s, s, s).Translate(x, y-s, z))
+	return l
+}
+
+// returns a plane area light raised by y, scaled by xs,xy,xz, of color c
+func flatarealight(x, y, z, xs, ys, zs float64, c color.Color) tracer.Light {
+	l := tracer.NewAreaLight(tracer.NewUnitCube(), tracer.ColorName(c), true)
+	l.SetTransform(tracer.IdentityMatrix().Scale(xs, ys, zs).Translate(x, y-2*ys, z))
+	return l
+}
+
+func simpleroom() {
+	w := envxy(640, 480)
+	w.Config.Antialias = 0
+	w.Config.SoftShadows = false
+	w.Config.SoftShadowRays = 10
+	w.Camera().SetFoV(math.Pi / 3)
+
+	// w.SetLights(tracer.Lights{spherearealight(0, 4.95, 5, 0.2, colornames.White)})
+	w.SetLights(tracer.Lights{flatarealight(0, 5, 5, 3, 0.1, 1, colornames.White)})
+
+	w.AddObject(defaultroom())
+
+	s := sphereOnPedestal()
+	s.SetTransform(tracer.IdentityMatrix().Scale(1.5, 1.5, 1.5).Translate(0, 0, 3))
+	w.AddObject(s)
+
+	mirrorRight := mirrorcube(5-0.02, 2.5, 3.2, 3.3, 1.5, 0.02, 0, math.Pi/2, 0)
+	w.AddObject(mirrorRight)
+
+	mirrorLeft := mirrorcube(-5+0.02, 2.5, 3.2, 3.3, 1.5, 0.02, 0, math.Pi/2, 0)
+	w.AddObject(mirrorLeft)
+
+	tracer.Render(w)
+}
+
+func defaultroom() *tracer.Group {
+	left, right := -5.0, 5.0
+	front, back := -10.0, 10.0
+	floor, ceiling := 0.0, 5.0
+	return room(left, front, right, back, ceiling, floor)
+}
+
+// room returns a room with all walls of the provided sizes
+func room(left, front, right, back, clng, flr float64) *tracer.Group {
+	g := tracer.NewGroup()
+	g.AddMember(floor(flr))
+	g.AddMember(backWall(back))
+	g.AddMember(leftWall(left))
+	g.AddMember(rightWall(right))
+	g.AddMember(frontWall(front))
+	g.AddMember(ceiling(clng))
+	return g
+}
+
 func simpletexturewall() {
 	w := envxy(640, 480)
 
@@ -1807,16 +1856,17 @@ func envxy(width, height float64) *tracer.World {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(3, 4, -1), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 4, 5), tracer.NewColor(1, 1, 1)),
 		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 3, -4)
-	to := tracer.NewPoint(0, -1, 10)
+	from := tracer.NewPoint(0, 2, -9)
+	to := tracer.NewPoint(0, 2, 10)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
+	w.Camera().SetFoV(math.Pi / 4)
 
 	return w
 }
@@ -1838,6 +1888,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	simpleroom()
 	// emissive()
 	// simpletexturewall()
 	// simplecone()
@@ -1872,11 +1923,11 @@ func main() {
 	// csg()
 	// simplesphere()
 
-	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	// f := path.Join(dir, "cubes2.obj")
-	f := path.Join(dir, "monkey-smooth2.obj")
-	// f := path.Join(dir, "texture2.obj")
-	objParse(f)
+	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	// // f := path.Join(dir, "cubes2.obj")
+	// f := path.Join(dir, "monkey-smooth2.obj")
+	// // f := path.Join(dir, "texture2.obj")
+	// objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

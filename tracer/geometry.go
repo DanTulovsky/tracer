@@ -1,5 +1,7 @@
 package tracer
 
+import "github.com/DanTulovsky/tracer/utils"
+
 // Shaper represents an physical object
 type Shaper interface {
 	Bounds() Bound
@@ -24,6 +26,9 @@ type Shaper interface {
 
 	Name() string
 	SetName(string)
+
+	// RandomPosition returns a andom point on the surface of the geometry
+	RandomPosition() Point
 
 	SetTransform(Matrix)
 	Transform() Matrix
@@ -158,6 +163,23 @@ func (s *Shape) calculateBounds() {
 // Bounds returns the untransformed bounding box
 func (s *Shape) Bounds() Bound {
 	return s.bound
+}
+
+// RandomPosition returns a random point on the surface
+func (s *Shape) RandomPosition() Point {
+	minx := s.Bounds().Min.X()
+	miny := s.Bounds().Min.Y()
+	minz := s.Bounds().Min.Z()
+	maxx := s.Bounds().Max.X()
+	maxy := s.Bounds().Max.Y()
+	maxz := s.Bounds().Max.Z()
+
+	rx := utils.RandomFloat(minx, maxx)
+	ry := utils.RandomFloat(miny, maxy)
+	rz := utils.RandomFloat(minz, maxz)
+
+	p := NewPoint(rx, ry, rz).ToWorldSpace(s)
+	return p
 }
 
 // Bound describes the bounding box for a shape

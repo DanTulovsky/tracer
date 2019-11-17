@@ -62,8 +62,8 @@ func (pl *Plane) IntersectWith(r Ray, t Intersections) Intersections {
 // calculateBounds calculates the bounding box of the shape
 func (pl *Plane) calculateBounds() {
 	pl.bound = Bound{
-		Min: NewPoint(-math.MaxFloat64, -0.001, -math.MaxFloat64),
-		Max: NewPoint(math.MaxFloat64, 0.001, math.MaxFloat64),
+		Min: NewPoint(-math.MaxFloat64, 0, -math.MaxFloat64),
+		Max: NewPoint(math.MaxFloat64, 0, math.MaxFloat64),
 	}
 }
 

@@ -3,6 +3,8 @@ package tracer
 import (
 	"math"
 	"sort"
+
+	"github.com/DanTulovsky/tracer/utils"
 )
 
 // Sphere is a spherical object, implements Shaper
@@ -95,4 +97,21 @@ func (s *Sphere) PrecomputeValues() {
 // Includes implements includes logic
 func (s *Sphere) Includes(s2 Shaper) bool {
 	return s == s2
+}
+
+// RandomPosition returns a random point on the surface of the sphere
+// http://mathworld.wolfram.com/SpherePointPicking.html
+func (s *Sphere) RandomPosition() Point {
+
+	u := utils.RandomFloat(0, 1)
+	v := utils.RandomFloat(0, 1)
+
+	theta := math.Pi * 2 * u
+	phi := math.Acos(2*v - 1)
+
+	x := s.Radius * math.Sin(phi) * math.Cos(theta)
+	y := s.Radius * math.Sin(phi) * math.Sin(theta)
+	z := s.Radius * math.Cos(phi)
+
+	return NewPoint(x, y, z).ToWorldSpace(s)
 }

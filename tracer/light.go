@@ -3,8 +3,6 @@ package tracer
 import (
 	"math"
 
-	"github.com/DanTulovsky/tracer/utils"
-
 	"golang.org/x/image/colornames"
 )
 
@@ -64,20 +62,7 @@ func (al *AreaLight) Position() Point {
 
 // RandomPosition implements the Light interface
 func (al *AreaLight) RandomPosition() Point {
-	// TODO: Makes this a call on the Shaper object instead
-	minx := al.Shaper.Bounds().Min.X()
-	miny := al.Shaper.Bounds().Min.Y()
-	minz := al.Shaper.Bounds().Min.Z()
-	maxx := al.Shaper.Bounds().Max.X()
-	maxy := al.Shaper.Bounds().Max.Y()
-	maxz := al.Shaper.Bounds().Min.Z()
-
-	rx := utils.RandomFloat(minx, maxx)
-	ry := utils.RandomFloat(miny, maxy)
-	rz := utils.RandomFloat(minz, maxz)
-
-	p := NewPoint(rx, ry, rz).ToWorldSpace(al.Shaper)
-	return p
+	return al.Shaper.RandomPosition()
 }
 
 // SetIntensity sets the intensity of the light
@@ -164,6 +149,11 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inten
 
 	sum := Black()
 
+	switch l.(type) {
+	case *PointLight:
+		rays = 1 // RandomPosition on PointLight always returns the same
+	}
+
 	for try := 0; try < rays; try++ {
 
 		// find the direction to the light source
@@ -171,6 +161,8 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inten
 
 		// lightDotNormal represents the cosine of the angle between the light vector and the normal vector
 		// a negaive number means the light is on the other side of the surface
+		// a very small number here means the angle is very close to 90 degree, this number is used
+		// to scale the diffuse contribution
 		lightDotNormal := lightv.Dot(normal)
 
 		if lightDotNormal < 0 {

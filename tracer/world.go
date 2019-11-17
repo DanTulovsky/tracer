@@ -77,7 +77,7 @@ func (w *World) Intersections(r Ray, xs Intersections) Intersections {
 }
 
 // SetLights sets the world lights
-func (w *World) SetLights(l []Light) {
+func (w *World) SetLights(l Lights) {
 	w.Lights = l
 	for _, l := range w.Lights {
 		if l.IsVisible() {

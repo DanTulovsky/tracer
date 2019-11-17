@@ -25,6 +25,10 @@ func showProgress(total, last, height, width, x, y float64) float64 {
 	if last < math.Floor(done) && math.Mod(math.Floor(done), every) == 0 {
 		fmt.Printf("...%.2f", done)
 		last = math.Floor(done)
+
+		if 100-every <= last {
+			fmt.Println()
+		}
 	}
 
 	return last

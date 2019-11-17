@@ -142,6 +142,7 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 	}
 
 	// TODO: Run this for ALL vertecies at the same time, here it's just one face at a time
+	// http://forum.raytracerchallenge.com/thread/27/triangle-mesh-normalization
 	// vertecies = normalizeOBJ(vertecies)
 
 	for i := 1; i < len(vertecies)-1; i++ {
