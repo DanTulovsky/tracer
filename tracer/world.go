@@ -336,8 +336,6 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 
 	// allow this many renders to run at once
 	max := w.Config.Parallelism
-	log.Printf("Parallelism: %v", max)
-	log.Printf("Antialiasing: %v", w.Config.Antialias)
 
 	// total := (camera.Vsize - 1) * (camera.Hsize - 1)
 	// last := 0.0
@@ -371,6 +369,13 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 // ShowInfo dumps info about the world
 func (w *World) ShowInfo() {
 	// log.Printf("Camera: %#v", w.Camera())
+	log.Printf("Antialiasing: %v", w.Config.Antialias)
+	log.Printf("Parallelism: %v", w.Config.Parallelism)
+	log.Printf("Max Recursion: %v", w.Config.MaxRecusions)
+	log.Printf("Soft Shadows enabled? -> %v", w.Config.SoftShadows)
+	if w.Config.SoftShadows {
+		log.Printf("  Soft shadow rays: %v", w.Config.SoftShadowRays)
+	}
 }
 
 // Render renders the world using the world camera

@@ -84,7 +84,7 @@ func (al *AreaLight) Shape() Shaper {
 	return al.Shaper
 }
 
-// IsVisible returns true if light is visible.
+// IsVisible returns true if the  light shape should be visible.
 func (al *AreaLight) IsVisible() bool {
 	return al.visible
 }
