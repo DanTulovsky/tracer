@@ -11,6 +11,7 @@ import (
 // Light is the interface all the lights use
 type Light interface {
 	Intensity() Color
+	SetIntensity(Color)
 	IsVisible() bool
 	// Center position on the light
 	Position() Point
@@ -79,12 +80,17 @@ func (al *AreaLight) RandomPosition() Point {
 	return p
 }
 
+// SetIntensity sets the intensity of the light
+func (al *AreaLight) SetIntensity(c Color) {
+	al.intensity = c
+}
+
 // Shape returns the Shaper object of this light
 func (al *AreaLight) Shape() Shaper {
 	return al.Shaper
 }
 
-// IsVisible returns true if light is visible.
+// IsVisible returns true if the  light shape should be visible.
 func (al *AreaLight) IsVisible() bool {
 	return al.visible
 }
@@ -97,6 +103,11 @@ func NewPointLight(p Point, i Color) *PointLight {
 // Intensity returns the intensity of the light
 func (pl *PointLight) Intensity() Color {
 	return pl.intensity
+}
+
+// SetIntensity sets the intensity of the light
+func (pl *PointLight) SetIntensity(c Color) {
+	pl.intensity = c
 }
 
 // Position returns the position of the light

@@ -44,7 +44,7 @@ func Test_lighting(t *testing.T) {
 		l        *PointLight
 		eye      Vector
 		normal   Vector
-		inShadow bool
+		inShadow float64
 	}
 	tests := []struct {
 		name string
@@ -72,7 +72,7 @@ func Test_lighting(t *testing.T) {
 				l:        NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
 				eye:      NewVector(0, 0, -1),
 				normal:   NewVector(0, 0, -1),
-				inShadow: true,
+				inShadow: 0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(0.1, 0.1, 0.1),
@@ -130,7 +130,7 @@ func Test_lighting(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.True(t, tt.want.Equal(
 				lighting(tt.args.m, tt.o, tt.args.p, tt.args.l,
-					tt.args.eye, tt.args.normal, tt.args.inShadow, 0, 0)))
+					tt.args.eye, tt.args.normal, tt.args.inShadow, 1, 0, 0)))
 		})
 	}
 }
@@ -142,7 +142,7 @@ func TestColorAtPoint(t *testing.T) {
 		l        *PointLight
 		eye      Vector
 		normal   Vector
-		inShadow bool
+		inShadow float64
 	}
 	tests := []struct {
 		name string

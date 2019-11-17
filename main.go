@@ -1072,11 +1072,16 @@ func ceiling() *tracer.Plane {
 
 func backWall() *tracer.Plane {
 	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
-	pp := tracer.NewStripedPattern(
-		tracer.ColorName(colornames.Purple), tracer.ColorName(colornames.White))
+	p.SetTransform(
+		tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
+	ppuv, err := tracer.NewUVImagePattern("/Users/dant/Downloads/ghost.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pp := tracer.NewTextureMapPattern(ppuv, tracer.NewPlaneMap())
+	pp.SetTransform(tracer.IdentityMatrix().Scale(8, 4, 4).RotateY(math.Pi / 2))
+	// pp := tracer.NewStripedPattern(
 	p.Material().SetPattern(pp)
-	// p.Material().Color = tracer.ColorName(colornames.Purple)
 	p.Material().Specular = 0
 
 	return p
@@ -1097,8 +1102,12 @@ func frontWall() *tracer.Plane {
 func rightWall() *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(4, 0, 0))
-	pp := tracer.NewStripedPattern(
-		tracer.ColorName(colornames.Yellow), tracer.ColorName(colornames.White))
+	ppuv, err := tracer.NewUVImagePattern("/Users/dant/Downloads/ghost.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pp := tracer.NewTextureMapPattern(ppuv, tracer.NewPlaneMap())
+	pp.SetTransform(tracer.IdentityMatrix().Scale(8, 4, 4).RotateY(math.Pi / 2))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 
@@ -1738,17 +1747,24 @@ func hollowsphere1() {
 
 func emissive() {
 	w := envxy(640, 480)
-	w.Config.Antialias = 0
+	w.Config.Antialias = 1
 	w.Config.SoftShadows = false
 	w.Config.SoftShadowRays = 64
+	// w.Camera().SetFoV(math.Pi / 4)
 
 	l := tracer.NewAreaLight(tracer.NewUnitCube(),
 		tracer.ColorName(colornames.White), true)
 	l.SetTransform(
 		tracer.IdentityMatrix().Scale(0.2, 1, 0.2).Translate(2, 1, 2))
-	// l := tracer.NewPointLight(tracer.NewPoint(0, 3, 2), tracer.White())
+	l.SetIntensity(l.Intensity().Scale(0.5))
 
-	w.SetLights(tracer.Lights{l})
+	l2 := tracer.NewAreaLight(tracer.NewUnitCube(),
+		tracer.ColorName(colornames.White), true)
+	l2.SetTransform(
+		tracer.IdentityMatrix().Scale(0.2, 1, 0.2).Translate(-2, 1, 2))
+	l2.SetIntensity(l.Intensity().Scale(0.5))
+
+	w.SetLights(tracer.Lights{l, l2})
 
 	// g := sphereOnPedestal()
 	g := mirrorSphereOnPedestal()
@@ -1762,6 +1778,23 @@ func emissive() {
 	w.AddObject(frontWall())
 	w.AddObject(ceiling())
 
+	tracer.Render(w)
+}
+func simpletexturewall() {
+	w := envxy(640, 480)
+
+	p := tracer.NewPlane()
+	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
+	ppuv, err := tracer.NewUVImagePattern("/Users/dant/Downloads/ghost.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pp := tracer.NewTextureMapPattern(ppuv, tracer.NewPlaneMap())
+	pp.SetTransform(tracer.IdentityMatrix().Scale(8, 5, 5).RotateY(math.Pi / 2))
+	p.Material().SetPattern(pp)
+	p.Material().Specular = 0
+
+	w.AddObject(p)
 	tracer.Render(w)
 }
 
@@ -1804,6 +1837,7 @@ func main() {
 	}
 
 	emissive()
+	// simpletexturewall()
 	// simplecone()
 	// simplecylinder()
 	// hollowsphere1()

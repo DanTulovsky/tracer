@@ -24,6 +24,7 @@ func imageToCanvas(m image.Image) *Canvas {
 	canvas := NewCanvas(bounds.Max.X, bounds.Max.Y)
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			// alpha = 0 returns black
 			clr := ColorName(m.At(x, y))
 			canvas.Set(x, y, clr)
 		}
@@ -71,6 +72,7 @@ func NewUVImagePattern(filename string) (*UVImagePattern, error) {
 // UVColorAt returns the color at the 2D coordinate (u, v)
 func (uvip *UVImagePattern) UVColorAt(u, v float64) Color {
 	v = 1 - v
+	u = 1 - u
 
 	x := u * (float64(uvip.canvas.Width) - 1)
 	y := v * (float64(uvip.canvas.Height) - 1)

@@ -302,7 +302,8 @@ func TestWorld_IsShadowed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// default world has only one light
-			assert.Equal(t, tt.want, tt.world.IsShadowed(tt.args.p, tt.world.Lights[0], NewIntersections()))
+			assert.Equal(t, tt.want,
+				tt.world.IsShadowed(tt.args.p, tt.world.Lights[0].Position(), NewIntersections()))
 		})
 	}
 }
