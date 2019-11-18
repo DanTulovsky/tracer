@@ -1,7 +1,6 @@
 package tracer
 
 import (
-	"github.com/DanTulovsky/tracer/utils"
 	"github.com/ojrac/opensimplex-go"
 )
 
@@ -35,7 +34,7 @@ func NewNoisePerturber() *NoisePerturber {
 	return &NoisePerturber{
 		// n:        opensimplex.NewNormalized(time.Now().Unix()),
 		n:        opensimplex.NewNormalized(1),
-		maxNoise: 1,
+		maxNoise: 0.8,
 	}
 }
 
@@ -43,16 +42,16 @@ func NewNoisePerturber() *NoisePerturber {
 func (p *NoisePerturber) Perturb(n Vector, pt Point) Vector {
 
 	// n = n.Normalize()
-	epsilon := 0.0001
+	epsilon := 0.001
 	f0 := p.n.Eval3(pt.X(), pt.Y(), pt.Z()) * p.maxNoise
 	fx := p.n.Eval3(pt.X()+epsilon, pt.Y(), pt.Z()) * p.maxNoise
 	fy := p.n.Eval3(pt.X(), pt.Y()+epsilon, pt.Z()) * p.maxNoise
 	fz := p.n.Eval3(pt.X(), pt.Y(), pt.Z()+epsilon) * p.maxNoise
 
-	f0 = utils.AT(f0, 0, 1, -1, 1)
-	fx = utils.AT(fx, 0, 1, -1, 1)
-	fy = utils.AT(fy, 0, 1, -1, 1)
-	fz = utils.AT(fz, 0, 1, -1, 1)
+	// f0 = utils.AT(f0, 0, 1, -1, 1)
+	// fx = utils.AT(fx, 0, 1, -1, 1)
+	// fy = utils.AT(fy, 0, 1, -1, 1)
+	// fz = utils.AT(fz, 0, 1, -1, 1)
 
 	df := NewVector((fx-f0)/epsilon, (fy-f0)/epsilon, (fz-f0)/epsilon)
 	// log.Println(f0)

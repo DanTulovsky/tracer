@@ -1412,23 +1412,47 @@ func shapes() {
 
 }
 
+func env2() *tracer.World {
+	width, height := 640.0, 480.0
+	// width, height := 1000.0, 1000.0
+
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewPointLight(tracer.NewPoint(3, 10, -30), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 14, -25)
+	to := tracer.NewPoint(0, 0, 10)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+
+	return w
+}
 func simplesphere() {
-	w := env()
+	w := env2()
 	w.Config.Parallelism = 1
+	w.Camera().SetFoV(math.Pi / 2.0)
 
 	sphere1 := tracer.NewUnitSphere()
-	sphere1.SetTransform(tracer.IdentityMatrix().Scale(1.6, 1.6, 1.6).Translate(0, 1, 1))
-	// mapper := tracer.NewSphericalMap()
-	// uvpattern := tracer.NewUVCheckersPattern(20, 10,
-	// 	tracer.ColorName(colornames.White), tracer.ColorName(colornames.Black))
-	// pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
-	// sphere1.Material().SetPattern(pattern)
+	sphere1.SetTransform(tracer.IdentityMatrix().Scale(9, 9, 9).Translate(0, 6, 1))
+	mapper := tracer.NewSphericalMap()
+	uvpattern := tracer.NewUVCheckersPattern(20, 10,
+		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Gray))
+	pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
+	sphere1.Material().SetPattern(pattern)
 	sphere1.Material().Color = tracer.ColorName(colornames.Lightblue)
 	sphere1.Material().SetPerturber(tracer.NewNoisePerturber())
 
 	w.AddObject(sphere1)
 	w.AddObject(floor(0))
-	w.AddObject(backWall(5))
+	w.AddObject(backWall(50))
 	tracer.Render(w)
 }
 
