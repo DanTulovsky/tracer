@@ -23,10 +23,13 @@ type Material struct {
 
 	// Some materials have textures associated with them, this is an image file read in and stored as a canvas
 	Texture *Canvas
+
+	// Used to apply perturbations to the material (changes in the normal vector)
+	perturber Perturber
 }
 
 // NewMaterial returns a new material
-func NewMaterial(clr Color, a, d, sp, s, r, t, ri float64) *Material {
+func NewMaterial(clr Color, a, d, sp, s, r, t, ri float64, p Perturber) *Material {
 
 	return &Material{
 		Color:           clr,
@@ -38,6 +41,7 @@ func NewMaterial(clr Color, a, d, sp, s, r, t, ri float64) *Material {
 		Transparency:    t,
 		RefractiveIndex: ri,
 		ShadowCaster:    true,
+		perturber:       p,
 	}
 }
 
@@ -54,6 +58,7 @@ func NewDefaultMaterial() *Material {
 		Transparency:    0,
 		RefractiveIndex: 1.0,
 		ShadowCaster:    true,
+		perturber:       NewDefaultPerturber(),
 	}
 }
 
@@ -70,7 +75,16 @@ func NewDefaultGlassMaterial() *Material {
 		Transparency:    1.0,
 		RefractiveIndex: 1.5,
 		ShadowCaster:    false,
+		perturber:       NewDefaultPerturber(),
 	}
+}
+
+// PerturbNormal applies he material perturbation function to the normal n at point p
+func (m *Material) PerturbNormal(n Vector, p Point) Vector {
+	if m.perturber != nil {
+		return m.perturber.Perturb(n, p)
+	}
+	return n
 }
 
 // ColorAtTexture returns the color at the u,v point based on the texture attached to the material
@@ -117,6 +131,11 @@ func (m *Material) HasTexture() bool {
 // SetPattern sets a pattern on a material
 func (m *Material) SetPattern(p Patterner) {
 	m.Pattern = p
+}
+
+// SetPerturber sets a perturber on a material
+func (m *Material) SetPerturber(p Perturber) {
+	m.perturber = p
 }
 
 // Equals return true if the materials are the same

@@ -1,6 +1,8 @@
 package tracer
 
-import "github.com/DanTulovsky/tracer/utils"
+import (
+	"github.com/DanTulovsky/tracer/utils"
+)
 
 // Shaper represents an physical object
 type Shaper interface {
@@ -108,13 +110,16 @@ func (s *Shape) NormalAt(p Point, xs *Intersection) Vector {
 	// object normal, this is different for each shape
 	on := s.lna(op, xs)
 
+	// Apply any material perturbations to the normal
+	on = s.Material().PerturbNormal(on, p)
+
 	// world normal
 	wn := on.NormalToWorldSpace(s)
 
 	return wn.Normalize()
 }
 
-// localNormalAt return the local normal vector at the point
+// localNormalAt returns the local normal vector at the point
 func (s *Shape) localNormalAt(p Point, xs *Intersection) Vector {
 	panic("must implement localNormalAt")
 }
