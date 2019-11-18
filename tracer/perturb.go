@@ -25,41 +25,44 @@ func (p *DefaultPerturber) Perturb(v Vector, unused Point) Vector {
 
 // NoisePerturber perturbes based on noise
 type NoisePerturber struct {
-	n        opensimplex.Noise
+	n opensimplex.Noise
+
+	// maxNoise generally controls the "vertical" (along the original normal) height
 	maxNoise float64
+
+	// scale controls the "horizontal" size of the pattern
+	// a larger value here means more bumps are visible
+	scale float64
 }
 
 // NewNoisePerturber returns a perturber that makes waves on the shape
-func NewNoisePerturber() *NoisePerturber {
+func NewNoisePerturber(maxNoise, scale float64) *NoisePerturber {
 	return &NoisePerturber{
 		// n:        opensimplex.NewNormalized(time.Now().Unix()),
-		n:        opensimplex.NewNormalized(1),
-		maxNoise: 0.8,
+		n: opensimplex.NewNormalized(1),
+
+		// These two parameters control the size and frequency of the bumps
+		maxNoise: maxNoise, // 1 is a nice value here
+		scale:    scale,    // 6 is a nice value for a -1,1 shape
 	}
 }
 
 // Perturb implements the Perturber interface
 func (p *NoisePerturber) Perturb(n Vector, pt Point) Vector {
 
-	// n = n.Normalize()
+	pt = pt.Scale(p.scale)
 	epsilon := 0.001
 	f0 := p.n.Eval3(pt.X(), pt.Y(), pt.Z()) * p.maxNoise
 	fx := p.n.Eval3(pt.X()+epsilon, pt.Y(), pt.Z()) * p.maxNoise
 	fy := p.n.Eval3(pt.X(), pt.Y()+epsilon, pt.Z()) * p.maxNoise
 	fz := p.n.Eval3(pt.X(), pt.Y(), pt.Z()+epsilon) * p.maxNoise
 
-	// f0 = utils.AT(f0, 0, 1, -1, 1)
-	// fx = utils.AT(fx, 0, 1, -1, 1)
-	// fy = utils.AT(fy, 0, 1, -1, 1)
-	// fz = utils.AT(fz, 0, 1, -1, 1)
-
 	df := NewVector((fx-f0)/epsilon, (fy-f0)/epsilon, (fz-f0)/epsilon)
-	// log.Println(f0)
-	// log.Println(fx)
-	// log.Println(fy)
-	// log.Println(fz)
-	// log.Println(df)
-	// log.Println()
 
 	return n.SubVector(df).Normalize()
+}
+
+// SetNoise allows setting the noise generator (mostly used for tests)
+func (p *NoisePerturber) SetNoise(n opensimplex.Noise) {
+	p.n = n
 }

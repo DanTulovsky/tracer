@@ -1414,7 +1414,6 @@ func shapes() {
 
 func env2() *tracer.World {
 	width, height := 640.0, 480.0
-	// width, height := 1000.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1427,7 +1426,8 @@ func env2() *tracer.World {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 14, -25)
+	// from := tracer.NewPoint(0, 14, -25)
+	from := tracer.NewPoint(0, 2, -2)
 	to := tracer.NewPoint(0, 0, 10)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -1436,19 +1436,20 @@ func env2() *tracer.World {
 	return w
 }
 func simplesphere() {
-	w := env2()
-	w.Config.Parallelism = 1
-	w.Camera().SetFoV(math.Pi / 2.0)
+	w := envxy(640, 480)
+	// w.Config.Parallelism = 1
+	// w.Camera().SetFoV(math.Pi / 2.0)
 
 	sphere1 := tracer.NewUnitSphere()
-	sphere1.SetTransform(tracer.IdentityMatrix().Scale(9, 9, 9).Translate(0, 6, 1))
+	sphere1.SetTransform(
+		tracer.IdentityMatrix().Scale(1.3, 1.3, 1.3).Translate(0, 1.3, 1))
 	mapper := tracer.NewSphericalMap()
 	uvpattern := tracer.NewUVCheckersPattern(20, 10,
 		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Gray))
 	pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
 	sphere1.Material().SetPattern(pattern)
-	sphere1.Material().Color = tracer.ColorName(colornames.Lightblue)
-	sphere1.Material().SetPerturber(tracer.NewNoisePerturber())
+	sphere1.Material().SetPerturber(
+		tracer.NewNoisePerturber(1, 10))
 
 	w.AddObject(sphere1)
 	w.AddObject(floor(0))
@@ -1886,8 +1887,8 @@ func envxy(width, height float64) *tracer.World {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(0, 4, 5), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(0, 4, 5), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(2, 10, -10), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
