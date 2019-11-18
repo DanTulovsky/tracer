@@ -21,6 +21,10 @@ func TestNewGroup(t *testing.T) {
 					transformInverse: IdentityMatrix().Inverse(),
 					material:         NewDefaultMaterial(),
 					shape:            "group",
+					bound: Bound{
+						Min: Origin(),
+						Max: Origin(),
+					},
 				},
 			},
 		},
@@ -424,6 +428,7 @@ func TestGroup_Bounds(t *testing.T) {
 			tt.group.PrecomputeValues()
 
 			got := tt.group.Bounds()
+			// log.Println(got)
 			assert.Equal(t, tt.want, got, "should equal")
 		})
 	}

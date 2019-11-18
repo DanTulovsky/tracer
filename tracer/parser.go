@@ -9,9 +9,11 @@ import (
 	"fmt"
 	"image"
 	"log"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 
 	"github.com/mokiat/go-data-front/decoder/mtl"
 	"github.com/mokiat/go-data-front/decoder/obj"
@@ -72,6 +74,54 @@ func parseOBJ(f *os.File, dir string) (*obj.Model, *mtl.Library, error) {
 	return model, lib, nil
 }
 
+// boundingBoxFromPoints returns the bounding box given a list of points
+func boundingBoxFromPoints(points ...Point) Bound {
+
+	var x []float64
+	var y []float64
+	var z []float64
+
+	for _, p := range points {
+		x = append(x, p.X())
+		y = append(y, p.Y())
+		z = append(z, p.Z())
+	}
+
+	sort.Float64s(x)
+	sort.Float64s(y)
+	sort.Float64s(z)
+
+	return Bound{
+		Min: NewPoint(x[0], y[0], z[0]),
+		Max: NewPoint(x[len(x)-1], y[len(y)-1], z[len(z)-1]),
+	}
+}
+
+// normalizeOBJ resizes the vertecies to all live in a box (-1, -1, -1) - (1, 1, 1)
+func normalizeOBJ(vertecies []Point) []Point {
+	log.Println("normalizing obj input...")
+	result := []Point{}
+
+	bbox := boundingBoxFromPoints(vertecies...)
+	log.Println(bbox)
+
+	sx := bbox.Max.x - bbox.Min.x
+	sy := bbox.Max.y - bbox.Min.y
+	sz := bbox.Max.z - bbox.Min.z
+
+	scale := math.Max(math.Max(sx, sy), sz) / 2
+
+	for _, v := range vertecies {
+		new := NewPoint(0, 0, 0)
+		new.x = (v.x - (bbox.Min.x + sx/2)) / scale
+		new.y = (v.y - (bbox.Min.y + sy/2)) / scale
+		new.z = (v.z - (bbox.Min.z + sz/2)) / scale
+		result = append(result, new)
+	}
+	return result
+
+}
+
 // triangulate converts a face into a list of triangles
 func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 	var tri []Shaper
@@ -91,6 +141,10 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 		textures = append(textures, NewVector(t.U, 1-t.V, t.W))
 	}
 
+	// TODO: Run this for ALL vertecies at the same time, here it's just one face at a time
+	// http://forum.raytracerchallenge.com/thread/27/triangle-mesh-normalization
+	// vertecies = normalizeOBJ(vertecies)
+
 	for i := 1; i < len(vertecies)-1; i++ {
 		t := NewSmoothTriangle(
 			vertecies[0], vertecies[i], vertecies[i+1],
@@ -101,7 +155,11 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 	}
 
 	return tri
+}
 
+// processIllum sets various material settings based on the illum parameter
+func processIllum(mat *mtl.Material, illum int64) *mtl.Material {
+	return mat
 }
 
 // convertMaterial converts OBJ material to *Material
@@ -147,6 +205,10 @@ func convertMaterial(mat *mtl.Material, dir string) (*Material, error) {
 	if m.Transparency > 0 {
 		m.ShadowCaster = false
 	}
+
+	// TODO: Implement support for illum, probably in lighting()
+	// http://paulbourke.net/dataformats/mtl/
+	mat = processIllum(mat, illum)
 
 	// If there is a texture present, use it
 	if mat.DiffuseTexture != "" {

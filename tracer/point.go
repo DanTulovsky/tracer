@@ -41,6 +41,11 @@ func (p Point) W() float64 {
 	return p.w
 }
 
+// SetW sets w
+func (p Point) SetW(a float64) {
+	p.w = a
+}
+
 // AddScalar adds a scalar to all the values of the point
 func (p Point) AddScalar(t float64) Point {
 	return NewPoint(p.X()+t, p.Y()+t, p.Z()+t)
@@ -96,4 +101,18 @@ func (p Point) ToObjectSpace(s Shaper) Point {
 	}
 
 	return res.TimesMatrix(s.TransformInverse())
+}
+
+// ToWorldSpace converts the given point from object space to world space
+func (p Point) ToWorldSpace(s Shaper) Point {
+	res := p
+
+	if s.HasParent() {
+		res = p.ToWorldSpace(s.Parent())
+	}
+
+	res = res.TimesMatrix(s.Transform())
+	res.SetW(1)
+
+	return res
 }

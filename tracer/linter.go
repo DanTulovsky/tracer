@@ -8,34 +8,44 @@ import (
 func (w *World) LintWorld() {
 	log.Println("Linting the world...")
 
-	// if w.Config.Antialias != 1 && !utils.IsPowerOf2(w.Config.Antialias) {
-	// 	log.Fatalf("world antialias parameter must be a power of 2 (have: %v)", w.Config.Antialias)
-	// }
-
 	for _, o := range w.Objects {
-		LintObject(o)
+		lintObject(o)
 	}
+
+	w.lintLights(w.Lights)
 
 }
 
 // LintObject runs linter checks for objects
-func LintObject(o Shaper) {
+func lintObject(o Shaper) {
 	if o.HasMembers() {
 		for _, m := range o.(*Group).Members() {
-			LintMaterial(m.Material(), m)
+			lintMaterial(m.Material(), m)
 		}
 	}
-	LintMaterial(o.Material(), o)
+	lintMaterial(o.Material(), o)
 }
 
 // LintMaterial runs linter checks for material
-func LintMaterial(m *Material, o Shaper) {
+func lintMaterial(m *Material, o Shaper) {
 
 	// Transparency checks
 	if m.Transparency > 0 {
 		// Warn if ShadowCaster is set on transparent objects
 		if m.ShadowCaster {
-			log.Printf("Object [%v] has Transparency and ShadowCaster set.", o.Name())
+			log.Printf("[warning] Object [%v] has Transparency and ShadowCaster set.", o.Name())
 		}
 	}
+}
+
+func (w *World) lintLights(lights []Light) {
+	for _, l := range lights {
+		switch l.(type) {
+		case *AreaLight:
+			if !w.Config.SoftShadows {
+				log.Printf("[warning] Have area lights, but soft shadows are off.")
+			}
+		}
+	}
+
 }

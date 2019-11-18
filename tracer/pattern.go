@@ -117,11 +117,6 @@ func (cm *CubeMapPattern) ColorAtObject(o Shaper, p Point) Color {
 	return cm.colorAt(cm.objectSpacePoint(o, p))
 }
 
-// uvColorAt returns the color at the 2D coordinate (u, v)
-func (cm *CubeMapPattern) uvColorAt(u, v float64) Color {
-	return White()
-}
-
 // ColorAt implements Patterner
 func (cm *CubeMapPattern) colorAt(p Point) Color {
 	// The correct face is calculated by this function
@@ -304,18 +299,18 @@ func (cp *CheckerPattern) colorAt(p Point) Color {
 	return cp.b
 }
 
-// PertrubedPattern jitters the points before passing them on to the real pattern
+// PerturbedPattern jitters the points before passing them on to the real pattern
 // Using Opensimplex: https://github.com/ojrac/opensimplex-go
-type PertrubedPattern struct {
+type PerturbedPattern struct {
 	basePattern
 	p        Patterner // real pattern to delegate to
 	noise    opensimplex.Noise
 	maxNoise float64
 }
 
-// NewPertrubedPattern returns a new pertrubed patterner
+// NewPerturbedPattern returns a new perturbed patterner
 // maxNoise is a [0, 1] value which clamps how much the noise affects the input
-func NewPertrubedPattern(p Patterner, maxNoise float64) *PertrubedPattern {
+func NewPerturbedPattern(p Patterner, maxNoise float64) *PerturbedPattern {
 
 	if maxNoise < 0 || maxNoise > 1 {
 		panic("maxNoise must be between 0 and 1")
@@ -323,7 +318,7 @@ func NewPertrubedPattern(p Patterner, maxNoise float64) *PertrubedPattern {
 
 	n := opensimplex.NewNormalized(time.Now().Unix())
 
-	return &PertrubedPattern{
+	return &PerturbedPattern{
 		p:        p,
 		noise:    n,
 		maxNoise: maxNoise,
@@ -335,7 +330,7 @@ func NewPertrubedPattern(p Patterner, maxNoise float64) *PertrubedPattern {
 }
 
 // ColorAtObject returns the color for the given pattern on the given object
-func (pp *PertrubedPattern) ColorAtObject(o Shaper, p Point) Color {
+func (pp *PerturbedPattern) ColorAtObject(o Shaper, p Point) Color {
 	// change p using opensimplex
 	n := pp.noise.Eval3(p.X(), p.Y(), p.Z()) * pp.maxNoise
 

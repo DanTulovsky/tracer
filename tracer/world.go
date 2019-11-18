@@ -3,33 +3,11 @@ package tracer
 import (
 	"log"
 	"math"
-	"runtime"
 	"sort"
 	"sync"
 
 	"golang.org/x/image/colornames"
 )
-
-// WorldConfig collects various settings to configure the world
-type WorldConfig struct {
-	// How many times to allow the ray to bounce between two objects (controls reflections of reflections)
-	MaxRecusions int
-
-	// Antialiasing support
-	Antialias int
-
-	// Parallelism, how many pixels to render at the same time
-	Parallelism int
-}
-
-// NewWorldConfig returns a new world config with default settings
-func NewWorldConfig() *WorldConfig {
-	return &WorldConfig{
-		Antialias:    1,
-		MaxRecusions: 4,
-		Parallelism:  runtime.NumCPU(),
-	}
-}
 
 // World holds everything in it
 type World struct {
@@ -66,16 +44,17 @@ func NewDefaultTestWorld() *World {
 	l1 := NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White))
 
 	s1 := NewUnitSphere()
-	s1.SetMaterial(NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1))
+	s1.SetMaterial(NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1, NewDefaultPerturber()))
 
 	s2 := NewUnitSphere()
 	s2.SetTransform(IdentityMatrix().Scale(0.5, 0.5, 0.5))
 
 	w := NewWorld(NewWorldConfig())
-	w.Objects = []Shaper{s1, s2}
-	w.Lights = []Light{l1}
-	return w
+	w.AddObject(s1)
+	w.AddObject(s2)
+	w.SetLights([]Light{l1})
 
+	return w
 }
 
 // AddObject adds an object into the world
@@ -98,8 +77,16 @@ func (w *World) Intersections(r Ray, xs Intersections) Intersections {
 }
 
 // SetLights sets the world lights
-func (w *World) SetLights(l []Light) {
+func (w *World) SetLights(l Lights) {
 	w.Lights = l
+	for _, l := range w.Lights {
+		if l.IsVisible() {
+			switch l.(type) {
+			case *AreaLight:
+				w.AddObject(l.(*AreaLight))
+			}
+		}
+	}
 }
 
 // AddLight adds a new light to the world
@@ -193,7 +180,7 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 	var result Color
 
 	for _, l := range w.Lights {
-		isShadowed := w.IsShadowed(state.OverPoint, l, xs)
+		inensity := w.IntensityAt(state.OverPoint, l, xs)
 
 		surface := lighting(
 			state.Object.Material(),
@@ -202,7 +189,8 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 			l,
 			state.EyeV,
 			state.NormalV,
-			isShadowed,
+			inensity,
+			w.Config.SoftShadowRays,
 			state.U,
 			state.V)
 
@@ -223,10 +211,40 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 	return result
 }
 
+// IntensityAt returns the intensity of the light at point p
+func (w *World) IntensityAt(p Point, l Light, xs Intersections) float64 {
+	maxShadowRays := w.Config.SoftShadowRays
+	if w.Config.SoftShadows {
+		maxShadowRays = w.Config.SoftShadowRays
+	}
+
+	switch l.(type) {
+	case *PointLight:
+		if w.IsShadowed(p, l.Position(), xs) {
+			return 0
+		}
+		return 1
+	case *AreaLight:
+		if !w.Config.SoftShadows {
+			if w.IsShadowed(p, l.Position(), xs) {
+				return 0
+			}
+			return 1
+		}
+		total := 0.0
+		for try := 0; try < maxShadowRays; try++ {
+			if !w.IsShadowed(p, l.RandomPosition(), xs) {
+				total = total + 1
+			}
+		}
+		return total / float64(maxShadowRays)
+	}
+	return 0
+}
+
 // IsShadowed returns true if p is in a shadow from the given light
-// TODO: Change this to be a range rather than a bool
-func (w *World) IsShadowed(p Point, l Light, xs Intersections) bool {
-	v := l.Position().SubPoint(p)
+func (w *World) IsShadowed(p Point, lp Point, xs Intersections) bool {
+	v := lp.SubPoint(p)
 	distance := v.Magnitude()
 	direction := v.Normalize()
 
@@ -295,8 +313,13 @@ func (w *World) renderWorker(in chan *pixel, canvas *Canvas) {
 
 	// antialias config
 	aa := float64(w.Config.Antialias)
-	numSquares := math.Pow(2, aa)
-	offset := 1.0 / (2 * aa)
+	numSquares := 1.0
+	offset := 0.5
+
+	if aa > 0 {
+		numSquares = math.Pow(2, aa)
+		offset = 1.0 / (2 * aa)
+	}
 	rowLength := math.Sqrt(numSquares)
 
 	for p := range in {
@@ -313,10 +336,6 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 
 	// allow this many renders to run at once
 	max := w.Config.Parallelism
-	log.Printf("Parallelism: %v", max)
-
-	// total := (camera.Vsize - 1) * (camera.Hsize - 1)
-	// last := 0.0
 
 	// create communications channel
 	pending := make(chan *pixel)
@@ -331,10 +350,14 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 		}()
 	}
 
+	total := (camera.Vsize - 1) * (camera.Hsize - 1)
+	last := 0.0
+
 	for y := 0.0; y < camera.Vsize-1; y++ {
 		for x := 0.0; x < camera.Hsize-1; x++ {
 			// send work to workers
 			pending <- &pixel{x: x, y: y}
+			last = showProgress(total, last, camera.Vsize-1, camera.Hsize-1, x, y)
 		}
 	}
 	close(pending)
@@ -347,6 +370,13 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 // ShowInfo dumps info about the world
 func (w *World) ShowInfo() {
 	// log.Printf("Camera: %#v", w.Camera())
+	log.Printf("Antialiasing: %v", w.Config.Antialias)
+	log.Printf("Parallelism: %v", w.Config.Parallelism)
+	log.Printf("Max Recursion: %v", w.Config.MaxRecusions)
+	log.Printf("Soft Shadows enabled? -> %v", w.Config.SoftShadows)
+	if w.Config.SoftShadows {
+		log.Printf("  Soft shadow rays: %v", w.Config.SoftShadowRays)
+	}
 }
 
 // Render renders the world using the world camera

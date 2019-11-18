@@ -248,6 +248,8 @@ func TestWorld_Render(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
+			log.Println(tt.canvas)
+			log.Println(got)
 			assert.True(t, NewColor(0.38066, 0.47583, 0.2855).Equal(got), "should equal")
 
 		})
@@ -300,7 +302,8 @@ func TestWorld_IsShadowed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// default world has only one light
-			assert.Equal(t, tt.want, tt.world.IsShadowed(tt.args.p, tt.world.Lights[0], NewIntersections()))
+			assert.Equal(t, tt.want,
+				tt.world.IsShadowed(tt.args.p, tt.world.Lights[0].Position(), NewIntersections()))
 		})
 	}
 }

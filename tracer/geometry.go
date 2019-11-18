@@ -1,5 +1,9 @@
 package tracer
 
+import (
+	"github.com/DanTulovsky/tracer/utils"
+)
+
 // Shaper represents an physical object
 type Shaper interface {
 	Bounds() Bound
@@ -24,6 +28,9 @@ type Shaper interface {
 
 	Name() string
 	SetName(string)
+
+	// RandomPosition returns a andom point on the surface of the geometry
+	RandomPosition() Point
 
 	SetTransform(Matrix)
 	Transform() Matrix
@@ -53,7 +60,7 @@ func (s *Shape) Equal(s2 *Shape) bool {
 		s.transform.Equals(s2.Transform()) &&
 		s.transformInverse.Equals(s2.Transform()) &&
 		s.material.Equals(s2.material) &&
-		s.bound == s2.bound &&
+		// s.bound == s2.bound &&
 		s.parent == s2.parent &&
 		(s.lna != nil) == (s2.lna != nil)
 
@@ -103,13 +110,16 @@ func (s *Shape) NormalAt(p Point, xs *Intersection) Vector {
 	// object normal, this is different for each shape
 	on := s.lna(op, xs)
 
+	// Apply any material perturbations to the normal
+	on = s.Material().PerturbNormal(on, p)
+
 	// world normal
 	wn := on.NormalToWorldSpace(s)
 
 	return wn.Normalize()
 }
 
-// localNormalAt return the local normal vector at the point
+// localNormalAt returns the local normal vector at the point
 func (s *Shape) localNormalAt(p Point, xs *Intersection) Vector {
 	panic("must implement localNormalAt")
 }
@@ -160,7 +170,29 @@ func (s *Shape) Bounds() Bound {
 	return s.bound
 }
 
+// RandomPosition returns a random point on the surface
+func (s *Shape) RandomPosition() Point {
+	minx := s.Bounds().Min.X()
+	miny := s.Bounds().Min.Y()
+	minz := s.Bounds().Min.Z()
+	maxx := s.Bounds().Max.X()
+	maxy := s.Bounds().Max.Y()
+	maxz := s.Bounds().Max.Z()
+
+	rx := utils.RandomFloat(minx, maxx)
+	ry := utils.RandomFloat(miny, maxy)
+	rz := utils.RandomFloat(minz, maxz)
+
+	p := NewPoint(rx, ry, rz).ToWorldSpace(s)
+	return p
+}
+
 // Bound describes the bounding box for a shape
 type Bound struct {
 	Min, Max Point
+}
+
+// Center returns the center of the bounding box
+func (b Bound) Center() Point {
+	return NewPoint((b.Max.x+b.Min.x)/2, (b.Max.y+b.Min.y)/2, (b.Max.z+b.Min.z)/2)
 }

@@ -42,6 +42,7 @@ func NewCone(min, max float64) *Cone {
 	c := NewDefaultCone()
 	c.Minimum = min
 	c.Maximum = max
+	c.calculateBounds()
 	return c
 }
 
