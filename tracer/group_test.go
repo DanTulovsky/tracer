@@ -329,8 +329,8 @@ func TestGroup_Bounds(t *testing.T) {
 			},
 			transform: IdentityMatrix(),
 			want: Bound{
-				Min: NewPoint(-math.MaxFloat64, -0.001, -math.MaxFloat64),
-				Max: NewPoint(math.MaxFloat64, 0.001, math.MaxFloat64),
+				Min: NewPoint(-math.MaxFloat64, 0, -math.MaxFloat64),
+				Max: NewPoint(math.MaxFloat64, 0, math.MaxFloat64),
 			},
 		},
 		{
@@ -428,7 +428,6 @@ func TestGroup_Bounds(t *testing.T) {
 			tt.group.PrecomputeValues()
 
 			got := tt.group.Bounds()
-			// log.Println(got)
 			assert.Equal(t, tt.want, got, "should equal")
 		})
 	}

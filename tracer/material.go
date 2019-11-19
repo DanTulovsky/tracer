@@ -5,8 +5,6 @@ import (
 	"log"
 
 	"golang.org/x/image/colornames"
-
-	"github.com/google/go-cmp/cmp"
 )
 
 // Material is a material to apply to shapes
@@ -140,5 +138,17 @@ func (m *Material) SetPerturber(p Perturber) {
 
 // Equals return true if the materials are the same
 func (m *Material) Equals(m2 *Material) bool {
-	return cmp.Equal(m, m2)
+	return m.Color.Equal(m2.Color) &&
+		m.Pattern == m2.Pattern &&
+		m.Ambient == m2.Ambient &&
+		m.Diffuse == m2.Diffuse &&
+		m.Specular == m2.Specular &&
+		m.Shininess == m2.Shininess &&
+		m.Reflective == m2.Reflective &&
+		m.Transparency == m2.Transparency &&
+		m.RefractiveIndex == m2.RefractiveIndex &&
+		m.Emissive.Equal(m2.Emissive) &&
+		m.ShadowCaster == m2.ShadowCaster &&
+		m.Texture == m2.Texture &&
+		m.perturber == m2.perturber
 }

@@ -1,8 +1,11 @@
 package tracer
 
 import (
+	"fmt"
 	"math"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/image/colornames"
@@ -55,11 +58,12 @@ func Test_lighting(t *testing.T) {
 		{
 			name: "eye between light and surface",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
-				eye:    NewVector(0, 0, -1),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
+				eye:      NewVector(0, 0, -1),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(1.9, 1.9, 1.9),
@@ -80,11 +84,12 @@ func Test_lighting(t *testing.T) {
 		{
 			name: "eye between light and surface, eye offset 45 degrees",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
-				eye:    NewVector(0, math.Sqrt2/2, -math.Sqrt2/2),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
+				eye:      NewVector(0, math.Sqrt2/2, -math.Sqrt2/2),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(1.0, 1.0, 1.0),
@@ -92,11 +97,12 @@ func Test_lighting(t *testing.T) {
 		{
 			name: "eye opposite surface, light offset 45 degrees",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 10, -10), ColorName(colornames.White)),
-				eye:    NewVector(0, 0, -1),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 10, -10), ColorName(colornames.White)),
+				eye:      NewVector(0, 0, -1),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(0.7364, 0.7364, 0.7364),
@@ -104,11 +110,12 @@ func Test_lighting(t *testing.T) {
 		{
 			name: "eye in the path of the reflection vector",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 10, -10), ColorName(colornames.White)),
-				eye:    NewVector(0, -math.Sqrt2/2, -math.Sqrt2/2),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 10, -10), ColorName(colornames.White)),
+				eye:      NewVector(0, -math.Sqrt2/2, -math.Sqrt2/2),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(1.6364, 1.6364, 1.6364),
@@ -116,11 +123,12 @@ func Test_lighting(t *testing.T) {
 		{
 			name: "light behind the surface",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 0, 10), ColorName(colornames.White)),
-				eye:    NewVector(0, 0, -1),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 0, 10), ColorName(colornames.White)),
+				eye:      NewVector(0, 0, -1),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(0.1, 0.1, 0.1),
@@ -128,9 +136,9 @@ func Test_lighting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equal(
-				lighting(tt.args.m, tt.o, tt.args.p, tt.args.l,
-					tt.args.eye, tt.args.normal, tt.args.inShadow, 1, 0, 0)))
+			got := lighting(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow, 1, 0, 0)
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }
@@ -153,11 +161,12 @@ func TestColorAtPoint(t *testing.T) {
 		{
 			name: "eye between light and surface",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
-				eye:    NewVector(0, 0, -1),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
+				eye:      NewVector(0, 0, -1),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(1.0, 1.0, 1.0),
@@ -165,11 +174,12 @@ func TestColorAtPoint(t *testing.T) {
 		{
 			name: "eye between light and surface, eye offset 45 degrees",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
-				eye:    NewVector(0, math.Sqrt2/2, -math.Sqrt2/2),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 0, -10), ColorName(colornames.White)),
+				eye:      NewVector(0, math.Sqrt2/2, -math.Sqrt2/2),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(1.0, 1.0, 1.0),
@@ -177,11 +187,12 @@ func TestColorAtPoint(t *testing.T) {
 		{
 			name: "eye opposite surface, light offset 45 degrees",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 10, -10), ColorName(colornames.White)),
-				eye:    NewVector(0, 0, -1),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 10, -10), ColorName(colornames.White)),
+				eye:      NewVector(0, 0, -1),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(0.7364, 0.7364, 0.7364),
@@ -189,11 +200,12 @@ func TestColorAtPoint(t *testing.T) {
 		{
 			name: "eye in the path of the reflection vector",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 10, -10), ColorName(colornames.White)),
-				eye:    NewVector(0, -math.Sqrt2/2, -math.Sqrt2/2),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 10, -10), ColorName(colornames.White)),
+				eye:      NewVector(0, -math.Sqrt2/2, -math.Sqrt2/2),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(1.0, 1.0, 1.0),
@@ -201,11 +213,12 @@ func TestColorAtPoint(t *testing.T) {
 		{
 			name: "light behind the surface",
 			args: args{
-				m:      NewDefaultMaterial(),
-				p:      NewPoint(0, 0, 0),
-				l:      NewPointLight(NewPoint(0, 0, 10), ColorName(colornames.White)),
-				eye:    NewVector(0, 0, -1),
-				normal: NewVector(0, 0, -1),
+				m:        NewDefaultMaterial(),
+				p:        NewPoint(0, 0, 0),
+				l:        NewPointLight(NewPoint(0, 0, 10), ColorName(colornames.White)),
+				eye:      NewVector(0, 0, -1),
+				normal:   NewVector(0, 0, -1),
+				inShadow: 1.0,
 			},
 			o:    NewUnitSphere(),
 			want: NewColor(0.1, 0.1, 0.1),
@@ -213,7 +226,9 @@ func TestColorAtPoint(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.True(t, tt.want.Equal(ColorAtPoint(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)))
+			got := ColorAtPoint(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }

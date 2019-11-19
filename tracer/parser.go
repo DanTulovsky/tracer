@@ -103,7 +103,6 @@ func normalizeOBJ(vertecies []Point) []Point {
 	result := []Point{}
 
 	bbox := boundingBoxFromPoints(vertecies...)
-	log.Println(bbox)
 
 	sx := bbox.Max.x - bbox.Min.x
 	sy := bbox.Max.y - bbox.Min.y

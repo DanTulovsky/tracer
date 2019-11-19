@@ -97,7 +97,7 @@ func TestWorld_shadeHit(t *testing.T) {
 			args: args{
 				i:         NewIntersection(NewUnitSphere(), 4),
 				r:         NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
-				material:  NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1),
+				material:  NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1, NewDefaultPerturber()),
 				transform: IdentityMatrix(),
 				lights: []Light{
 					NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White)),
@@ -187,7 +187,7 @@ func TestWorld_ColorAt(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 1, 0)),
 			},
-			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1),
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1, NewDefaultPerturber()),
 			m2:   NewDefaultMaterial(),
 			want: ColorName(colornames.Black),
 		},
@@ -197,7 +197,7 @@ func TestWorld_ColorAt(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
 			},
-			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1),
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1, NewDefaultPerturber()),
 			m2:   NewDefaultMaterial(),
 			want: NewColor(0.38066, 0.47583, 0.2855),
 		},
@@ -207,8 +207,8 @@ func TestWorld_ColorAt(t *testing.T) {
 			args: args{
 				r: NewRay(NewPoint(0, 0, 0.75), NewVector(0, 0, -1)),
 			},
-			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 1, 0.7, 0.2, 200, 0, 0, 1),
-			m2:   NewMaterial(NewColor(1.0, 1.0, 1.0), 1, 0.9, 0.9, 200, 0, 0, 1),
+			m1:   NewMaterial(NewColor(0.8, 1.0, 0.6), 1, 0.7, 0.2, 200, 0, 0, 1, NewDefaultPerturber()),
+			m2:   NewMaterial(NewColor(1.0, 1.0, 1.0), 1, 0.9, 0.9, 200, 0, 0, 1, NewDefaultPerturber()),
 			want: NewColor(1, 1, 1),
 		},
 	}
@@ -248,8 +248,6 @@ func TestWorld_Render(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			log.Println(tt.canvas)
-			log.Println(got)
 			assert.True(t, NewColor(0.38066, 0.47583, 0.2855).Equal(got), "should equal")
 
 		})
