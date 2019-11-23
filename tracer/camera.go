@@ -1,6 +1,8 @@
 package tracer
 
-import "math"
+import (
+	"math"
+)
 
 // ViewTransform returns the view transform matrix given from, to and up vectors
 func ViewTransform(from, to Point, up Vector) Matrix {

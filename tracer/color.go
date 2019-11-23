@@ -2,6 +2,7 @@ package tracer
 
 import (
 	"image/color"
+	"math"
 
 	"github.com/DanTulovsky/tracer/utils"
 	"github.com/lucasb-eyer/go-colorful"
@@ -100,6 +101,22 @@ func (c Color) Equal(c2 Color) bool {
 		return true
 	}
 	return false
+}
+
+// GreyScale returns the GreyScale value of this color
+// from https://stackoverflow.com/questions/17615963/standard-rgb-to-grayscale-conversion
+func (c Color) GreyScale() float64 {
+	var csrgb float64
+
+	clin := 0.2126*c.R + 0.7152*c.G + 0.0722*c.B
+	switch {
+	case clin <= 0.0031308:
+		csrgb = 12.92 * clin
+	default:
+		csrgb = 1.055*math.Pow(clin, 1/2.4) - 0.055
+	}
+
+	return csrgb
 }
 
 // Colors is a list of Color

@@ -111,7 +111,7 @@ func (s *Shape) NormalAt(p Point, xs *Intersection) Vector {
 	on := s.lna(op, xs)
 
 	// Apply any material perturbations to the normal
-	on = s.Material().PerturbNormal(on, p)
+	on = s.Material().PerturbNormal(on, op)
 
 	// world normal
 	wn := on.NormalToWorldSpace(s)

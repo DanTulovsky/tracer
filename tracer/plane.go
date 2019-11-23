@@ -23,7 +23,7 @@ func NewPlane() *Plane {
 			shape:            "plane",
 		},
 	}
-	pl.lna = pl.NormalAt
+	pl.lna = pl.localNormalAt
 	pl.calculateBounds()
 	return pl
 }
@@ -33,13 +33,8 @@ func (pl *Plane) Equal(pl2 *Plane) bool {
 	return pl.Shape.Equal(&pl2.Shape)
 }
 
-// NormalAt returns the normal vector at the given point on the surface of the plane
-// Avoid unneeded calculations and override the Shape method
-func (pl *Plane) NormalAt(p Point, xs *Intersection) Vector {
-	on := NewVector(0, 1, 0)
-	wn := on.NormalToWorldSpace(pl)
-
-	return wn.Normalize()
+func (pl *Plane) localNormalAt(unused Point, xs *Intersection) Vector {
+	return NewVector(0, 1, 0)
 }
 
 // IntersectWith returns the 't' values of Ray r intersecting with the plane in sorted order

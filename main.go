@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"math"
 	"os"
@@ -20,6 +21,7 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
+	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -1412,29 +1414,6 @@ func shapes() {
 
 }
 
-func env2() *tracer.World {
-	width, height := 640.0, 480.0
-
-	// setup world, default light and camera
-	w := tracer.NewDefaultWorld(width, height)
-	w.Config.MaxRecusions = 5
-
-	// override light here
-	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(3, 10, -30), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-9, 10, 10), tracer.NewColor(1, 1, 1)),
-	})
-
-	// where the camera is and where it's pointing; also which way is "up"
-	// from := tracer.NewPoint(0, 14, -25)
-	from := tracer.NewPoint(0, 2, -2)
-	to := tracer.NewPoint(0, 0, 10)
-	up := tracer.NewVector(0, 1, 0)
-	cameraTransform := tracer.ViewTransform(from, to, up)
-	w.Camera().SetTransform(cameraTransform)
-
-	return w
-}
 func simplesphere() {
 	w := envxy(640, 480)
 	// w.Config.Parallelism = 1
@@ -1442,14 +1421,17 @@ func simplesphere() {
 
 	sphere1 := tracer.NewUnitSphere()
 	sphere1.SetTransform(
-		tracer.IdentityMatrix().Scale(1.3, 1.3, 1.3).Translate(0, 1.3, 1))
-	mapper := tracer.NewSphericalMap()
-	uvpattern := tracer.NewUVCheckersPattern(20, 10,
-		tracer.ColorName(colornames.White), tracer.ColorName(colornames.Gray))
-	pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
-	sphere1.Material().SetPattern(pattern)
-	sphere1.Material().SetPerturber(
-		tracer.NewNoisePerturber(1, 10))
+		tracer.IdentityMatrix().Scale(2.3, 2.3, 2.3).Translate(0, 2.3, 1))
+	// mapper := tracer.NewSphericalMap()
+	// uvpattern := tracer.NewUVCheckersPattern(20, 10,
+	// 	tracer.ColorName(colornames.White), tracer.ColorName(colornames.Gray))
+	// pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
+	// sphere1.Material().SetPattern(pattern)
+	sphere1.Material().Color = tracer.ColorName(colornames.Red)
+	pert := tracer.NewNoisePerturber(sphere1, 1)
+	pert.SetTransform(tracer.IdentityMatrix().Scale(.15, .15, .15))
+
+	sphere1.Material().SetPerturber(pert)
 
 	w.AddObject(sphere1)
 	w.AddObject(floor(0))
@@ -1457,6 +1439,59 @@ func simplesphere() {
 	tracer.Render(w)
 }
 
+func heightmapplane(filename string) {
+	// w := envxy2(6, 6)
+	w := envxy2(640, 480)
+	// w.Config.Parallelism = 1
+	// w.Camera().SetFoV(math.Pi / 1.1)
+	// w.Camera().SetTransform(tracer.IdentityMatrix())
+
+	plane := tracer.NewPlane()
+	plane.SetTransform(tracer.IdentityMatrix().Scale(3, 3, 3).RotateX(math.Pi/2).Translate(0, 0, 0))
+	// plane.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi / 2))
+	plane.Material().Specular = 0
+	plane.Material().Color = tracer.ColorName(colornames.Lightblue)
+	mapper := tracer.NewPlaneMap()
+	// mapper := tracer.NewSphericalMap()
+	pert, err := tracer.NewImageHeightmapPerturber(filename, mapper, plane)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pert.SetTransform(tracer.IdentityMatrix().Scale(1, 1, 1))
+	plane.Material().SetPerturber(pert)
+
+	w.AddObject(plane)
+	// w.AddObject(floor(0))
+	// w.AddObject(backWall(50))
+	tracer.Render(w)
+}
+
+// func heightmapsphere(filename string) {
+// 	w := envxy(640, 480)
+// 	// w.Config.Parallelism = 1
+// 	// w.Camera().SetFoV(math.Pi / 2.0)
+
+// 	sphere1 := tracer.NewUnitSphere()
+// 	sphere1.SetTransform(
+// 		tracer.IdentityMatrix().Scale(2.3, 2.3, 2.3).Translate(0, 2.3, 1))
+// 	// mapper := tracer.NewSphericalMap()
+// 	// uvpattern := tracer.NewUVCheckersPattern(20, 10,
+// 	// 	tracer.ColorName(colornames.White), tracer.ColorName(colornames.Gray))
+// 	// pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
+// 	// sphere1.Material().SetPattern(pattern)
+// 	sphere1.Material().Color = tracer.ColorName(colornames.Red)
+// 	mapper := tracer.NewSphericalMap()
+// 	pert, err := tracer.NewImageHeightmapPerturber(filename, mapper, 10)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	sphere1.Material().SetPerturber(pert)
+
+// 	w.AddObject(sphere1)
+// 	w.AddObject(floor(0))
+// 	w.AddObject(backWall(50))
+// 	tracer.Render(w)
+// }
 func texttureMap() {
 
 	w := env()
@@ -1862,17 +1897,17 @@ func room(left, front, right, back, clng, flr float64) *tracer.Group {
 	return g
 }
 
-func simpletexturewall() {
+func simpletexturewall(filename string) {
 	w := envxy(640, 480)
 
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
-	ppuv, err := tracer.NewUVImagePattern("/Users/dant/Downloads/ghost.png")
+	ppuv, err := tracer.NewUVImagePattern(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
 	pp := tracer.NewTextureMapPattern(ppuv, tracer.NewPlaneMap())
-	pp.SetTransform(tracer.IdentityMatrix().Scale(8, 5, 5).RotateY(math.Pi / 2))
+	pp.SetTransform(tracer.IdentityMatrix().Scale(5, 5, 5).RotateY(math.Pi / 2))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 
@@ -1880,6 +1915,28 @@ func simpletexturewall() {
 	tracer.Render(w)
 }
 
+func envxy2(width, height float64) *tracer.World {
+	// setup world, default light and camera
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+	w.Config.SoftShadows = false
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		// tracer.NewPointLight(tracer.NewPoint(0, 4, 5), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(2, 10, -10), tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := tracer.NewPoint(0, 0, -4)
+	to := tracer.NewPoint(0, 0, 10)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+	w.Camera().SetFoV(math.Pi / 4)
+
+	return w
+}
 func envxy(width, height float64) *tracer.World {
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1919,9 +1976,13 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/heightmaps"))
+	heightmapplane(path.Join(dir, "sergun-kuyucu-medieval-blocks-height.jpg"))
+	// simplesphere()
+	// heightmapsphere(path.Join(dir, "brick_bump.png"))
 	// simpleroom()
 	// emissive()
-	// simpletexturewall()
+	// simpletexturewall(path.Join(dir, "brick_bump.png"))
 	// simplecone()
 	// simplecylinder()
 	// hollowsphere1()
@@ -1950,7 +2011,6 @@ func main() {
 	// triangle()
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 	// csg()
-	simplesphere()
 
 	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// // f := path.Join(dir, "cubes2.obj")

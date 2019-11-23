@@ -56,7 +56,6 @@ func NewDefaultMaterial() *Material {
 		Transparency:    0,
 		RefractiveIndex: 1.0,
 		ShadowCaster:    true,
-		perturber:       NewDefaultPerturber(),
 	}
 }
 
@@ -73,19 +72,19 @@ func NewDefaultGlassMaterial() *Material {
 		Transparency:    1.0,
 		RefractiveIndex: 1.5,
 		ShadowCaster:    false,
-		perturber:       NewDefaultPerturber(),
 	}
 }
 
-// PerturbNormal applies he material perturbation function to the normal n at point p
-func (m *Material) PerturbNormal(n Vector, p Point) Vector {
+// PerturbNormal applies the material perturbation function to the normal n at point p
+func (m *Material) PerturbNormal(normal Vector, p Point) Vector {
 	if m.perturber != nil {
-		return m.perturber.Perturb(n, p)
+		return m.perturber.Perturb(normal, p)
 	}
-	return n
+	return normal
 }
 
 // ColorAtTexture returns the color at the u,v point based on the texture attached to the material
+// Only works for SmoothTriangles, used during obj import
 func (m *Material) ColorAtTexture(o Shaper, u, v float64) Color {
 	if m.Texture == nil {
 		return ColorName(colornames.Purple) // highly visible, texture emissing
@@ -100,7 +99,7 @@ func (m *Material) ColorAtTexture(o Shaper, u, v float64) Color {
 	clr, err := m.Texture.Get(int(x), int(y))
 	if err != nil {
 		log.Println(err)
-		return ColorName(colornames.Purple) // highly visible, texture emissing
+		return ColorName(colornames.Purple) // highly visible, texture missing
 	}
 
 	return clr

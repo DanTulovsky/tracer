@@ -44,7 +44,7 @@ func NewDefaultTestWorld() *World {
 	l1 := NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White))
 
 	s1 := NewUnitSphere()
-	s1.SetMaterial(NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1, NewDefaultPerturber()))
+	s1.SetMaterial(NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1, nil))
 
 	s2 := NewUnitSphere()
 	s2.SetTransform(IdentityMatrix().Scale(0.5, 0.5, 0.5))
@@ -322,9 +322,9 @@ func (w *World) renderWorker(in chan *pixel, canvas *Canvas) {
 	}
 	rowLength := math.Sqrt(numSquares)
 
-	for p := range in {
+	for pixel := range in {
 		// render the pixel
-		p.Render(w, canvas, xs, offset, rowLength)
+		pixel.Render(w, canvas, xs, offset, rowLength)
 		// clear intersections for next pixel
 		xs = xs[:0]
 	}
@@ -350,14 +350,14 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 		}()
 	}
 
-	total := (camera.Vsize - 1) * (camera.Hsize - 1)
-	last := 0.0
+	// total := (camera.Vsize - 1) * (camera.Hsize - 1)
+	// last := 0.0
 
-	for y := 0.0; y < camera.Vsize-1; y++ {
-		for x := 0.0; x < camera.Hsize-1; x++ {
+	for y := 0.0; y < camera.Vsize; y++ {
+		for x := 0.0; x < camera.Hsize; x++ {
 			// send work to workers
 			pending <- &pixel{x: x, y: y}
-			last = showProgress(total, last, camera.Vsize-1, camera.Hsize-1, x, y)
+			// last = showProgress(total, last, camera.Vsize-1, camera.Hsize-1, x, y)
 		}
 	}
 	close(pending)
@@ -369,7 +369,11 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 
 // ShowInfo dumps info about the world
 func (w *World) ShowInfo() {
-	// log.Printf("Camera: %#v", w.Camera())
+	log.Printf("Camera HSize: %v", w.Camera().Hsize)
+	log.Printf("Camera WSize: %v", w.Camera().Vsize)
+	log.Printf("Camera Pixel Size: %v", w.Camera().PixelSize)
+	log.Printf("Camera Half With: %v", w.Camera().HalfWidth)
+	log.Printf("Camera Half Height: %v", w.Camera().HalfHeight)
 	log.Printf("Antialiasing: %v", w.Config.Antialias)
 	log.Printf("Parallelism: %v", w.Config.Parallelism)
 	log.Printf("Max Recursion: %v", w.Config.MaxRecusions)
