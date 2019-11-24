@@ -1,6 +1,7 @@
 package tracer
 
 import (
+	"log"
 	"math"
 
 	"golang.org/x/image/colornames"
@@ -119,18 +120,24 @@ func (pl *PointLight) IsVisible() bool {
 func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, intensity float64, rays int, u, v float64) Color {
 	var ambient, diffuse, specular Color
 
-	var clr Color
+	clr := m.Color
 
-	switch {
-	case m.HasPattern():
-		clr = m.Pattern.ColorAtObject(o, p)
-	default:
-		clr = m.Color
+	if m.HasPattern() {
+		clr = clr.Blend(m.Pattern.ColorAtObject(o, p))
 	}
 
 	if m.HasTexture() {
 		// Texture blends with the base color, so pass it in here
-		clr = m.ColorAtTexture(o, u, v, clr)
+		// - Kd - material diffuse is multiplied by the texture value
+		// This is only used by Smooth Triangles, to apply textures to other shapes,
+		// use the ImageTexturePattern
+		// Awkward... consider fixing
+		switch o.(type) {
+		case *SmoothTriangle:
+			clr = clr.Blend(m.ColorAtTexture(o, u, v))
+		default:
+			log.Fatal("Texture attached to non Smooth Triangle, use an ImagePattern instead.")
+		}
 	}
 
 	// combine surface color with light's color/intensity

@@ -947,12 +947,12 @@ func triangle() {
 
 func objParse(f string) {
 
-	// width, height := 640.0, 480.0
-	width, height := 1200.0, 1000.0
+	width, height := 640.0, 480.0
+	// width, height := 1200.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
-	// w.Config.Parallelism = 1
+	w.Config.Parallelism = 1
 
 	// override light here
 	w.SetLights([]tracer.Light{

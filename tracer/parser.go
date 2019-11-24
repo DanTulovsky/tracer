@@ -240,7 +240,7 @@ func convertMaterial(mat *mtl.Material, dir string) (*Material, error) {
 		}
 		log.Printf("decoded image format %v", format)
 
-		// store the texture in the material
+		// store the texture in the material, only used by smooth triangles
 		m.AddDiffuseTexture(mat.Name, decode)
 	}
 

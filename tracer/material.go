@@ -87,7 +87,7 @@ func (m *Material) PerturbNormal(normal Vector, p Point) Vector {
 
 // ColorAtTexture returns the color at the u,v point based on the texture attached to the material
 // Only works for SmoothTriangles, used during obj import
-func (m *Material) ColorAtTexture(o Shaper, u, v float64, base Color) Color {
+func (m *Material) ColorAtTexture(o Shaper, u, v float64) Color {
 	if m.Texture == nil {
 		return ColorName(colornames.Purple) // highly visible, texture emissing
 	}
@@ -112,8 +112,7 @@ func (m *Material) ColorAtTexture(o Shaper, u, v float64, base Color) Color {
 		return ColorName(colornames.Purple) // highly visible, texture missing
 	}
 
-	// - Kd - material diffuse is multiplied by the texture value
-	return clr.Blend(base)
+	return clr
 }
 
 // AddDiffuseTexture adds a texture mapped to a Canvas
