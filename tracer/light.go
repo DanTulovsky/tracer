@@ -128,9 +128,9 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inten
 		clr = m.Color
 	}
 
-	switch {
-	case m.HasTexture():
-		clr = m.ColorAtTexture(o, u, v)
+	if m.HasTexture() {
+		// Texture blends with the base color, so pass it in here
+		clr = m.ColorAtTexture(o, u, v, clr)
 	}
 
 	// combine surface color with light's color/intensity

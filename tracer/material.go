@@ -3,6 +3,7 @@ package tracer
 import (
 	"image"
 	"log"
+	"math"
 
 	"golang.org/x/image/colornames"
 )
@@ -23,6 +24,7 @@ type Material struct {
 	Texture *Canvas
 
 	// Used to apply perturbations to the material (changes in the normal vector)
+	// Use this for BumpMaps
 	perturber Perturber
 }
 
@@ -85,7 +87,7 @@ func (m *Material) PerturbNormal(normal Vector, p Point) Vector {
 
 // ColorAtTexture returns the color at the u,v point based on the texture attached to the material
 // Only works for SmoothTriangles, used during obj import
-func (m *Material) ColorAtTexture(o Shaper, u, v float64) Color {
+func (m *Material) ColorAtTexture(o Shaper, u, v float64, base Color) Color {
 	if m.Texture == nil {
 		return ColorName(colornames.Purple) // highly visible, texture emissing
 	}
@@ -96,17 +98,26 @@ func (m *Material) ColorAtTexture(o Shaper, u, v float64) Color {
 	x := (u*t.VT2.x + v*t.VT3.x + w*t.VT1.x) * float64((m.Texture.Width - 1))
 	y := (u*t.VT2.y + v*t.VT3.y + w*t.VT1.y) * float64((m.Texture.Height - 1))
 
+	// wrap textures around if needed
+	if x < 0 {
+		x = float64(m.Texture.Width-1) + math.Mod(x, float64(m.Texture.Width-1))
+	}
+	if y < 0 {
+		y = float64(m.Texture.Height-1) + math.Mod(y, float64(m.Texture.Height-1))
+	}
+
 	clr, err := m.Texture.Get(int(x), int(y))
 	if err != nil {
 		log.Println(err)
 		return ColorName(colornames.Purple) // highly visible, texture missing
 	}
 
-	return clr
+	// - Kd - material diffuse is multiplied by the texture value
+	return clr.Blend(base)
 }
 
-// AddTexture adds a texture mapped to a Canvas
-func (m *Material) AddTexture(name string, i image.Image) error {
+// AddDiffuseTexture adds a texture mapped to a Canvas
+func (m *Material) AddDiffuseTexture(name string, i image.Image) error {
 	log.Println("converting image (texture) to canvas...")
 	canvas := imageToCanvas(i)
 

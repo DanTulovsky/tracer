@@ -35,7 +35,7 @@ func TestNewMaterial(t *testing.T) {
 				reflective:      0.5,
 				transparency:    0.6,
 				refractiveIndex: 0.7,
-				perturber:       NewDefaultPerturber(),
+				perturber:       nil,
 			},
 			want: &Material{
 				Color:           ColorName(colornames.Red),
@@ -47,7 +47,7 @@ func TestNewMaterial(t *testing.T) {
 				Transparency:    0.6,
 				RefractiveIndex: 0.7,
 				ShadowCaster:    true,
-				perturber:       NewDefaultPerturber(),
+				perturber:       nil,
 			},
 		},
 	}
@@ -58,7 +58,7 @@ func TestNewMaterial(t *testing.T) {
 				tt.want,
 				NewMaterial(
 					tt.args.clr, tt.args.ambient, tt.args.diffuse,
-					tt.args.specular, tt.args.shininess, tt.args.reflective, tt.args.transparency, tt.args.refractiveIndex, NewDefaultPerturber()))
+					tt.args.specular, tt.args.shininess, tt.args.reflective, tt.args.transparency, tt.args.refractiveIndex, nil))
 		})
 	}
 }
@@ -109,7 +109,7 @@ func TestNewDefaultMaterial(t *testing.T) {
 				Transparency:    0,
 				RefractiveIndex: 1.0,
 				ShadowCaster:    true,
-				perturber:       NewDefaultPerturber(),
+				perturber:       nil,
 			},
 		},
 	}

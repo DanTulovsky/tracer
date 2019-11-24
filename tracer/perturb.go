@@ -20,7 +20,6 @@ type Perturber interface {
 }
 
 type basePerturb struct {
-	shape            Shaper
 	transform        Matrix
 	transformInverse Matrix
 }
@@ -41,12 +40,6 @@ func (bp *basePerturb) TransformInverse() Matrix {
 	return bp.transformInverse
 }
 
-// objectSpacePoint returns the world point as object point
-func (bp *basePerturb) objectSpacePoint(p Point) Point {
-	op := p.ToObjectSpace(bp.shape)
-	return op.TimesMatrix(bp.TransformInverse())
-}
-
 // Perturb implements the Perturber interface
 func (bp *basePerturb) Perturb(v Vector, p Point) Vector {
 	panic("need to implement Perturb")
@@ -60,21 +53,16 @@ type NoisePerturber struct {
 
 	// maxNoise generally controls the "vertical" (along the original normal) height
 	maxNoise float64
-
-	// scale controls the "horizontal" size of the pattern
-	// a larger value here means more bumps are visible
-	scale float64
 }
 
 // NewNoisePerturber returns a perturber that makes waves on the shape
-func NewNoisePerturber(o Shaper, maxNoise float64) *NoisePerturber {
+func NewNoisePerturber(maxNoise float64) *NoisePerturber {
 	return &NoisePerturber{
 		n: opensimplex.NewNormalized(time.Now().Unix()),
 
 		// These two parameters control the size and frequency of the bumps
 		maxNoise: maxNoise, // 1 is a nice value here
 		basePerturb: basePerturb{
-			shape:            o,
 			transform:        IdentityMatrix(),
 			transformInverse: IdentityMatrix().Inverse(),
 		},
@@ -83,7 +71,7 @@ func NewNoisePerturber(o Shaper, maxNoise float64) *NoisePerturber {
 
 // Perturb implements the Perturber interface
 func (np *NoisePerturber) Perturb(v Vector, p Point) Vector {
-	return np.perturb(v, np.objectSpacePoint(p))
+	return np.perturb(v, p.TimesMatrix(np.TransformInverse()))
 }
 
 // perturb is the local perturb function
@@ -110,17 +98,12 @@ type SinePerturber struct {
 	basePerturb
 
 	n opensimplex.Noise
-
-	// scale controls the "horizontal" size of the pattern
-	// a larger value here means more bumps are visible
-	scale float64
 }
 
 // NewSinePerturber returns a perturber that makes waves on the shape
-func NewSinePerturber(o Shaper) *SinePerturber {
+func NewSinePerturber() *SinePerturber {
 	return &SinePerturber{
 		basePerturb: basePerturb{
-			shape:            o,
 			transform:        IdentityMatrix(),
 			transformInverse: IdentityMatrix().Inverse(),
 		},
@@ -129,7 +112,7 @@ func NewSinePerturber(o Shaper) *SinePerturber {
 
 // Perturb implements the Perturber interface
 func (sp *SinePerturber) Perturb(v Vector, p Point) Vector {
-	return sp.perturb(v, sp.objectSpacePoint(p))
+	return sp.perturb(v, p.TimesMatrix(sp.TransformInverse()))
 }
 
 // Perturb implements the Perturber interface
@@ -150,17 +133,12 @@ type ImageHeightmapPerturber struct {
 
 	canvas *Canvas
 
-	// scale controls the "horizontal" size of the pattern
-	scale float64
-
 	// convert (x,y,z) -> (u,v)
 	mapper Mapper
-
-	shape Shaper
 }
 
-// NewImageHeightmapPerturber returns a perturber that makes waves on the shape
-func NewImageHeightmapPerturber(filename string, mapper Mapper, o Shaper) (*ImageHeightmapPerturber, error) {
+// NewImageHeightmapPerturber returns a perturber that uses an image to simulate bumps
+func NewImageHeightmapPerturber(filename string, mapper Mapper) (*ImageHeightmapPerturber, error) {
 	// read in image
 	reader, err := os.Open(filename)
 	if err != nil {
@@ -181,7 +159,6 @@ func NewImageHeightmapPerturber(filename string, mapper Mapper, o Shaper) (*Imag
 		canvas: canvas,
 		mapper: mapper,
 		basePerturb: basePerturb{
-			shape:            o,
 			transform:        IdentityMatrix(),
 			transformInverse: IdentityMatrix().Inverse(),
 		},
@@ -207,13 +184,12 @@ func (ip *ImageHeightmapPerturber) UVColorAt(u, v float64) Color {
 
 // Perturb implements the Perturber interface
 func (ip *ImageHeightmapPerturber) Perturb(normal Vector, p Point) Vector {
-	return ip.perturb(normal, p)
+	return ip.perturb(normal, p.TimesMatrix(ip.TransformInverse()))
 }
 
 // perturb is the local perturb function
 func (ip *ImageHeightmapPerturber) perturb(n Vector, p Point) Vector {
 
-	p = p.TimesMatrix(ip.TransformInverse())
 	u, v := ip.mapper.Map(p)
 	epsilon := 0.001
 

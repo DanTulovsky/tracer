@@ -952,6 +952,7 @@ func objParse(f string) {
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
+	// w.Config.Parallelism = 1
 
 	// override light here
 	w.SetLights([]tracer.Light{
@@ -960,7 +961,7 @@ func objParse(f string) {
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(1, 7, -14)
+	from := tracer.NewPoint(1, 6, -4)
 	to := tracer.NewPoint(0, 0, 4)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -1421,14 +1422,14 @@ func simplesphere() {
 
 	sphere1 := tracer.NewUnitSphere()
 	sphere1.SetTransform(
-		tracer.IdentityMatrix().Scale(2.3, 2.3, 2.3).Translate(0, 2.3, 1))
+		tracer.IdentityMatrix().Scale(2.3, 2.3, 2.3).Translate(0, 2.3, 5))
 	// mapper := tracer.NewSphericalMap()
 	// uvpattern := tracer.NewUVCheckersPattern(20, 10,
 	// 	tracer.ColorName(colornames.White), tracer.ColorName(colornames.Gray))
 	// pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
 	// sphere1.Material().SetPattern(pattern)
 	sphere1.Material().Color = tracer.ColorName(colornames.Red)
-	pert := tracer.NewNoisePerturber(sphere1, 1)
+	pert := tracer.NewNoisePerturber(1)
 	pert.SetTransform(tracer.IdentityMatrix().Scale(.15, .15, .15))
 
 	sphere1.Material().SetPerturber(pert)
@@ -1447,7 +1448,7 @@ func heightmapplane(filename string) {
 	plane.Material().Specular = 0
 	plane.Material().Color = tracer.ColorName(colornames.Lightblue)
 	mapper := tracer.NewPlaneMap()
-	pert, err := tracer.NewImageHeightmapPerturber(filename, mapper, plane)
+	pert, err := tracer.NewImageHeightmapPerturber(filename, mapper)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1455,6 +1456,32 @@ func heightmapplane(filename string) {
 	plane.Material().SetPerturber(pert)
 
 	w.AddObject(plane)
+	// w.AddObject(floor(0))
+	w.AddObject(backWall(50))
+	tracer.Render(w)
+}
+
+func heightmapcube(filename string) {
+	w := envxy(640, 480)
+	w.Camera().SetFoV(math.Pi / 8)
+
+	shape := tracer.NewUnitCube()
+	shape.SetTransform(tracer.IdentityMatrix().Scale(1, 1, 1).RotateX(math.Pi/4).RotateY(math.Pi/4).Translate(0, 3, 0))
+	shape.Material().Specular = 0
+	shape.Material().Color = tracer.ColorName(colornames.Lightblue)
+	uvp, err := tracer.NewUVImagePattern(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	mapper := tracer.NewCubeMapSame(uvp)
+	pert, err := tracer.NewImageHeightmapPerturber(filename, mapper)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pert.SetTransform(tracer.IdentityMatrix().Scale(3, 3, 3))
+	shape.Material().SetPerturber(pert)
+
+	w.AddObject(shape)
 	// w.AddObject(floor(0))
 	w.AddObject(backWall(50))
 	tracer.Render(w)
@@ -1479,7 +1506,7 @@ func brickwall(dir string) {
 	plane.Material().SetPattern(pattern)
 
 	// Heightmap
-	pert, err := tracer.NewImageHeightmapPerturber(heightmap, mapper, plane)
+	pert, err := tracer.NewImageHeightmapPerturber(heightmap, mapper)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1506,7 +1533,7 @@ func heightmapsphere(filename string) {
 	// pattern := tracer.NewTextureMapPattern(uvpattern, mapper)
 	// sphere1.Material().SetPattern(pattern)
 	sphere1.Material().Color = tracer.ColorName(colornames.Lightgoldenrodyellow)
-	pert, err := tracer.NewImageHeightmapPerturber(filename, mapper, sphere1)
+	pert, err := tracer.NewImageHeightmapPerturber(filename, mapper)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1934,28 +1961,6 @@ func simpletexturewall(filename string) {
 	tracer.Render(w)
 }
 
-func envxy2(width, height float64) *tracer.World {
-	// setup world, default light and camera
-	w := tracer.NewDefaultWorld(width, height)
-	w.Config.MaxRecusions = 5
-	w.Config.SoftShadows = false
-
-	// override light here
-	w.SetLights([]tracer.Light{
-		// tracer.NewPointLight(tracer.NewPoint(0, 4, 5), tracer.NewColor(1, 1, 1)),
-		tracer.NewPointLight(tracer.NewPoint(2, 10, -10), tracer.NewColor(1, 1, 1)),
-	})
-
-	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 0, -4)
-	to := tracer.NewPoint(0, 0, 10)
-	up := tracer.NewVector(0, 1, 0)
-	cameraTransform := tracer.ViewTransform(from, to, up)
-	w.Camera().SetTransform(cameraTransform)
-	w.Camera().SetFoV(math.Pi / 4)
-
-	return w
-}
 func envxy(width, height float64) *tracer.World {
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1963,12 +1968,13 @@ func envxy(width, height float64) *tracer.World {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		// tracer.NewPointLight(tracer.NewPoint(0, 4, 5), tracer.NewColor(1, 1, 1)),
-		tracer.NewPointLight(tracer.NewPoint(2, 10, -10), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 4, 5), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(2, -10, -10), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(-2, 10, 1), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 0, -9)
+	from := tracer.NewPoint(0, 4, -9)
 	to := tracer.NewPoint(0, 0, 20)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
@@ -1995,10 +2001,12 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/heightmaps"))
-	// heightmapplane(path.Join(dir, "volcano.gif"))
-	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/brickwall"))
-	brickwall(dir)
+	var dir string
+	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/heightmaps"))
+	// heightmapplane(path.Join(dir, "brick_bump.png"))
+	// heightmapcube(path.Join(dir, "brick_bump.png"))
+	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/brickwall"))
+	// brickwall(dir)
 	// simplesphere()
 	// heightmapsphere(path.Join(dir, "brick_bump.png"))
 	// simpleroom()
@@ -2033,11 +2041,12 @@ func main() {
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 	// csg()
 
-	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// // f := path.Join(dir, "cubes2.obj")
 	// f := path.Join(dir, "monkey-smooth2.obj")
-	// // f := path.Join(dir, "texture2.obj")
-	// objParse(f)
+	// f := path.Join(dir, "texture2.obj")
+	f := path.Join(dir, "monkeybump2.obj")
+	objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

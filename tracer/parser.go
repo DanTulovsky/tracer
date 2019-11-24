@@ -157,6 +157,7 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 }
 
 // processIllum sets various material settings based on the illum parameter
+// TODO: Implement this
 func processIllum(mat *mtl.Material, illum int64) *mtl.Material {
 	return mat
 }
@@ -190,6 +191,7 @@ func convertMaterial(mat *mtl.Material, dir string) (*Material, error) {
 	log.Printf("    %v\n", mat.Name)
 	log.Printf("    Diffuse: %v\n", kdColor)
 	log.Printf("    Diffuse texture: %v\n", mat.DiffuseTexture)
+	log.Printf("    Bump texture: %v\n", mat.BumpTexture)
 	log.Printf("    Ambient: %v\n", kaColor)
 	log.Printf("    Specular: %v\n", ksColor)
 	log.Printf("    Specular Exp: %v\n", ns)
@@ -209,6 +211,19 @@ func convertMaterial(mat *mtl.Material, dir string) (*Material, error) {
 	// http://paulbourke.net/dataformats/mtl/
 	mat = processIllum(mat, illum)
 
+	// If there is a bump map present, use it
+	if mat.BumpTexture != "" {
+		log.Println("Reading in bump map textures...")
+
+		imageFile := path.Join(dir, mat.BumpTexture)
+
+		pert, err := NewImageHeightmapPerturber(imageFile, NewPlaneMap())
+		if err != nil {
+			return nil, err
+		}
+		m.SetPerturber(pert)
+	}
+
 	// If there is a texture present, use it
 	if mat.DiffuseTexture != "" {
 		log.Println("Reading in material textures...")
@@ -226,7 +241,7 @@ func convertMaterial(mat *mtl.Material, dir string) (*Material, error) {
 		log.Printf("decoded image format %v", format)
 
 		// store the texture in the material
-		m.AddTexture(mat.Name, decode)
+		m.AddDiffuseTexture(mat.Name, decode)
 	}
 
 	return m, nil
