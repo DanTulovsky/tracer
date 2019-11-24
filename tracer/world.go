@@ -350,14 +350,14 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 		}()
 	}
 
-	// total := (camera.Vsize - 1) * (camera.Hsize - 1)
-	// last := 0.0
+	total := (camera.Vsize - 1) * (camera.Hsize - 1)
+	last := 0.0
 
 	for y := 0.0; y < camera.Vsize; y++ {
 		for x := 0.0; x < camera.Hsize; x++ {
 			// send work to workers
 			pending <- &pixel{x: x, y: y}
-			// last = showProgress(total, last, camera.Vsize-1, camera.Hsize-1, x, y)
+			last = showProgress(total, last, camera.Vsize-1, camera.Hsize-1, x, y)
 		}
 	}
 	close(pending)

@@ -71,8 +71,8 @@ func NewUVImagePattern(filename string) (*UVImagePattern, error) {
 
 // UVColorAt returns the color at the 2D coordinate (u, v)
 func (uvip *UVImagePattern) UVColorAt(u, v float64) Color {
-	v = 1 - v
-	u = 1 - u
+	// v = 1 - v
+	// u = 1 - u
 
 	x := u * (float64(uvip.canvas.Width) - 1)
 	y := v * (float64(uvip.canvas.Height) - 1)
