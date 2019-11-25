@@ -947,26 +947,28 @@ func triangle() {
 
 func objParse(f string) {
 
-	width, height := 640.0, 480.0
-	// width, height := 1200.0, 1000.0
+	// width, height := 100.0, 100.0
+	// width, height := 640.0, 480.0
+	width, height := 1200.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
-	w.Config.Parallelism = 1
+	// w.Config.Parallelism = 1
+	w.Config.SoftShadows = false
 
 	// override light here
 	w.SetLights([]tracer.Light{
 		tracer.NewPointLight(tracer.NewPoint(10, 50, -30), tracer.NewColor(1, 1, 1)),
-		tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(1, 6, -4)
-	to := tracer.NewPoint(0, 0, 4)
+	from := tracer.NewPoint(0, 10, -30)
+	to := tracer.NewPoint(0, 0, 40)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
-	w.Camera().SetFoV(math.Pi / 3)
+	w.Camera().SetFoV(math.Pi / 3.5)
 
 	g, err := tracer.ParseOBJ(f)
 	if err != nil {
@@ -974,7 +976,7 @@ func objParse(f string) {
 	}
 
 	// g.SetTransform(tracer.IdentityMatrix().RotateY(math.Pi/5).RotateX(math.Pi/3).Translate(0, 2, 0))
-	g.SetTransform(tracer.IdentityMatrix().Scale(2.5, 2.5, 2.5).RotateY(math.Pi/7).Translate(0, 2, 0))
+	// g.SetTransform(tracer.IdentityMatrix().Scale(2.5, 2.5, 2.5).RotateY(math.Pi/7).Translate(0, 2, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
@@ -1489,8 +1491,8 @@ func heightmapcube(filename string) {
 
 func brickwall(dir string) {
 	w := envxy(1024, 768)
-	basecolor := path.Join(dir, "basecolor.jpg")
-	heightmap := path.Join(dir, "height.jpg")
+	basecolor := path.Join(dir, "basecolor.png")
+	heightmap := path.Join(dir, "height.png")
 
 	plane := tracer.NewPlane()
 	plane.SetTransform(tracer.IdentityMatrix().Scale(3, 3, 3).RotateX(math.Pi/2).Translate(0, 0, 0))
@@ -1968,9 +1970,9 @@ func envxy(width, height float64) *tracer.World {
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(0, 4, 5), tracer.NewColor(1, 1, 1)),
-		tracer.NewPointLight(tracer.NewPoint(2, -10, -10), tracer.NewColor(1, 1, 1)),
-		tracer.NewPointLight(tracer.NewPoint(-2, 10, 1), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(0, 4, 5), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(2, -10, -10), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(-6, 10, -10), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -2002,11 +2004,11 @@ func main() {
 	}
 
 	var dir string
-	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/heightmaps"))
-	// heightmapplane(path.Join(dir, "brick_bump.png"))
+	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
+	// heightmapplane(path.Join(dir, "heightmap.png"))
 	// heightmapcube(path.Join(dir, "brick_bump.png"))
-	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/brickwall"))
-	// brickwall(dir)
+	dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
+	brickwall(dir)
 	// simplesphere()
 	// heightmapsphere(path.Join(dir, "brick_bump.png"))
 	// simpleroom()
@@ -2041,12 +2043,12 @@ func main() {
 	// https://octolinker-demo.now.sh/mokiat/go-data-front
 	// csg()
 
-	dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// // f := path.Join(dir, "cubes2.obj")
 	// f := path.Join(dir, "monkey-smooth2.obj")
 	// f := path.Join(dir, "texture2.obj")
-	f := path.Join(dir, "monkeybump2.obj")
-	objParse(f)
+	// f := path.Join(dir, "simple-human-shape1.obj")
+	// objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

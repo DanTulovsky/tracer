@@ -76,33 +76,33 @@ func (cm *CubeMap) faceFromPoint(p Point) cubeFace {
 func (cm *CubeMap) uvFront(p Point) (float64, float64) {
 	u := math.Mod((p.x+1), 2) / 2
 	v := math.Mod((p.y+1), 2) / 2
-	return u, v
+	return u, 1 - v
 }
 
 func (cm *CubeMap) uvBack(p Point) (float64, float64) {
 	u := math.Mod((1-p.x), 2) / 2
 	v := math.Mod((p.y+1), 2) / 2
-	return u, v
+	return u, 1 - v
 }
 func (cm *CubeMap) uvLeft(p Point) (float64, float64) {
 	u := math.Mod((p.z+1), 2) / 2
 	v := math.Mod((p.y+1), 2) / 2
-	return u, v
+	return u, 1 - v
 }
 func (cm *CubeMap) uvRight(p Point) (float64, float64) {
 	u := math.Mod((1-p.z), 2) / 2
 	v := math.Mod((p.y+1), 2) / 2
-	return u, v
+	return u, 1 - v
 }
 func (cm *CubeMap) uvUp(p Point) (float64, float64) {
 	u := math.Mod((p.x+1), 2) / 2
 	v := math.Mod((1-p.z), 2) / 2
-	return u, v
+	return u, 1 - v
 }
 func (cm *CubeMap) uvDown(p Point) (float64, float64) {
 	u := math.Mod((p.x+1), 2) / 2
 	v := math.Mod((p.z+1), 2) / 2
-	return u, v
+	return u, 1 - v
 }
 
 // Map implements the Mapper interface
@@ -213,5 +213,5 @@ func (sm *SphericalMap) Map(p Point) (float64, float64) {
 	// by subtracting it from 1.
 	v := 1 - phi/math.Pi
 
-	return u, v
+	return 1 - u, 1 - v
 }

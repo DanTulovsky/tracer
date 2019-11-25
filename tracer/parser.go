@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	maxMaterials = 10
+	maxMaterials = 30
 )
 
 func parseMTL(model *obj.Model, dir string) (*mtl.Library, error) {
