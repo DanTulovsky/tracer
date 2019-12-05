@@ -44,6 +44,7 @@ func TestNewTriangle(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.want.Shape.lna = tt.want.localNormalAt
 			got := NewTriangle(tt.args.p1, tt.args.p2, tt.args.p3)
 			diff := cmp.Diff(tt.want, got)
 			assert.Equal(t, "", fmt.Sprint(diff))

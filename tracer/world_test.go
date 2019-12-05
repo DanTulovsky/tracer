@@ -464,6 +464,9 @@ func TestWorldRefractedColor_TotalInternalReflection(t *testing.T) {
 func TestWorldRefractedColor_Normal(t *testing.T) {
 	w := NewDefaultTestWorld()
 	r := NewRay(NewPoint(0, 0, 0.1), NewVector(0, 1, 0))
+	w.Config.SoftShadows = false
+	w.Config.SoftShadowRays = 1
+	w.Config.Antialias = 0
 
 	a := w.Objects[0]
 	a.Material().Ambient = 1
@@ -482,7 +485,7 @@ func TestWorldRefractedColor_Normal(t *testing.T) {
 	state := PrepareComputations(xs[2], r, xs)
 	clr := w.RefractedColor(state, 5, NewIntersections())
 
-	assert.True(t, NewColor(0, 0.998874, 0.047218).Equal(clr), "should be true")
+	assert.True(t, NewColor(0, 0.998874, 0.028331).Equal(clr), "should be true")
 }
 
 func TestWorld_shadeHit_Transparent(t *testing.T) {

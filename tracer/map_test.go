@@ -39,7 +39,7 @@ func TestSphericalMap_Map(t *testing.T) {
 			args: args{
 				p: NewPoint(0, 0, -1),
 			},
-			wantU: 0.0,
+			wantU: 1.0,
 			wantV: 0.5,
 		},
 		{
@@ -47,7 +47,7 @@ func TestSphericalMap_Map(t *testing.T) {
 			args: args{
 				p: NewPoint(1, 0, 0),
 			},
-			wantU: 0.25,
+			wantU: 0.75,
 			wantV: 0.5,
 		},
 		{
@@ -63,7 +63,7 @@ func TestSphericalMap_Map(t *testing.T) {
 			args: args{
 				p: NewPoint(-1, 0, 0),
 			},
-			wantU: 0.75,
+			wantU: 0.25,
 			wantV: 0.5,
 		},
 		{
@@ -72,7 +72,7 @@ func TestSphericalMap_Map(t *testing.T) {
 				p: NewPoint(0, 1, 0),
 			},
 			wantU: 0.5,
-			wantV: 1.0,
+			wantV: 0.0,
 		},
 		{
 			sm: NewSphericalMap(),
@@ -80,15 +80,15 @@ func TestSphericalMap_Map(t *testing.T) {
 				p: NewPoint(0, -1, 0),
 			},
 			wantU: 0.5,
-			wantV: 0,
+			wantV: 1,
 		},
 		{
 			sm: NewSphericalMap(),
 			args: args{
 				p: NewPoint(math.Sqrt2/2, math.Sqrt2/2, 0),
 			},
-			wantU: 0.25,
-			wantV: 0.75,
+			wantU: 0.75,
+			wantV: 0.25,
 		},
 	}
 	for _, tt := range tests {
@@ -407,7 +407,7 @@ func TestCubeMap_uvFront(t *testing.T) {
 				p: NewPoint(-0.5, 0.5, 1),
 			},
 			wantU: 0.25,
-			wantV: 0.75,
+			wantV: 0.25,
 		},
 		{
 			cm: &CubeMap{},
@@ -415,7 +415,7 @@ func TestCubeMap_uvFront(t *testing.T) {
 				p: NewPoint(0.5, -0.5, 1),
 			},
 			wantU: 0.75,
-			wantV: 0.25,
+			wantV: 0.75,
 		},
 	}
 	for _, tt := range tests {
@@ -444,7 +444,7 @@ func TestCubeMap_uvBack(t *testing.T) {
 				p: NewPoint(0.5, 0.5, -1),
 			},
 			wantU: 0.25,
-			wantV: 0.75,
+			wantV: 0.25,
 		},
 		{
 			cm: &CubeMap{},
@@ -452,7 +452,7 @@ func TestCubeMap_uvBack(t *testing.T) {
 				p: NewPoint(-0.5, -0.5, -1),
 			},
 			wantU: 0.75,
-			wantV: 0.25,
+			wantV: 0.75,
 		},
 	}
 	for _, tt := range tests {
@@ -481,7 +481,7 @@ func TestCubeMap_uvLeft(t *testing.T) {
 				p: NewPoint(-1, 0.5, -0.5),
 			},
 			wantU: 0.25,
-			wantV: 0.75,
+			wantV: 0.25,
 		},
 		{
 			cm: &CubeMap{},
@@ -489,7 +489,7 @@ func TestCubeMap_uvLeft(t *testing.T) {
 				p: NewPoint(-1, -0.5, 0.5),
 			},
 			wantU: 0.75,
-			wantV: 0.25,
+			wantV: 0.75,
 		},
 	}
 	for _, tt := range tests {
@@ -518,7 +518,7 @@ func TestCubeMap_uvRight(t *testing.T) {
 				p: NewPoint(1, 0.5, 0.5),
 			},
 			wantU: 0.25,
-			wantV: 0.75,
+			wantV: 0.25,
 		},
 		{
 			cm: &CubeMap{},
@@ -526,7 +526,7 @@ func TestCubeMap_uvRight(t *testing.T) {
 				p: NewPoint(1, -0.5, -0.5),
 			},
 			wantU: 0.75,
-			wantV: 0.25,
+			wantV: 0.75,
 		},
 	}
 	for _, tt := range tests {
@@ -555,7 +555,7 @@ func TestCubeMap_uvUp(t *testing.T) {
 				p: NewPoint(-0.5, 1, -0.5),
 			},
 			wantU: 0.25,
-			wantV: 0.75,
+			wantV: 0.25,
 		},
 		{
 			cm: &CubeMap{},
@@ -563,7 +563,7 @@ func TestCubeMap_uvUp(t *testing.T) {
 				p: NewPoint(0.5, 1, 0.5),
 			},
 			wantU: 0.75,
-			wantV: 0.25,
+			wantV: 0.75,
 		},
 	}
 	for _, tt := range tests {
@@ -592,7 +592,7 @@ func TestCubeMap_uvDown(t *testing.T) {
 				p: NewPoint(-0.5, -1, 0.5),
 			},
 			wantU: 0.25,
-			wantV: 0.75,
+			wantV: 0.25,
 		},
 		{
 			cm: &CubeMap{},
@@ -600,7 +600,7 @@ func TestCubeMap_uvDown(t *testing.T) {
 				p: NewPoint(0.5, -1, -0.5),
 			},
 			wantU: 0.75,
-			wantV: 0.25,
+			wantV: 0.75,
 		},
 	}
 	for _, tt := range tests {

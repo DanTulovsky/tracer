@@ -39,6 +39,7 @@ func NewTriangle(p1, p2, p3 Point) *Triangle {
 	}
 
 	t.Normal = t.E2.Cross(t.E1).Normalize()
+	t.lna = t.localNormalAt
 	t.calculateBounds()
 	return t
 }
@@ -103,7 +104,7 @@ func (t *Triangle) IntersectWith(r Ray, xs Intersections) Intersections {
 // 	return t.localNormalAt(xs)
 // }
 
-func (t *Triangle) localNormalAt(xs *Intersection) Vector {
+func (t *Triangle) localNormalAt(unused Point, xs *Intersection) Vector {
 	return t.Normal
 }
 

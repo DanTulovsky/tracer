@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"math"
 	"os"
@@ -21,7 +20,6 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
-	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -1826,7 +1824,7 @@ func hollowsphere(wallWidth float64) *tracer.Group {
 
 func hollowsphere1() {
 	w := envxy(1024, 768)
-	w.Config.Antialias = 1
+	w.Config.Antialias = 4
 
 	// width of the sphere wall: (0, 1)
 	wallWidth := 0.02
@@ -1857,9 +1855,9 @@ func hollowsphere1() {
 
 func emissive() {
 	w := envxy(640, 480)
-	w.Config.Antialias = 0
-	w.Config.SoftShadows = false
-	w.Config.SoftShadowRays = 1
+	w.Config.Antialias = 3
+	w.Config.SoftShadows = true
+	w.Config.SoftShadowRays = 50
 	// w.Camera().SetFoV(math.Pi / 4)
 
 	l := tracer.NewAreaLight(tracer.NewUnitSphere(),
@@ -1903,9 +1901,9 @@ func flatarealight(x, y, z, xs, ys, zs float64, c color.Color) tracer.Light {
 
 func simpleroom() {
 	w := envxy(640, 480)
-	w.Config.Antialias = 0
+	w.Config.Antialias = 1
 	w.Config.SoftShadows = false
-	w.Config.SoftShadowRays = 10
+	w.Config.SoftShadowRays = 2
 	w.Camera().SetFoV(math.Pi / 3)
 
 	// w.SetLights(tracer.Lights{spherearealight(0, 4.95, 5, 0.2, colornames.White)})
@@ -2003,15 +2001,15 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	var dir string
+	// var dir string
 	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
 	// heightmapplane(path.Join(dir, "heightmap.png"))
 	// heightmapcube(path.Join(dir, "brick_bump.png"))
-	dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
-	brickwall(dir)
+	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
+	// brickwall(dir)
 	// simplesphere()
 	// heightmapsphere(path.Join(dir, "brick_bump.png"))
-	// simpleroom()
+	simpleroom()
 	// emissive()
 	// simpletexturewall(path.Join(dir, "brick_bump.png"))
 	// simplecone()
