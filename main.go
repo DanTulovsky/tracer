@@ -161,7 +161,8 @@ func mirrors() {
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
-	w.Config.MaxRecusions = 5
+	w.Config.MaxRecusions = 10
+	w.Config.Antialias = 4
 
 	// override light here
 	w.SetLights([]tracer.Light{
@@ -236,7 +237,8 @@ func mirror() {
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
-	w.Config.MaxRecusions = 1
+	w.Config.MaxRecusions = 4
+	w.Config.Antialias = 2
 
 	// override light here
 	w.SetLights([]tracer.Light{
@@ -946,8 +948,8 @@ func triangle() {
 func objParse(f string) {
 
 	// width, height := 100.0, 100.0
-	// width, height := 640.0, 480.0
-	width, height := 1200.0, 1000.0
+	width, height := 640.0, 480.0
+	// width, height := 1200.0, 1000.0
 
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -1176,6 +1178,7 @@ func simplecylinder() {
 
 func cylindertextures() {
 	w := env()
+	w.Config.Antialias = 2
 
 	cylinder1 := tracer.NewClosedCylinder(0, 2)
 	cylinder1.SetTransform(
@@ -1416,7 +1419,7 @@ func shapes() {
 }
 
 func simplesphere() {
-	w := envxy(640, 480)
+	w := envxy(1000, 500)
 	// w.Config.Parallelism = 1
 	// w.Camera().SetFoV(math.Pi / 2.0)
 
@@ -2023,12 +2026,12 @@ func main() {
 	// shapes()
 	// movedgroup()
 	// skyboxcube1("field1")
-	skyboxsphere1("rooitou_park_4k.hdr")
+	// skyboxsphere1("rooitou_park_4k.hdr")
 	// image1()
 	// textureMap()
 	// cubeMap()
 	// mirrors()
-	// mirror()
+	mirror()
 	// cube()
 	// glass()
 
@@ -2040,11 +2043,10 @@ func main() {
 	// cylindertextures()
 	// group()
 	// triangle()
-	// https://octolinker-demo.now.sh/mokiat/go-data-front
 	// csg()
 
-	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
-	// // f := path.Join(dir, "cubes2.obj")
+	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	// f := path.Join(dir, "cubes2.obj")
 	// f := path.Join(dir, "monkey-smooth2.obj")
 	// f := path.Join(dir, "texture2.obj")
 	// f := path.Join(dir, "simple-human-shape1.obj")
