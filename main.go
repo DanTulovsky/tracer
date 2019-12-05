@@ -1685,11 +1685,13 @@ func skyboxsphere1(input string) {
 	p := tracer.NewTextureMapPattern(up, tracer.NewSphericalMap())
 	sb.Material().SetPattern(p)
 
-	sphere := tracer.NewGlassSphere()
-	sphere.Material().Diffuse = 0.1
-	sphere.Material().Reflective = 0.5
-	sphere.Material().Color = tracer.Black()
+	sphere := hollowsphere(0.02)
 	sphere.SetTransform(tracer.IdentityMatrix().Translate(0, 2, 0))
+	// sphere := tracer.NewGlassSphere()
+	// sphere.Material().Diffuse = 0.1
+	// sphere.Material().Reflective = 0.5
+	// sphere.Material().Color = tracer.Black()
+	// sphere.SetTransform(tracer.IdentityMatrix().Translate(0, 2, 0))
 
 	w.AddObject(sphere)
 	w.AddObject(sb)
@@ -2009,7 +2011,7 @@ func main() {
 	// brickwall(dir)
 	// simplesphere()
 	// heightmapsphere(path.Join(dir, "brick_bump.png"))
-	simpleroom()
+	// simpleroom()
 	// emissive()
 	// simpletexturewall(path.Join(dir, "brick_bump.png"))
 	// simplecone()
@@ -2021,7 +2023,7 @@ func main() {
 	// shapes()
 	// movedgroup()
 	// skyboxcube1("field1")
-	// skyboxsphere1("rooitou_park_4k.hdr")
+	skyboxsphere1("rooitou_park_4k.hdr")
 	// image1()
 	// textureMap()
 	// cubeMap()
