@@ -444,18 +444,14 @@ func TestCylinder_Bounds(t *testing.T) {
 		{
 			name: "default inf",
 			c:    NewDefaultCylinder(),
-			want: Bound{
-				Min: NewPoint(-1, -math.MaxFloat64, -1),
-				Max: NewPoint(1, math.MaxFloat64, 1),
-			},
+			want: NewBound(
+				NewPoint(-1, -math.MaxFloat64, -1),
+				NewPoint(1, math.MaxFloat64, 1)),
 		},
 		{
 			name: "capped",
 			c:    NewCylinder(-5, 5),
-			want: Bound{
-				Min: NewPoint(-1, -5, -1),
-				Max: NewPoint(1, 5, 1),
-			},
+			want: NewBound(NewPoint(-1, -5, -1), NewPoint(1, 5, 1)),
 		},
 	}
 	for _, tt := range tests {

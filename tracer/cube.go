@@ -101,10 +101,7 @@ func (c *Cube) localNormalAt(p Point, xs *Intersection) Vector {
 
 // calculateBounds calculates the bounding box of the shape
 func (c *Cube) calculateBounds() {
-	c.bound = Bound{
-		Min: NewPoint(-1, -1, -1),
-		Max: NewPoint(1, 1, 1),
-	}
+	c.bound = NewBound(NewPoint(-1, -1, -1), NewPoint(1, 1, 1))
 }
 
 // PrecomputeValues precomputes some values for render speedup

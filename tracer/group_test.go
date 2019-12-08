@@ -1,8 +1,11 @@
 package tracer
 
 import (
+	"fmt"
 	"math"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -266,10 +269,7 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewUnitCube(), t: IdentityMatrix()},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-1, -1, -1),
-				Max: NewPoint(1, 1, 1),
-			},
+			want:      NewBound(NewPoint(-1, -1, -1), NewPoint(1, 1, 1)),
 		},
 		{
 			name:  "single cube moved",
@@ -278,10 +278,7 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewUnitCube(), t: IdentityMatrix().Translate(1, 0, 0)},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(0, -1, -1),
-				Max: NewPoint(2, 1, 1),
-			},
+			want:      NewBound(NewPoint(0, -1, -1), NewPoint(2, 1, 1)),
 		},
 		{
 			name:  "double cube moved",
@@ -291,10 +288,7 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewUnitCube(), t: IdentityMatrix().Translate(-1, 0, 0)},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-2, -1, -1),
-				Max: NewPoint(2, 1, 1),
-			},
+			want:      NewBound(NewPoint(-2, -1, -1), NewPoint(2, 1, 1)),
 		},
 		{
 			name:  "single cube moved and scaled",
@@ -303,10 +297,7 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewUnitCube(), t: IdentityMatrix().Scale(2, 2, 2).Translate(1, 1, 1)},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-1, -1, -1),
-				Max: NewPoint(3, 3, 3),
-			},
+			want:      NewBound(NewPoint(-1, -1, -1), NewPoint(3, 3, 3)),
 		},
 		{
 			name:  "cube and sphere",
@@ -316,10 +307,7 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewUnitSphere(), t: IdentityMatrix().Scale(2, 2, 2).Translate(-1, -1, -1)},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-3, -3, -3),
-				Max: NewPoint(3, 3, 3),
-			},
+			want:      NewBound(NewPoint(-3, -3, -3), NewPoint(3, 3, 3)),
 		},
 		{
 			name:  "plane",
@@ -328,10 +316,9 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewPlane(), t: IdentityMatrix()},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-math.MaxFloat64, 0, -math.MaxFloat64),
-				Max: NewPoint(math.MaxFloat64, 0, math.MaxFloat64),
-			},
+			want: NewBound(
+				NewPoint(-math.MaxFloat64, 0, -math.MaxFloat64),
+				NewPoint(math.MaxFloat64, 0, math.MaxFloat64)),
 		},
 		{
 			name:  "cube , sphere, plane",
@@ -342,10 +329,9 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewPlane(), t: IdentityMatrix()},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-math.MaxFloat64, -3, -math.MaxFloat64),
-				Max: NewPoint(math.MaxFloat64, 3, math.MaxFloat64),
-			},
+			want: NewBound(
+				NewPoint(-math.MaxFloat64, -3, -math.MaxFloat64),
+				NewPoint(math.MaxFloat64, 3, math.MaxFloat64)),
 		},
 		{
 			name:  "cube , sphere, plane, cone",
@@ -357,10 +343,9 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewDefaultCone(), t: IdentityMatrix()},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64),
-				Max: NewPoint(math.MaxFloat64, math.MaxFloat64, math.MaxFloat64),
-			},
+			want: NewBound(
+				NewPoint(-math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64),
+				NewPoint(math.MaxFloat64, math.MaxFloat64, math.MaxFloat64)),
 		},
 		{
 			name:  "cylinder",
@@ -369,10 +354,9 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewDefaultCylinder(), t: IdentityMatrix()},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-1, -math.MaxFloat64, -1),
-				Max: NewPoint(1, math.MaxFloat64, 1),
-			},
+			want: NewBound(
+				NewPoint(-1, -math.MaxFloat64, -1),
+				NewPoint(1, math.MaxFloat64, 1)),
 		},
 		{
 			name:  "capped cylinder",
@@ -381,10 +365,7 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewClosedCylinder(5, 10), t: IdentityMatrix()},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-1, 5, -1),
-				Max: NewPoint(1, 10, 1),
-			},
+			want:      NewBound(NewPoint(-1, 5, -1), NewPoint(1, 10, 1)),
 		},
 		{
 			name:  "capped cylinder + cone",
@@ -394,10 +375,7 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewClosedCone(-5, 2), t: IdentityMatrix()},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-5, -5, -5),
-				Max: NewPoint(5, 10, 5),
-			},
+			want:      NewBound(NewPoint(-5, -5, -5), NewPoint(5, 10, 5)),
 		},
 		{
 			name:  "cone",
@@ -406,10 +384,7 @@ func TestGroup_Bounds(t *testing.T) {
 				{s: NewClosedCone(-5, 2), t: IdentityMatrix()},
 			},
 			transform: IdentityMatrix(),
-			want: Bound{
-				Min: NewPoint(-5, -5, -5),
-				Max: NewPoint(5, 2, 5),
-			},
+			want:      NewBound(NewPoint(-5, -5, -5), NewPoint(5, 2, 5)),
 		},
 	}
 	for _, tt := range tests {
@@ -558,10 +533,7 @@ func TestGroup_boundBoxFromBoundingBoxes(t *testing.T) {
 					Bound{Min: NewPoint(-1, -1, -1), Max: NewPoint(1, 1, 1)},
 				},
 			},
-			want: Bound{
-				Min: NewPoint(-1, -1, -1),
-				Max: NewPoint(1, 1, 1),
-			},
+			want: NewBound(NewPoint(-1, -1, -1), NewPoint(1, 1, 1)),
 		},
 		{
 			name: "test2",
@@ -571,45 +543,39 @@ func TestGroup_boundBoxFromBoundingBoxes(t *testing.T) {
 					Bound{Min: NewPoint(-1, -2, -3), Max: NewPoint(4, 5, 6)},
 				},
 			},
-			want: Bound{
-				Min: NewPoint(-1, -2, -3),
-				Max: NewPoint(4, 5, 6),
-			},
+			want: NewBound(NewPoint(-1, -2, -3), NewPoint(4, 5, 6)),
 		},
 		{
 			name: "test3",
 			g:    NewGroup(),
 			args: args{
 				boxes: []Bound{
-					Bound{Min: NewPoint(-1, -2, -3), Max: NewPoint(4, 5, 6)},
-					Bound{Min: NewPoint(-10, -2, -3), Max: NewPoint(43, 50, 6)},
+					NewBound(NewPoint(-1, -2, -3), NewPoint(4, 5, 6)),
+					NewBound(NewPoint(-10, -2, -3), NewPoint(43, 50, 6)),
 				},
 			},
-			want: Bound{
-				Min: NewPoint(-10, -2, -3),
-				Max: NewPoint(43, 50, 6),
-			},
+			want: NewBound(NewPoint(-10, -2, -3), NewPoint(43, 50, 6)),
 		},
 		{
 			name: "test4",
 			g:    NewGroup(),
 			args: args{
 				boxes: []Bound{
-					Bound{Min: NewPoint(-1, -2, -3), Max: NewPoint(4, 5, 6)},
-					Bound{Min: NewPoint(-10, -2, -3), Max: NewPoint(43, 50, 6)},
-					Bound{Min: NewPoint(-10, math.Inf(-1), -3), Max: NewPoint(43, math.Inf(1), 6)},
+					NewBound(NewPoint(-1, -2, -3), NewPoint(4, 5, 6)),
+					NewBound(NewPoint(-10, -2, -3), NewPoint(43, 50, 6)),
+					NewBound(NewPoint(-10, math.Inf(-1), -3), NewPoint(43, math.Inf(1), 6)),
 				},
 			},
-			want: Bound{
-				Min: NewPoint(-10, math.Inf(-1), -3),
-				Max: NewPoint(43, math.Inf(1), 6),
-			},
+			want: NewBound(
+				NewPoint(-10, math.Inf(-1), -3),
+				NewPoint(43, math.Inf(1), 6)),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.g.boundBoxFromBoundingBoxes(tt.args.boxes)
-			assert.Equal(t, tt.want, got, "should equal")
+			diff := cmp.Diff(tt.want, got)
+			assert.Equal(t, "", fmt.Sprint(diff))
 		})
 	}
 }

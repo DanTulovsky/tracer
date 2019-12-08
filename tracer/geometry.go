@@ -190,9 +190,32 @@ func (s *Shape) RandomPosition() Point {
 // Bound describes the bounding box for a shape
 type Bound struct {
 	Min, Max Point
+	center   Point
 }
 
-// Center returns the center of the bounding box
-func (b Bound) Center() Point {
+// NewBound returns a new bounding box
+func NewBound(min, max Point) Bound {
+	b := Bound{
+		Min: min,
+		Max: max,
+	}
+	b.center = b.calculateCenter()
+
+	return b
+}
+
+// calculateCenter calculates the center of the bounding box
+func (b Bound) calculateCenter() Point {
+	// TODO: Handle case when Max and Min are Inf and -Inf (adding them results in NaN)
 	return NewPoint((b.Max.x+b.Min.x)/2, (b.Max.y+b.Min.y)/2, (b.Max.z+b.Min.z)/2)
+}
+
+// Center returns the center of the boundng box
+func (b Bound) Center() Point {
+	return b.center
+}
+
+// Equal returns true if the b == b2
+func (b Bound) Equal(b2 Bound) bool {
+	return b.Min == b2.Min && b.Max == b2.Max
 }

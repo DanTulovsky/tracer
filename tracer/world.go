@@ -213,11 +213,6 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 
 // IntensityAt returns the intensity of the light at point p
 func (w *World) IntensityAt(p Point, l Light, xs Intersections) float64 {
-	maxShadowRays := w.Config.SoftShadowRays
-	if w.Config.SoftShadows {
-		maxShadowRays = w.Config.SoftShadowRays
-	}
-
 	switch l.(type) {
 	case *PointLight:
 		if w.IsShadowed(p, l.Position(), xs) {
@@ -232,12 +227,12 @@ func (w *World) IntensityAt(p Point, l Light, xs Intersections) float64 {
 			return 1
 		}
 		total := 0.0
-		for try := 0; try < maxShadowRays; try++ {
+		for try := 0; try < w.Config.SoftShadowRays; try++ {
 			if !w.IsShadowed(p, l.RandomPosition(), xs) {
 				total = total + 1
 			}
 		}
-		return total / float64(maxShadowRays)
+		return total / float64(w.Config.SoftShadowRays)
 	}
 	return 0
 }
@@ -371,9 +366,9 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 func (w *World) ShowInfo() {
 	log.Printf("Camera HSize: %v", w.Camera().Hsize)
 	log.Printf("Camera WSize: %v", w.Camera().Vsize)
-	log.Printf("Camera Pixel Size: %v", w.Camera().PixelSize)
-	log.Printf("Camera Half With: %v", w.Camera().HalfWidth)
-	log.Printf("Camera Half Height: %v", w.Camera().HalfHeight)
+	log.Printf("Camera Pixel Size: %.4f", w.Camera().PixelSize)
+	log.Printf("Camera Half With: %.4f", w.Camera().HalfWidth)
+	log.Printf("Camera Half Height: %.4f", w.Camera().HalfHeight)
 	log.Printf("Antialiasing: %v", w.Config.Antialias)
 	log.Printf("Parallelism: %v", w.Config.Parallelism)
 	log.Printf("Max Recursion: %v", w.Config.MaxRecusions)

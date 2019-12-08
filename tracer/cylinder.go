@@ -164,10 +164,7 @@ func (c *Cylinder) localNormalAt(p Point, xs *Intersection) Vector {
 
 // calculateBounds calculates the bounding box of the shape
 func (c *Cylinder) calculateBounds() {
-	c.bound = Bound{
-		Min: NewPoint(-1, c.Minimum, -1),
-		Max: NewPoint(1, c.Maximum, 1),
-	}
+	c.bound = NewBound(NewPoint(-1, c.Minimum, -1), NewPoint(1, c.Maximum, 1))
 }
 
 // PrecomputeValues precomputes some values for render speedup

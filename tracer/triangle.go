@@ -118,10 +118,7 @@ func (t *Triangle) calculateBounds() {
 	maxY := math.Max(t.P1.Y(), math.Max(t.P2.Y(), t.P3.Y()))
 	maxZ := math.Max(t.P1.Z(), math.Max(t.P2.Z(), t.P3.Z()))
 
-	t.bound = Bound{
-		Min: NewPoint(minX, minY, minZ),
-		Max: NewPoint(maxX, maxY, maxZ),
-	}
+	t.bound = NewBound(NewPoint(minX, minY, minZ), NewPoint(maxX, maxY, maxZ))
 }
 
 // PrecomputeValues precomputes some values for render speedup

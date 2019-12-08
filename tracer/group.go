@@ -194,10 +194,9 @@ func (g *Group) boundBoxFromBoundingBoxes(boxes []Bound) Bound {
 	sort.Float64s(y)
 	sort.Float64s(z)
 
-	return Bound{
-		Min: NewPoint(x[0], y[0], z[0]),
-		Max: NewPoint(x[len(x)-1], y[len(y)-1], z[len(z)-1]),
-	}
+	return NewBound(
+		NewPoint(x[0], y[0], z[0]),
+		NewPoint(x[len(x)-1], y[len(y)-1], z[len(z)-1]))
 }
 
 // PrecomputeValues precomputes some values for render speedup

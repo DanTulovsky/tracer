@@ -17,7 +17,6 @@ type WorldConfig struct {
 	SoftShadows bool
 
 	// SoftShadowRays specifies how many shadow rays to cast, also used by area lights
-	// TODO: Split out the area light rays into their own setting
 	SoftShadowRays int
 
 	// AreaLightRays specifies how many rays to cast for area lights

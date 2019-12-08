@@ -177,10 +177,9 @@ func (c *Cone) localNormalAt(p Point, xs *Intersection) Vector {
 func (c *Cone) calculateBounds() {
 	min := -math.Max(math.Abs(c.Maximum), math.Abs(c.Minimum))
 
-	c.bound = Bound{
-		Min: NewPoint(min, c.Minimum, min),
-		Max: NewPoint(-min, c.Maximum, -min),
-	}
+	c.bound = NewBound(
+		NewPoint(min, c.Minimum, min),
+		NewPoint(-min, c.Maximum, -min))
 }
 
 // PrecomputeValues precomputes some values for render speedup

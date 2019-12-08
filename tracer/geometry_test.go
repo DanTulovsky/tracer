@@ -173,10 +173,7 @@ func TestBound_Center(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			b := Bound{
-				Min: tt.fields.Min,
-				Max: tt.fields.Max,
-			}
+			b := NewBound(tt.fields.Min, tt.fields.Max)
 			got := b.Center()
 			assert.Equal(t, tt.want, got, "should equal")
 		})

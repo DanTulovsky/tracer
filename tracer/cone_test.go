@@ -249,18 +249,14 @@ func TestCone_Bounds(t *testing.T) {
 		{
 			name: "default inf",
 			c:    NewDefaultCone(),
-			want: Bound{
-				Min: NewPoint(-math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64),
-				Max: NewPoint(math.MaxFloat64, math.MaxFloat64, math.MaxFloat64),
-			},
+			want: NewBound(
+				NewPoint(-math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64),
+				NewPoint(math.MaxFloat64, math.MaxFloat64, math.MaxFloat64)),
 		},
 		{
 			name: "capped",
 			c:    NewCone(-5, 5),
-			want: Bound{
-				Min: NewPoint(-5, -5, -5),
-				Max: NewPoint(5, 5, 5),
-			},
+			want: NewBound(NewPoint(-5, -5, -5), NewPoint(5, 5, 5)),
 		},
 	}
 	for _, tt := range tests {

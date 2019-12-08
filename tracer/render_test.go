@@ -231,9 +231,8 @@ func BenchmarkRenderEmmisive(b *testing.B) {
 	w := envxy(640, 480)
 	w.Config.Antialias = 3
 	w.Config.SoftShadows = true
-	w.Config.SoftShadowRays = 50
-	w.Config.AreaLightRays = 5
-	// w.Camera().SetFoV(math.Pi / 4)
+	w.Config.SoftShadowRays = 10
+	w.Config.AreaLightRays = 10
 
 	l := NewAreaLight(NewUnitSphere(),
 		ColorName(colornames.White), true)
@@ -249,7 +248,6 @@ func BenchmarkRenderEmmisive(b *testing.B) {
 
 	w.SetLights(Lights{l, l2})
 
-	// g := sphereOnPedestal()
 	g := mirrorSphereOnPedestal()
 	g.SetTransform(IdentityMatrix().Translate(0, 0, 2.5))
 
@@ -260,11 +258,11 @@ func BenchmarkRenderEmmisive(b *testing.B) {
 		RenderToFile(w, "/tmp/output.png")
 	}
 }
+
 func BenchmarkRenderSphere(b *testing.B) {
 	width, height := 300.0, 300.0
 	w := NewDefaultWorld(width, height)
 
-	// where the camera is and where it's pointing; also which way is "up"
 	from := NewPoint(0, 1.7, -4.7)
 	to := NewPoint(0, -1, 10)
 	up := NewVector(0, 1, 0)
@@ -272,7 +270,6 @@ func BenchmarkRenderSphere(b *testing.B) {
 	w.Camera().SetTransform(cameraTransform)
 
 	s1 := NewUnitSphere()
-
 	w.AddObject(s1)
 
 	for n := 0; n < b.N; n++ {

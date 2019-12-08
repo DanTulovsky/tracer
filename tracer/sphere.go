@@ -82,10 +82,7 @@ func (s *Sphere) localNormalAt(p Point, xs *Intersection) Vector {
 
 // calculateBounds calculates the bounding box of the shape
 func (s *Sphere) calculateBounds() {
-	s.bound = Bound{
-		Min: NewPoint(-1, -1, -1),
-		Max: NewPoint(1, 1, 1),
-	}
+	s.bound = NewBound(NewPoint(-1, -1, -1), NewPoint(1, 1, 1))
 }
 
 // PrecomputeValues precomputes some values for render speedup
