@@ -26,8 +26,8 @@ func NewMatrixFromData(d [][]float64) Matrix {
 	return Matrix(d)
 }
 
-// IdentityMatrix returns a 4x4 identity Matrix
-func IdentityMatrix() Matrix {
+// IM returns a 4x4 identity Matrix
+func IM() Matrix {
 	return Matrix{
 		{1, 0, 0, 0},
 		{0, 1, 0, 0},

@@ -25,7 +25,7 @@ func TestViewTransform(t *testing.T) {
 				to:   NewPoint(0, 0, -1),
 				up:   NewVector(0, 1, 0),
 			},
-			want: IdentityMatrix(),
+			want: IM(),
 		},
 		{
 			name: "positive z",
@@ -34,7 +34,7 @@ func TestViewTransform(t *testing.T) {
 				to:   NewPoint(0, 0, 1),
 				up:   NewVector(0, 1, 0),
 			},
-			want: IdentityMatrix().Scale(-1, 1, -1),
+			want: IM().Scale(-1, 1, -1),
 		},
 		{
 			name: "view transform moves the world",
@@ -43,7 +43,7 @@ func TestViewTransform(t *testing.T) {
 				to:   NewPoint(0, 0, 0),
 				up:   NewVector(0, 1, 0),
 			},
-			want: IdentityMatrix().Translate(0, 0, -8),
+			want: IM().Translate(0, 0, -8),
 		},
 		{
 			name: "arbitrary view transformation",
@@ -90,8 +90,8 @@ func TestNewCamera(t *testing.T) {
 				Hsize:            160,
 				Vsize:            120,
 				fov:              math.Pi / 2,
-				Transform:        IdentityMatrix(),
-				TransformInverse: IdentityMatrix().Inverse(),
+				Transform:        IM(),
+				TransformInverse: IM().Inverse(),
 				HalfWidth:        1,
 				HalfHeight:       0.75,
 				PixelSize:        0.0125,
@@ -148,7 +148,7 @@ func TestCamera_RayForPixel(t *testing.T) {
 				x: 100.5,
 				y: 50.5,
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewRay(NewPoint(0, 0, 0), NewVector(0, 0, -1)),
 		},
 		{
@@ -158,7 +158,7 @@ func TestCamera_RayForPixel(t *testing.T) {
 				x: 0.5,
 				y: 0.5,
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewRay(NewPoint(0, 0, 0), NewVector(0.66519, 0.33259, -0.66851)),
 		},
 		{
@@ -168,8 +168,8 @@ func TestCamera_RayForPixel(t *testing.T) {
 				x: 100.5,
 				y: 50.5,
 			},
-			// transform: IdentityMatrix().RotateY(math.Pi/4).Translate(0, -2, 5),
-			transform: IdentityMatrix().Translate(0, -2, 5).RotateY(math.Pi / 4),
+			// transform: IM().RotateY(math.Pi/4).Translate(0, -2, 5),
+			transform: IM().Translate(0, -2, 5).RotateY(math.Pi / 4),
 			want:      NewRay(NewPoint(0, 2, -5), NewVector(math.Sqrt2/2, 0, -math.Sqrt2/2)),
 		},
 	}

@@ -23,8 +23,8 @@ func TestNewDefaultCylinder(t *testing.T) {
 				Maximum: math.MaxFloat64,
 				Closed:  false,
 				Shape: Shape{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 					material:         NewDefaultMaterial(),
 					shape:            "cylinder",
 				},
@@ -348,8 +348,8 @@ func TestNewCylinder(t *testing.T) {
 				Maximum: 3,
 				Closed:  false,
 				Shape: Shape{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 					material:         NewDefaultMaterial(),
 					shape:            "cylinder",
 				},
@@ -403,8 +403,8 @@ func TestNewClosedCylinder(t *testing.T) {
 				Maximum: 3,
 				Closed:  true,
 				Shape: Shape{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 					material:         NewDefaultMaterial(),
 					shape:            "cylinder",
 				},

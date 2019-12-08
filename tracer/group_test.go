@@ -20,8 +20,8 @@ func TestNewGroup(t *testing.T) {
 			want: &Group{
 				members: []Shaper{},
 				Shape: Shape{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 					material:         NewDefaultMaterial(),
 					shape:            "group",
 					bound: Bound{
@@ -36,7 +36,7 @@ func TestNewGroup(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g := NewGroup()
 			assert.Equal(t, tt.want, g, "should equal")
-			assert.Equal(t, IdentityMatrix(), g.Transform(), "should equal")
+			assert.Equal(t, IM(), g.Transform(), "should equal")
 		})
 	}
 }
@@ -158,7 +158,7 @@ func TestGroup_IntersectWith(t *testing.T) {
 			name:      "empty group",
 			group:     NewGroup(),
 			members:   []member{},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			args: args{
 				r: NewRay(Origin(), NewVector(0, 0, 1)),
 			},
@@ -168,11 +168,11 @@ func TestGroup_IntersectWith(t *testing.T) {
 			name:  "spheres",
 			group: NewGroup(),
 			members: []member{
-				{s: NewUnitSphere(), t: IdentityMatrix()},
-				{s: NewUnitSphere(), t: IdentityMatrix().Translate(0, 0, -3)},
-				{s: NewUnitSphere(), t: IdentityMatrix().Translate(5, 0, 0)},
+				{s: NewUnitSphere(), t: IM()},
+				{s: NewUnitSphere(), t: IM().Translate(0, 0, -3)},
+				{s: NewUnitSphere(), t: IM().Translate(5, 0, 0)},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
 			},
@@ -183,9 +183,9 @@ func TestGroup_IntersectWith(t *testing.T) {
 			name:  "group and object transform",
 			group: NewGroup(),
 			members: []member{
-				{s: NewUnitSphere(), t: IdentityMatrix().Translate(5, 0, 0)},
+				{s: NewUnitSphere(), t: IM().Translate(5, 0, 0)},
 			},
-			transform: IdentityMatrix().Scale(2, 2, 2),
+			transform: IM().Scale(2, 2, 2),
 			args: args{
 				r: NewRay(NewPoint(10, 0, -10), NewVector(0, 0, 1)),
 			},
@@ -221,15 +221,15 @@ func TestGroup_IntersectWith(t *testing.T) {
 
 func TestGroup_NormalAt(t *testing.T) {
 	g1 := NewGroup()
-	g1.SetTransform(IdentityMatrix().RotateY(math.Pi / 2))
+	g1.SetTransform(IM().RotateY(math.Pi / 2))
 
 	g2 := NewGroup()
-	g2.SetTransform(IdentityMatrix().Scale(1, 2, 3))
+	g2.SetTransform(IM().Scale(1, 2, 3))
 
 	g1.AddMember(g2)
 
 	s := NewUnitSphere()
-	s.SetTransform(IdentityMatrix().Translate(5, 0, 0))
+	s.SetTransform(IM().Translate(5, 0, 0))
 	g2.AddMember(s)
 
 	point := NewPoint(1.7321, 1.1547, -5.5774)
@@ -256,7 +256,7 @@ func TestGroup_Bounds(t *testing.T) {
 			name:      "test1",
 			group:     NewGroup(),
 			members:   []member{},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want: Bound{
 				Min: NewPoint(0, 0, 0),
 				Max: NewPoint(0, 0, 0),
@@ -266,56 +266,56 @@ func TestGroup_Bounds(t *testing.T) {
 			name:  "single cube",
 			group: NewGroup(),
 			members: []member{
-				{s: NewUnitCube(), t: IdentityMatrix()},
+				{s: NewUnitCube(), t: IM()},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewBound(NewPoint(-1, -1, -1), NewPoint(1, 1, 1)),
 		},
 		{
 			name:  "single cube moved",
 			group: NewGroup(),
 			members: []member{
-				{s: NewUnitCube(), t: IdentityMatrix().Translate(1, 0, 0)},
+				{s: NewUnitCube(), t: IM().Translate(1, 0, 0)},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewBound(NewPoint(0, -1, -1), NewPoint(2, 1, 1)),
 		},
 		{
 			name:  "double cube moved",
 			group: NewGroup(),
 			members: []member{
-				{s: NewUnitCube(), t: IdentityMatrix().Translate(1, 0, 0)},
-				{s: NewUnitCube(), t: IdentityMatrix().Translate(-1, 0, 0)},
+				{s: NewUnitCube(), t: IM().Translate(1, 0, 0)},
+				{s: NewUnitCube(), t: IM().Translate(-1, 0, 0)},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewBound(NewPoint(-2, -1, -1), NewPoint(2, 1, 1)),
 		},
 		{
 			name:  "single cube moved and scaled",
 			group: NewGroup(),
 			members: []member{
-				{s: NewUnitCube(), t: IdentityMatrix().Scale(2, 2, 2).Translate(1, 1, 1)},
+				{s: NewUnitCube(), t: IM().Scale(2, 2, 2).Translate(1, 1, 1)},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewBound(NewPoint(-1, -1, -1), NewPoint(3, 3, 3)),
 		},
 		{
 			name:  "cube and sphere",
 			group: NewGroup(),
 			members: []member{
-				{s: NewUnitCube(), t: IdentityMatrix().Scale(2, 2, 2).Translate(1, 1, 1)},
-				{s: NewUnitSphere(), t: IdentityMatrix().Scale(2, 2, 2).Translate(-1, -1, -1)},
+				{s: NewUnitCube(), t: IM().Scale(2, 2, 2).Translate(1, 1, 1)},
+				{s: NewUnitSphere(), t: IM().Scale(2, 2, 2).Translate(-1, -1, -1)},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewBound(NewPoint(-3, -3, -3), NewPoint(3, 3, 3)),
 		},
 		{
 			name:  "plane",
 			group: NewGroup(),
 			members: []member{
-				{s: NewPlane(), t: IdentityMatrix()},
+				{s: NewPlane(), t: IM()},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want: NewBound(
 				NewPoint(-math.MaxFloat64, 0, -math.MaxFloat64),
 				NewPoint(math.MaxFloat64, 0, math.MaxFloat64)),
@@ -324,11 +324,11 @@ func TestGroup_Bounds(t *testing.T) {
 			name:  "cube , sphere, plane",
 			group: NewGroup(),
 			members: []member{
-				{s: NewUnitCube(), t: IdentityMatrix().Scale(2, 2, 2).Translate(1, 1, 1)},
-				{s: NewUnitSphere(), t: IdentityMatrix().Scale(2, 2, 2).Translate(-1, -1, -1)},
-				{s: NewPlane(), t: IdentityMatrix()},
+				{s: NewUnitCube(), t: IM().Scale(2, 2, 2).Translate(1, 1, 1)},
+				{s: NewUnitSphere(), t: IM().Scale(2, 2, 2).Translate(-1, -1, -1)},
+				{s: NewPlane(), t: IM()},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want: NewBound(
 				NewPoint(-math.MaxFloat64, -3, -math.MaxFloat64),
 				NewPoint(math.MaxFloat64, 3, math.MaxFloat64)),
@@ -337,12 +337,12 @@ func TestGroup_Bounds(t *testing.T) {
 			name:  "cube , sphere, plane, cone",
 			group: NewGroup(),
 			members: []member{
-				{s: NewUnitCube(), t: IdentityMatrix().Scale(2, 2, 2).Translate(1, 1, 1)},
-				{s: NewUnitSphere(), t: IdentityMatrix().Scale(2, 2, 2).Translate(-1, -1, -1)},
-				{s: NewPlane(), t: IdentityMatrix()},
-				{s: NewDefaultCone(), t: IdentityMatrix()},
+				{s: NewUnitCube(), t: IM().Scale(2, 2, 2).Translate(1, 1, 1)},
+				{s: NewUnitSphere(), t: IM().Scale(2, 2, 2).Translate(-1, -1, -1)},
+				{s: NewPlane(), t: IM()},
+				{s: NewDefaultCone(), t: IM()},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want: NewBound(
 				NewPoint(-math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64),
 				NewPoint(math.MaxFloat64, math.MaxFloat64, math.MaxFloat64)),
@@ -351,9 +351,9 @@ func TestGroup_Bounds(t *testing.T) {
 			name:  "cylinder",
 			group: NewGroup(),
 			members: []member{
-				{s: NewDefaultCylinder(), t: IdentityMatrix()},
+				{s: NewDefaultCylinder(), t: IM()},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want: NewBound(
 				NewPoint(-1, -math.MaxFloat64, -1),
 				NewPoint(1, math.MaxFloat64, 1)),
@@ -362,28 +362,28 @@ func TestGroup_Bounds(t *testing.T) {
 			name:  "capped cylinder",
 			group: NewGroup(),
 			members: []member{
-				{s: NewClosedCylinder(5, 10), t: IdentityMatrix()},
+				{s: NewClosedCylinder(5, 10), t: IM()},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewBound(NewPoint(-1, 5, -1), NewPoint(1, 10, 1)),
 		},
 		{
 			name:  "capped cylinder + cone",
 			group: NewGroup(),
 			members: []member{
-				{s: NewClosedCylinder(5, 10), t: IdentityMatrix()},
-				{s: NewClosedCone(-5, 2), t: IdentityMatrix()},
+				{s: NewClosedCylinder(5, 10), t: IM()},
+				{s: NewClosedCone(-5, 2), t: IM()},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewBound(NewPoint(-5, -5, -5), NewPoint(5, 10, 5)),
 		},
 		{
 			name:  "cone",
 			group: NewGroup(),
 			members: []member{
-				{s: NewClosedCone(-5, 2), t: IdentityMatrix()},
+				{s: NewClosedCone(-5, 2), t: IM()},
 			},
-			transform: IdentityMatrix(),
+			transform: IM(),
 			want:      NewBound(NewPoint(-5, -5, -5), NewPoint(5, 2, 5)),
 		},
 	}

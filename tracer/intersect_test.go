@@ -198,7 +198,7 @@ func TestUnderPoint(t *testing.T) {
 
 	ray := NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1))
 	shape := NewGlassSphere()
-	shape.SetTransform(IdentityMatrix().Translate(0, 0, 1))
+	shape.SetTransform(IM().Translate(0, 0, 1))
 
 	i := NewIntersection(shape, 5)
 	xs := NewIntersections(i)
@@ -256,9 +256,9 @@ func Test_findRefractiveIndexes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			transformA := IdentityMatrix().Scale(2, 2, 2)
-			transformB := IdentityMatrix().Translate(0, 0, -0.25)
-			transformC := IdentityMatrix().Translate(0, 0, 0.25)
+			transformA := IM().Scale(2, 2, 2)
+			transformB := IM().Translate(0, 0, -0.25)
+			transformC := IM().Translate(0, 0, 0.25)
 
 			glass1 := NewGlassSphere()
 			glass1.SetTransform(transformA)

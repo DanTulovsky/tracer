@@ -47,7 +47,7 @@ func NewDefaultTestWorld() *World {
 	s1.SetMaterial(NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1, nil))
 
 	s2 := NewUnitSphere()
-	s2.SetTransform(IdentityMatrix().Scale(0.5, 0.5, 0.5))
+	s2.SetTransform(IM().Scale(0.5, 0.5, 0.5))
 
 	w := NewWorld(NewWorldConfig())
 	w.AddObject(s1)

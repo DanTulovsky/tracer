@@ -70,8 +70,8 @@ func NewCubeMapPattern(left, front, right, back, up, down UVPatterner) *CubeMapP
 		down:   down,
 		mapper: NewCubeMap(left, front, right, back, up, down),
 		basePattern: basePattern{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -87,8 +87,8 @@ func NewCubeMapPatternSame(p UVPatterner) *CubeMapPattern {
 		down:   p,
 		mapper: NewCubeMapSame(p),
 		basePattern: basePattern{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -158,8 +158,8 @@ func NewTextureMapPattern(p UVPatterner, m Mapper) *TextureMapPattern {
 		pattern: p,
 		mapper:  m,
 		basePattern: basePattern{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -187,8 +187,8 @@ func NewStripedPattern(c1, c2 Color) *StripedPattern {
 		a: c1,
 		b: c2,
 		basePattern: basePattern{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -218,8 +218,8 @@ func NewGradientPattern(c1, c2 Color) *GradientPattern {
 		a: c1,
 		b: c2,
 		basePattern: basePattern{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -249,8 +249,8 @@ func NewRingPattern(c1, c2 Color) *RingPattern {
 		a: c1,
 		b: c2,
 		basePattern: basePattern{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -280,8 +280,8 @@ func NewCheckerPattern(c1, c2 Color) *CheckerPattern {
 		a: c1,
 		b: c2,
 		basePattern: basePattern{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -323,8 +323,8 @@ func NewPerturbedPattern(p Patterner, maxNoise float64) *PerturbedPattern {
 		noise:    n,
 		maxNoise: maxNoise,
 		basePattern: basePattern{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -352,8 +352,8 @@ func NewBlendedPattern(p1, p2 Patterner) *BlendedPattern {
 		p1: p1,
 		p2: p2,
 		basePattern: basePattern{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }

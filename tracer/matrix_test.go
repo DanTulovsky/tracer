@@ -283,7 +283,7 @@ func TestMatrix_TimesMatrix(t *testing.T) {
 	}
 }
 
-func TestIdentityMatrix(t *testing.T) {
+func TestIM(t *testing.T) {
 	tests := []struct {
 		name string
 		want Matrix
@@ -300,7 +300,7 @@ func TestIdentityMatrix(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, IdentityMatrix(), "should be equal")
+			assert.Equal(t, tt.want, IM(), "should be equal")
 		})
 	}
 }

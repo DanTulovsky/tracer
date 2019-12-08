@@ -32,8 +32,8 @@ func NewCSG(s1, s2 Shaper, op Operation) *CSG {
 		right: s2,
 		op:    op,
 		Shape: Shape{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "csg",
 		},

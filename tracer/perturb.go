@@ -63,8 +63,8 @@ func NewNoisePerturber(maxNoise float64) *NoisePerturber {
 		// These two parameters control the size and frequency of the bumps
 		maxNoise: maxNoise, // 1 is a nice value here
 		basePerturb: basePerturb{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -104,8 +104,8 @@ type SinePerturber struct {
 func NewSinePerturber() *SinePerturber {
 	return &SinePerturber{
 		basePerturb: basePerturb{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 }
@@ -159,8 +159,8 @@ func NewImageHeightmapPerturber(filename string, mapper Mapper) (*ImageHeightmap
 		canvas: canvas,
 		mapper: mapper,
 		basePerturb: basePerturb{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 		},
 	}
 

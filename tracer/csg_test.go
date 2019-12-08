@@ -33,8 +33,8 @@ func TestNewCSG(t *testing.T) {
 				right: tt.args.s2,
 				op:    Union,
 				Shape: Shape{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 					material:         NewDefaultMaterial(),
 					shape:            "csg",
 				},
@@ -380,7 +380,7 @@ func TestCSG_IntersectWith2(t *testing.T) {
 
 	s1 := NewUnitSphere()
 	s2 := NewUnitSphere()
-	s2.SetTransform(IdentityMatrix().Translate(0, 0, 0.5))
+	s2.SetTransform(IM().Translate(0, 0, 0.5))
 
 	c := NewCSG(s1, s2, Union)
 	r := NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1))

@@ -398,15 +398,15 @@ func TestVector_Reflect(t *testing.T) {
 
 func TestVector_NormalToWorldSpace(t *testing.T) {
 	g1 := NewGroup()
-	g1.SetTransform(IdentityMatrix().RotateY(math.Pi / 2))
+	g1.SetTransform(IM().RotateY(math.Pi / 2))
 
 	g2 := NewGroup()
-	g2.SetTransform(IdentityMatrix().Scale(1, 2, 3))
+	g2.SetTransform(IM().Scale(1, 2, 3))
 
 	g1.AddMember(g2)
 
 	s := NewUnitSphere()
-	s.SetTransform(IdentityMatrix().Translate(5, 0, 0))
+	s.SetTransform(IM().Translate(5, 0, 0))
 	g2.AddMember(s)
 
 	vector := NewVector(math.Sqrt(3)/3, math.Sqrt(3)/3, math.Sqrt(3)/3)

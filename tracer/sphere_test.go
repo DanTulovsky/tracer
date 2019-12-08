@@ -23,7 +23,7 @@ func TestSphere_IntersectWith(t *testing.T) {
 		{
 			name:      "2 point intersect",
 			sphere:    NewUnitSphere(),
-			transform: IdentityMatrix(),
+			transform: IM(),
 			args: args{
 				r: NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
 			},
@@ -32,7 +32,7 @@ func TestSphere_IntersectWith(t *testing.T) {
 		{
 			name:      "1 point intersect",
 			sphere:    NewUnitSphere(),
-			transform: IdentityMatrix(),
+			transform: IM(),
 			args: args{
 				r: NewRay(NewPoint(0, 1, -5), NewVector(0, 0, 1)),
 			},
@@ -41,7 +41,7 @@ func TestSphere_IntersectWith(t *testing.T) {
 		{
 			name:      "0 point intersect",
 			sphere:    NewUnitSphere(),
-			transform: IdentityMatrix(),
+			transform: IM(),
 			args: args{
 				r: NewRay(NewPoint(0, 2, -5), NewVector(0, 0, 1)),
 			},
@@ -50,7 +50,7 @@ func TestSphere_IntersectWith(t *testing.T) {
 		{
 			name:      "ray inside sphere",
 			sphere:    NewUnitSphere(),
-			transform: IdentityMatrix(),
+			transform: IM(),
 			args: args{
 				r: NewRay(NewPoint(0, 0, 0), NewVector(0, 0, 1)),
 			},
@@ -59,7 +59,7 @@ func TestSphere_IntersectWith(t *testing.T) {
 		{
 			name:      "sphere behind ray",
 			sphere:    NewUnitSphere(),
-			transform: IdentityMatrix(),
+			transform: IM(),
 			args: args{
 				r: NewRay(NewPoint(0, 0, 5), NewVector(0, 0, 1)),
 			},
@@ -109,8 +109,8 @@ func TestNewUnitSphere(t *testing.T) {
 				Center: NewPoint(0, 0, 0),
 				Radius: 1,
 				Shape: Shape{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 					material:         NewDefaultMaterial(),
 					shape:            "sphere",
 				},
@@ -136,7 +136,7 @@ func TestSphere_Transform(t *testing.T) {
 		{
 			name:   "identity by default",
 			sphere: NewUnitSphere(),
-			want:   IdentityMatrix(),
+			want:   IM(),
 		},
 	}
 	for _, tt := range tests {
@@ -192,7 +192,7 @@ func TestSphere_NormalAt(t *testing.T) {
 			args: args{
 				p: NewPoint(1, 0, 0),
 			},
-			m:    IdentityMatrix(),
+			m:    IM(),
 			want: NewVector(1, 0, 0),
 		},
 		{
@@ -201,7 +201,7 @@ func TestSphere_NormalAt(t *testing.T) {
 			args: args{
 				p: NewPoint(0, 1, 0),
 			},
-			m:    IdentityMatrix(),
+			m:    IM(),
 			want: NewVector(0, 1, 0),
 		},
 		{
@@ -210,7 +210,7 @@ func TestSphere_NormalAt(t *testing.T) {
 			args: args{
 				p: NewPoint(0, 0, 1),
 			},
-			m:    IdentityMatrix(),
+			m:    IM(),
 			want: NewVector(0, 0, 1),
 		},
 		{
@@ -219,7 +219,7 @@ func TestSphere_NormalAt(t *testing.T) {
 			args: args{
 				p: NewPoint(math.Sqrt(3)/3, math.Sqrt(3)/3, math.Sqrt(3)/3),
 			},
-			m:    IdentityMatrix(),
+			m:    IM(),
 			want: NewVector(math.Sqrt(3)/3, math.Sqrt(3)/3, math.Sqrt(3)/3),
 		},
 		{
@@ -228,7 +228,7 @@ func TestSphere_NormalAt(t *testing.T) {
 			args: args{
 				p: NewPoint(0, 1.70711, -0.70711),
 			},
-			m:    IdentityMatrix().Translate(0, 1, 0),
+			m:    IM().Translate(0, 1, 0),
 			want: NewVector(0, 0.70711, -0.70711),
 		},
 		{
@@ -237,7 +237,7 @@ func TestSphere_NormalAt(t *testing.T) {
 			args: args{
 				p: NewPoint(0, math.Sqrt2/2, -math.Sqrt2/2),
 			},
-			m:    IdentityMatrix().RotateZ(math.Pi/5).Scale(1, 0.5, 1),
+			m:    IM().RotateZ(math.Pi/5).Scale(1, 0.5, 1),
 			want: NewVector(0, 0.97014, -0.24254),
 		},
 	}

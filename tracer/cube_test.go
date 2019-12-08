@@ -17,8 +17,8 @@ func TestNewUnitCube(t *testing.T) {
 			name: "test1",
 			want: &Cube{
 				Shape: Shape{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 					material:         NewDefaultMaterial(),
 					shape:            "cube",
 				},

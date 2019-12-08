@@ -32,8 +32,8 @@ func NewSmoothTriangle(p1, p2, p3 Point, n1, n2, n3 Vector, vt1, vt2, vt3 Vector
 			E1: p2.SubPoint(p1),
 			E2: p3.SubPoint(p1),
 			Shape: Shape{
-				transform:        IdentityMatrix(),
-				transformInverse: IdentityMatrix().Inverse(),
+				transform:        IM(),
+				transformInverse: IM().Inverse(),
 				material:         NewDefaultMaterial(),
 				shape:            "smooth-triangle",
 			},

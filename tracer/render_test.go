@@ -36,7 +36,7 @@ func envxy(width, height float64) *World {
 
 func mirorsphere() *Sphere {
 	s := NewUnitSphere()
-	s.SetTransform(IdentityMatrix().Scale(.75, .75, .75).Translate(0, 1.75, 0))
+	s.SetTransform(IM().Scale(.75, .75, .75).Translate(0, 1.75, 0))
 	s.Material().Ambient = 0
 	s.Material().Diffuse = 0
 	s.Material().Reflective = 1.0
@@ -49,7 +49,7 @@ func mirorsphere() *Sphere {
 
 func pedestal() *Cube {
 	s := NewUnitCube()
-	s.SetTransform(IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(0, 0.5, 0))
+	s.SetTransform(IM().Scale(0.5, 0.5, 0.5).Translate(0, 0.5, 0))
 	s.Material().Color = ColorName(colornames.Gold)
 	up := NewUVCheckersPattern(8, 8,
 		ColorName(colornames.White), ColorName(colornames.Violet))
@@ -62,7 +62,7 @@ func pedestal() *Cube {
 
 func floor(y float64) *Plane {
 	p := NewPlane()
-	p.SetTransform(IdentityMatrix().Translate(0, y, 0))
+	p.SetTransform(IM().Translate(0, y, 0))
 	pp := NewCheckerPattern(ColorName(colornames.Gray), ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 
@@ -96,9 +96,9 @@ func mirrorSphereOnPedestal() *Group {
 
 func ceiling(y float64) *Plane {
 	p := NewPlane()
-	p.SetTransform(IdentityMatrix().Translate(0, y, 0))
+	p.SetTransform(IM().Translate(0, y, 0))
 	pp := NewGradientPattern(ColorName(colornames.Blue), ColorName(colornames.Red))
-	pp.SetTransform(IdentityMatrix().Scale(10, 1, 1).Translate(-15, 0, 0))
+	pp.SetTransform(IM().Scale(10, 1, 1).Translate(-15, 0, 0))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 	p.Material().Ambient = 0.15
@@ -108,7 +108,7 @@ func ceiling(y float64) *Plane {
 func backWall(z float64) *Plane {
 	p := NewPlane()
 	p.SetTransform(
-		IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, z))
+		IM().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, z))
 	p.Material().Color = ColorName(colornames.Lightpink)
 	p.Material().Specular = 0
 
@@ -117,7 +117,7 @@ func backWall(z float64) *Plane {
 func frontWall(z float64) *Plane {
 	p := NewPlane()
 	p.SetTransform(
-		IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, z))
+		IM().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, z))
 	uvpp := NewUVCheckersPattern(4, 4,
 		ColorName(colornames.Orange), ColorName(colornames.White))
 	pp := NewTextureMapPattern(uvpp, NewPlaneMap())
@@ -128,10 +128,10 @@ func frontWall(z float64) *Plane {
 }
 func rightWall(x float64) *Plane {
 	p := NewPlane()
-	p.SetTransform(IdentityMatrix().RotateZ(math.Pi/2).Translate(x, 0, 0))
+	p.SetTransform(IM().RotateZ(math.Pi/2).Translate(x, 0, 0))
 	pp := NewGradientPattern(
 		ColorName(colornames.Orange), ColorName(colornames.White))
-	pp.SetTransform(IdentityMatrix().Scale(10, 1, 1).Translate(-5, 0, 0))
+	pp.SetTransform(IM().Scale(10, 1, 1).Translate(-5, 0, 0))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 
@@ -139,7 +139,7 @@ func rightWall(x float64) *Plane {
 }
 func leftWall(x float64) *Plane {
 	p := NewPlane()
-	p.SetTransform(IdentityMatrix().RotateZ(math.Pi/2).Translate(x, 0, 0))
+	p.SetTransform(IM().RotateZ(math.Pi/2).Translate(x, 0, 0))
 	pp := NewStripedPattern(
 		ColorName(colornames.Lightskyblue), ColorName(colornames.White))
 	p.Material().SetPattern(pp)
@@ -150,7 +150,7 @@ func leftWall(x float64) *Plane {
 
 func sphere() *Sphere {
 	s := NewUnitSphere()
-	s.SetTransform(IdentityMatrix().Scale(.75, .75, .75).Translate(0, 1.75, 0))
+	s.SetTransform(IM().Scale(.75, .75, .75).Translate(0, 1.75, 0))
 	s.Material().Ambient = 0
 	s.Material().Diffuse = 0
 	s.Material().Reflective = 1.0
@@ -163,7 +163,7 @@ func sphere() *Sphere {
 
 func cone() *Cone {
 	s := NewClosedCone(-2, 0)
-	s.SetTransform(IdentityMatrix().Translate(0, 2, 0))
+	s.SetTransform(IM().Translate(0, 2, 0))
 	sp := NewCheckerPattern(ColorName(colornames.Green), ColorName(colornames.Violet))
 	s.Material().SetPattern(sp)
 	return s
@@ -172,7 +172,7 @@ func cone() *Cone {
 func background() *Group {
 	g := NewGroup()
 	g.AddMember(cone())
-	g.SetTransform(IdentityMatrix().Translate(0, 1, 6))
+	g.SetTransform(IM().Translate(0, 1, 6))
 	return g
 }
 
@@ -237,19 +237,19 @@ func BenchmarkRenderEmmisive(b *testing.B) {
 	l := NewAreaLight(NewUnitSphere(),
 		ColorName(colornames.White), true)
 	l.SetTransform(
-		IdentityMatrix().Scale(0.2, 1, 0.2).Translate(2, 1, 2))
+		IM().Scale(0.2, 1, 0.2).Translate(2, 1, 2))
 	l.SetIntensity(l.Intensity().Scale(0.5))
 
 	l2 := NewAreaLight(NewUnitCube(),
 		ColorName(colornames.White), true)
 	l2.SetTransform(
-		IdentityMatrix().Scale(0.2, 1, 0.2).Translate(-2, 1, 2))
+		IM().Scale(0.2, 1, 0.2).Translate(-2, 1, 2))
 	l2.SetIntensity(l.Intensity().Scale(0.5))
 
 	w.SetLights(Lights{l, l2})
 
 	g := mirrorSphereOnPedestal()
-	g.SetTransform(IdentityMatrix().Translate(0, 0, 2.5))
+	g.SetTransform(IM().Translate(0, 0, 2.5))
 
 	w.AddObject(g)
 	w.AddObject(defaultroom())
@@ -316,7 +316,7 @@ func benchmarkRenderObjParse(filename string, b *testing.B) {
 		log.Fatalln(err)
 	}
 
-	g.SetTransform(IdentityMatrix().Translate(0, 2, 0))
+	g.SetTransform(IM().Translate(0, 2, 0))
 
 	w.AddObject(g)
 

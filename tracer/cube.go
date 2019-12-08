@@ -16,8 +16,8 @@ type Cube struct {
 func NewUnitCube() *Cube {
 	c := &Cube{
 		Shape: Shape{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "cube",
 		},

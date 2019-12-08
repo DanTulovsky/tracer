@@ -34,8 +34,8 @@ func TestNewTriangle(t *testing.T) {
 				E2:     NewVector(1, -1, 0),
 				Normal: NewVector(0, 0, -1),
 				Shape: Shape{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 					material:         NewDefaultMaterial(),
 					shape:            "triangle",
 				},

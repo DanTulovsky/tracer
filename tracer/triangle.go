@@ -31,8 +31,8 @@ func NewTriangle(p1, p2, p3 Point) *Triangle {
 		E2:                p3.SubPoint(p1),
 		RayTransformCache: sync.Map{},
 		Shape: Shape{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "triangle",
 		},

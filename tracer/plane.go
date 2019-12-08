@@ -16,8 +16,8 @@ func NewPlane() *Plane {
 
 	pl := &Plane{
 		Shape: Shape{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "plane",
 		},

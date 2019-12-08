@@ -38,8 +38,8 @@ func NewCamera(hsize, vsize, fov float64) *Camera {
 		Hsize:            hsize,
 		Vsize:            vsize,
 		fov:              fov,
-		Transform:        IdentityMatrix(),
-		TransformInverse: IdentityMatrix().Inverse(),
+		Transform:        IM(),
+		TransformInverse: IM().Inverse(),
 	}
 
 	c.setPixelSize()

@@ -15,7 +15,7 @@ type testPattern struct {
 func newTestPattern() Patterner {
 	return &testPattern{
 		basePattern: basePattern{
-			transform: IdentityMatrix(),
+			transform: IM(),
 		},
 	}
 }
@@ -44,8 +44,8 @@ func TestNewStripedPattern(t *testing.T) {
 				a: Black(),
 				b: White(),
 				basePattern: basePattern{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 				},
 			},
 		},
@@ -211,8 +211,8 @@ func TestStripedPattern_ColorAtObject(t *testing.T) {
 		{
 			name:       "object transformation",
 			pattern:    NewStripedPattern(White(), Black()),
-			oTransform: IdentityMatrix().Scale(2, 2, 2),
-			pTransform: IdentityMatrix(),
+			oTransform: IM().Scale(2, 2, 2),
+			pTransform: IM(),
 			args: args{
 				o: NewUnitSphere(),
 				p: NewPoint(1.5, 0, 0),
@@ -222,8 +222,8 @@ func TestStripedPattern_ColorAtObject(t *testing.T) {
 		{
 			name:       "pattern transform",
 			pattern:    NewStripedPattern(White(), Black()),
-			oTransform: IdentityMatrix(),
-			pTransform: IdentityMatrix().Scale(2, 2, 2),
+			oTransform: IM(),
+			pTransform: IM().Scale(2, 2, 2),
 			args: args{
 				o: NewUnitSphere(),
 				p: NewPoint(1.5, 0, 0),
@@ -233,8 +233,8 @@ func TestStripedPattern_ColorAtObject(t *testing.T) {
 		{
 			name:       "object and pattern transform",
 			pattern:    NewStripedPattern(White(), Black()),
-			oTransform: IdentityMatrix().Scale(2, 2, 2),
-			pTransform: IdentityMatrix().Translate(0.5, 0, 0),
+			oTransform: IM().Scale(2, 2, 2),
+			pTransform: IM().Translate(0.5, 0, 0),
 			args: args{
 				o: NewUnitSphere(),
 				p: NewPoint(1.5, 0, 0),
@@ -271,8 +271,8 @@ func TestNewGradientPattern(t *testing.T) {
 				a: White(),
 				b: Black(),
 				basePattern: basePattern{
-					transform:        IdentityMatrix(),
-					transformInverse: IdentityMatrix().Inverse(),
+					transform:        IM(),
+					transformInverse: IM().Inverse(),
 				},
 			},
 		},

@@ -9,7 +9,7 @@ import (
 // newTestShape returns a test shape for testing
 func newTestShape() *Shape {
 	return &Shape{
-		transform: IdentityMatrix(),
+		transform: IM(),
 		material:  NewDefaultMaterial(),
 	}
 }
@@ -70,7 +70,7 @@ func TestShape_Transform(t *testing.T) {
 		{
 			name:  "identity by default",
 			shape: newTestShape(),
-			want:  IdentityMatrix(),
+			want:  IM(),
 		},
 	}
 	for _, tt := range tests {

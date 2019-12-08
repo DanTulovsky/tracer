@@ -25,8 +25,8 @@ func NewDefaultCylinder() *Cylinder {
 		Maximum: math.MaxFloat64,
 		Closed:  false,
 		Shape: Shape{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "cylinder",
 		},

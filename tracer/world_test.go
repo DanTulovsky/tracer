@@ -98,7 +98,7 @@ func TestWorld_shadeHit(t *testing.T) {
 				i:         NewIntersection(NewUnitSphere(), 4),
 				r:         NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1)),
 				material:  NewMaterial(NewColor(0.8, 1.0, 0.6), 0.1, 0.7, 0.2, 200, 0, 0, 1, nil),
-				transform: IdentityMatrix(),
+				transform: IM(),
 				lights: []Light{
 					NewPointLight(NewPoint(-10, 10, -10), ColorName(colornames.White)),
 				},
@@ -112,7 +112,7 @@ func TestWorld_shadeHit(t *testing.T) {
 				i:         NewIntersection(NewUnitSphere(), 0.5),
 				r:         NewRay(NewPoint(0, 0, 0), NewVector(0, 0, 1)),
 				material:  NewDefaultMaterial(),
-				transform: IdentityMatrix().Scale(0.5, 0.5, 0.5),
+				transform: IM().Scale(0.5, 0.5, 0.5),
 				lights: []Light{
 					NewPointLight(NewPoint(0, 0.25, 0), ColorName(colornames.White)),
 				},
@@ -142,7 +142,7 @@ func TestWorld_shadeHitShadow(t *testing.T) {
 	w.AddObject(s1)
 
 	s2 := NewUnitSphere()
-	s2.SetTransform(IdentityMatrix().Translate(0, 0, 10))
+	s2.SetTransform(IM().Translate(0, 0, 10))
 	w.AddObject(s2)
 
 	r := NewRay(NewPoint(0, 0, 5), NewVector(0, 0, 1))
@@ -158,7 +158,7 @@ func TestWorld_shadeHitShadow(t *testing.T) {
 func TestWorld_shadeHitOffset(t *testing.T) {
 	r := NewRay(NewPoint(0, 0, -5), NewVector(0, 0, 1))
 	shape := NewUnitSphere()
-	shape.SetTransform(IdentityMatrix().Translate(0, 0, 1))
+	shape.SetTransform(IM().Translate(0, 0, 1))
 
 	xs := NewIntersections(
 		NewIntersection(shape, 5))
@@ -329,7 +329,7 @@ func TestWorld_ReflectedColor_Reflective(t *testing.T) {
 
 	shape := NewPlane()
 	shape.Material().Reflective = 0.5
-	shape.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	shape.SetTransform(IM().Translate(0, -1, 0))
 	w.AddObject(shape)
 
 	xs := NewIntersections(
@@ -349,7 +349,7 @@ func TestWorld_shadeHit_Reflective(t *testing.T) {
 
 	shape := NewPlane()
 	shape.Material().Reflective = 0.5
-	shape.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	shape.SetTransform(IM().Translate(0, -1, 0))
 	w.AddObject(shape)
 
 	xs := NewIntersections(
@@ -371,12 +371,12 @@ func TestWorld_AvoidInfRecursion(t *testing.T) {
 
 	lower := NewPlane()
 	lower.Material().Reflective = 1
-	lower.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	lower.SetTransform(IM().Translate(0, -1, 0))
 	w.AddObject(lower)
 
 	upper := NewPlane()
 	upper.Material().Reflective = 1
-	upper.SetTransform(IdentityMatrix().Translate(0, 1, 0))
+	upper.SetTransform(IM().Translate(0, 1, 0))
 	w.AddObject(upper)
 
 	r := NewRay(NewPoint(0, 0, 0), NewVector(0, 1, 0))
@@ -391,7 +391,7 @@ func TestWorld_shadeHit_MaxRecursiveReflected(t *testing.T) {
 
 	shape := NewPlane()
 	shape.Material().Reflective = 0.5
-	shape.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	shape.SetTransform(IM().Translate(0, -1, 0))
 	w.AddObject(shape)
 
 	xs := NewIntersections(
@@ -492,7 +492,7 @@ func TestWorld_shadeHit_Transparent(t *testing.T) {
 	w := NewDefaultTestWorld()
 
 	floor := NewPlane()
-	floor.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	floor.SetTransform(IM().Translate(0, -1, 0))
 	floor.Material().Transparency = 0.5
 	floor.Material().RefractiveIndex = 1.5
 	w.AddObject(floor)
@@ -500,7 +500,7 @@ func TestWorld_shadeHit_Transparent(t *testing.T) {
 	ball := NewUnitSphere()
 	ball.Material().Color = NewColor(1, 0, 0)
 	ball.Material().Ambient = 0.5
-	ball.SetTransform(IdentityMatrix().Translate(0, -3.5, -0.5))
+	ball.SetTransform(IM().Translate(0, -3.5, -0.5))
 	w.AddObject(ball)
 
 	r := NewRay(NewPoint(0, 0, -3), NewVector(0, -math.Sqrt2/2, math.Sqrt2/2))
@@ -516,7 +516,7 @@ func TestWorld_shadeHit_Schlick(t *testing.T) {
 	w := NewDefaultTestWorld()
 
 	floor := NewPlane()
-	floor.SetTransform(IdentityMatrix().Translate(0, -1, 0))
+	floor.SetTransform(IM().Translate(0, -1, 0))
 	floor.Material().Transparency = 0.5
 	floor.Material().Reflective = 0.5
 	floor.Material().RefractiveIndex = 1.5
@@ -525,7 +525,7 @@ func TestWorld_shadeHit_Schlick(t *testing.T) {
 	ball := NewUnitSphere()
 	ball.Material().Color = NewColor(1, 0, 0)
 	ball.Material().Ambient = 0.5
-	ball.SetTransform(IdentityMatrix().Translate(0, -3.5, -0.5))
+	ball.SetTransform(IM().Translate(0, -3.5, -0.5))
 	w.AddObject(ball)
 
 	r := NewRay(NewPoint(0, 0, -3), NewVector(0, -math.Sqrt2/2, math.Sqrt2/2))

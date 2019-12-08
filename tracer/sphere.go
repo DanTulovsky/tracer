@@ -19,8 +19,8 @@ func NewUnitSphere() *Sphere {
 		Center: NewPoint(0, 0, 0),
 		Radius: 1,
 		Shape: Shape{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "sphere",
 		},

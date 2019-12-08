@@ -20,8 +20,8 @@ func NewGroup() *Group {
 	g := &Group{
 		members: []Shaper{},
 		Shape: Shape{
-			transform:        IdentityMatrix(),
-			transformInverse: IdentityMatrix().Inverse(),
+			transform:        IM(),
+			transformInverse: IM().Inverse(),
 			material:         NewDefaultMaterial(),
 			shape:            "group",
 		},
