@@ -149,7 +149,7 @@ func (w *World) RefractedColor(state *IntersectionState, remaining int, xs Inter
 	cosi := state.EyeV.Dot(state.NormalV)
 
 	// find sun(theta_t)^2 via trigonometric identity
-	sin2t := math.Pow(nRatio, 2) * (1 - math.Pow(cosi, 2))
+	sin2t := nRatio * nRatio * (1 - cosi*cosi)
 
 	if sin2t > 1 { // total internal reflection
 		return Black()

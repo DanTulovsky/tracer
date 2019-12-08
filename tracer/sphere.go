@@ -60,7 +60,7 @@ func (s *Sphere) IntersectWith(r Ray, t Intersections) Intersections {
 	c := sphereToRay.Dot(sphereToRay) - 1
 
 	// discriminant
-	d := math.Pow(b, 2) - 4*a*c
+	d := b*b - 4*a*c
 
 	// no intersection
 	if d < 0 {

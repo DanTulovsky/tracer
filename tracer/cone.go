@@ -67,7 +67,7 @@ func (c *Cone) checkCap(r Ray, t, y float64) bool {
 	x := r.Origin.X() + t*r.Dir.X()
 	z := r.Origin.Z() + t*r.Dir.Z()
 
-	return (math.Pow(x, 2) + math.Pow(z, 2)) <= y
+	return (x*x + z*z) <= y
 }
 
 // intersectCaps returns intersections with the caps
@@ -104,9 +104,9 @@ func (c *Cone) IntersectWith(r Ray, t Intersections) Intersections {
 	// check for intersections with the caps
 	t = c.intersectCaps(r, t)
 
-	a := math.Pow(r.Dir.X(), 2) - math.Pow(r.Dir.Y(), 2) + math.Pow(r.Dir.Z(), 2)
+	a := r.Dir.X()*r.Dir.X() - r.Dir.Y()*r.Dir.Y() + r.Dir.Z()*r.Dir.Z()
 	b := 2*r.Origin.X()*r.Dir.X() - 2*r.Origin.Y()*r.Dir.Y() + 2*r.Origin.Z()*r.Dir.Z()
-	cc := math.Pow(r.Origin.X(), 2) - math.Pow(r.Origin.Y(), 2) + math.Pow(r.Origin.Z(), 2)
+	cc := r.Origin.X()*r.Origin.X() - r.Origin.Y()*r.Origin.Y() + r.Origin.Z()*r.Origin.Z()
 
 	// ray misses the cone
 	if math.Abs(a) < constants.Epsilon {
@@ -121,7 +121,7 @@ func (c *Cone) IntersectWith(r Ray, t Intersections) Intersections {
 		return t
 	}
 
-	disc := math.Pow(b, 2) - 4*a*cc
+	disc := b*b - 4*a*cc
 
 	// ray does not intersect cone itself
 	if disc < 0 {
@@ -154,7 +154,7 @@ func (c *Cone) localNormalAt(p Point, xs *Intersection) Vector {
 	var on Vector
 
 	// compute the square of the distance form the y-axis
-	dist := math.Pow(p.X(), 2) + math.Pow(p.Z(), 2)
+	dist := p.X()*p.X() + p.Z()*p.Z()
 
 	switch {
 	case dist < 1 && p.Y() >= c.Maximum-constants.Epsilon:
@@ -162,7 +162,7 @@ func (c *Cone) localNormalAt(p Point, xs *Intersection) Vector {
 	case dist < 1 && p.Y() <= c.Minimum+constants.Epsilon:
 		on = NewVector(0, -1, 0)
 	default:
-		y := math.Sqrt(math.Pow(p.X(), 2) + math.Pow(p.Z(), 2))
+		y := math.Sqrt(p.X()*p.X() + p.Z()*p.Z())
 		if p.Y() > 0 {
 			y = -y
 		}

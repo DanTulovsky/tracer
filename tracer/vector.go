@@ -86,7 +86,7 @@ func (v Vector) Scale(s float64) Vector {
 
 // Magnitude computes the magnitude of the vector
 func (v Vector) Magnitude() float64 {
-	return math.Sqrt(math.Pow(v.X(), 2) + math.Pow(v.Y(), 2) + math.Pow(v.Z(), 2) + math.Pow(v.W(), 2))
+	return math.Sqrt(v.x*v.x + v.y*v.y + v.z*v.z + v.w*v.w)
 }
 
 // Normalize normalizes a vector to a unit vector
@@ -96,7 +96,7 @@ func (v Vector) Normalize() Vector {
 		return NewVector(0, 0, 0)
 	}
 	m := 1 / magnitude // optimization
-	return NewVector(v.X()*m, v.Y()*m, v.Z()*m)
+	return NewVector(v.x*m, v.y*m, v.z*m)
 }
 
 // MagnitudeNormalize returns both the magnitude and the normalized vector
@@ -106,7 +106,7 @@ func (v Vector) MagnitudeNormalize() (float64, Vector) {
 		return magnitude, NewVector(0, 0, 0)
 	}
 	m := 1 / magnitude // optimization
-	return magnitude, NewVector(v.X()*m, v.Y()*m, v.Z()*m)
+	return magnitude, NewVector(v.x*m, v.y*m, v.z*m)
 }
 
 // Dot returns the dot product of the two vectors

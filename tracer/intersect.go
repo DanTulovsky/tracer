@@ -205,7 +205,7 @@ func Schlick(s *IntersectionState) float64 {
 	// total intrnal reflection can only occur if n1 > n2
 	if s.N1 > s.N2 {
 		n := s.N1 / s.N2
-		sin2t := math.Pow(n, 2) * (1.0 - math.Pow(cos, 2))
+		sin2t := n * n * (1.0 - cos*cos)
 		if sin2t > 1.0 {
 			return 1.0
 		}
@@ -217,7 +217,7 @@ func Schlick(s *IntersectionState) float64 {
 		cos = cost
 	}
 
-	r0 := math.Pow((s.N1-s.N2)/(s.N1+s.N2), 2)
+	r0 := ((s.N1 - s.N2) / (s.N1 + s.N2)) * ((s.N1 - s.N2) / (s.N1 + s.N2))
 
 	return r0 + (1-r0)*math.Pow((1-cos), 5)
 }

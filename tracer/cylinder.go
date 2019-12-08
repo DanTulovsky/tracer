@@ -69,7 +69,7 @@ func (c *Cylinder) checkCap(r Ray, t float64) bool {
 	x := r.Origin.X() + t*r.Dir.X()
 	z := r.Origin.Z() + t*r.Dir.Z()
 
-	return (math.Pow(x, 2) + math.Pow(z, 2)) <= c.Radius
+	return (x*x + z*z) <= c.Radius
 }
 
 func (c *Cylinder) intersectCaps(r Ray, xs Intersections) Intersections {
@@ -106,7 +106,7 @@ func (c *Cylinder) IntersectWith(r Ray, t Intersections) Intersections {
 	t = c.intersectCaps(r, t)
 
 	// cylinder custom
-	a := math.Pow(r.Dir.X(), 2) + math.Pow(r.Dir.Z(), 2)
+	a := r.Dir.X()*r.Dir.X() + r.Dir.Z()*r.Dir.Z()
 
 	// ray is parallel to the y axis
 	if a < constants.Epsilon {
@@ -114,9 +114,9 @@ func (c *Cylinder) IntersectWith(r Ray, t Intersections) Intersections {
 	}
 
 	b := 2*r.Origin.X()*r.Dir.X() + 2*r.Origin.Z()*r.Dir.Z()
-	cc := math.Pow(r.Origin.X(), 2) + math.Pow(r.Origin.Z(), 2) - 1
+	cc := r.Origin.X()*r.Origin.X() + r.Origin.Z()*r.Origin.Z() - 1
 
-	disc := math.Pow(b, 2) - 4*a*cc
+	disc := b*b - 4*a*cc
 
 	// ray does not intersect cylinder itself
 	if disc < 0 {
@@ -149,7 +149,7 @@ func (c *Cylinder) localNormalAt(p Point, xs *Intersection) Vector {
 	var on Vector
 
 	// compute the square of the distance form the y-axis
-	dist := math.Pow(p.X(), 2) + math.Pow(p.Z(), 2)
+	dist := p.X()*p.X() + p.Z()*p.Z()
 
 	switch {
 	case dist < 1 && p.Y() >= c.Maximum-constants.Epsilon:

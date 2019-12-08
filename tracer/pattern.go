@@ -262,7 +262,7 @@ func (rp *RingPattern) ColorAtObject(o Shaper, p Point) Color {
 
 // ColorAt implements Patterner
 func (rp *RingPattern) colorAt(p Point) Color {
-	if int(math.Floor(math.Sqrt(math.Pow(p.X(), 2)+math.Pow(p.Z(), 2))))%2 == 0 {
+	if int(math.Floor(math.Sqrt(p.X()*p.X()+p.Z()*p.Z())))%2 == 0 {
 		return rp.a
 	}
 	return rp.b
