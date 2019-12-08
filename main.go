@@ -1863,6 +1863,7 @@ func emissive() {
 	w.Config.Antialias = 3
 	w.Config.SoftShadows = true
 	w.Config.SoftShadowRays = 50
+	w.Config.AreaLightRays = 5
 	// w.Camera().SetFoV(math.Pi / 4)
 
 	l := tracer.NewAreaLight(tracer.NewUnitSphere(),
@@ -2015,7 +2016,7 @@ func main() {
 	// simplesphere()
 	// heightmapsphere(path.Join(dir, "brick_bump.png"))
 	// simpleroom()
-	// emissive()
+	emissive()
 	// simpletexturewall(path.Join(dir, "brick_bump.png"))
 	// simplecone()
 	// simplecylinder()
@@ -2031,7 +2032,7 @@ func main() {
 	// textureMap()
 	// cubeMap()
 	// mirrors()
-	mirror()
+	// mirror()
 	// cube()
 	// glass()
 

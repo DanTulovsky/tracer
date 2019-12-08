@@ -190,7 +190,7 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 			state.EyeV,
 			state.NormalV,
 			inensity,
-			w.Config.SoftShadowRays,
+			w.Config.AreaLightRays,
 			state.U,
 			state.V)
 
@@ -377,6 +377,7 @@ func (w *World) ShowInfo() {
 	log.Printf("Antialiasing: %v", w.Config.Antialias)
 	log.Printf("Parallelism: %v", w.Config.Parallelism)
 	log.Printf("Max Recursion: %v", w.Config.MaxRecusions)
+	log.Printf("Area Light Rays: %v", w.Config.AreaLightRays)
 	log.Printf("Soft Shadows enabled? -> %v", w.Config.SoftShadows)
 	if w.Config.SoftShadows {
 		log.Printf("  Soft shadow rays: %v", w.Config.SoftShadowRays)

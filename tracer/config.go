@@ -19,12 +19,16 @@ type WorldConfig struct {
 	// SoftShadowRays specifies how many shadow rays to cast, also used by area lights
 	// TODO: Split out the area light rays into their own setting
 	SoftShadowRays int
+
+	// AreaLightRays specifies how many rays to cast for area lights
+	AreaLightRays int
 }
 
 // NewWorldConfig returns a new world config with default settings
 func NewWorldConfig() *WorldConfig {
 	return &WorldConfig{
 		Antialias:      0,
+		AreaLightRays:  10,
 		MaxRecusions:   4,
 		Parallelism:    runtime.NumCPU(),
 		SoftShadows:    true,
