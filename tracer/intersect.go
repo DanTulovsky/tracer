@@ -174,8 +174,9 @@ func PrepareComputations(hit *Intersection, r Ray, xs Intersections) *Intersecti
 		normalv = normalv.Negate()
 	}
 
-	overPoint := point.AddVector(normalv.Scale(constants.Epsilon))
-	underPoint := point.SubVector(normalv.Scale(constants.Epsilon))
+	normalvScaled := normalv.Scale(constants.Epsilon)
+	overPoint := point.AddVector(normalvScaled)
+	underPoint := point.SubVector(normalvScaled)
 	reflectv := r.Dir.Reflect(normalv)
 	n1, n2 = findRefractiveIndexes(hit, xs)
 

@@ -35,7 +35,8 @@ func TestNewGroup(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := NewGroup()
-			assert.Equal(t, tt.want, g, "should equal")
+			diff := cmp.Diff(tt.want, g)
+			assert.Equal(t, diff, "", "should equal")
 			assert.Equal(t, IM(), g.Transform(), "should equal")
 		})
 	}

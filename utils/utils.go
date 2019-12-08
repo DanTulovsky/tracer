@@ -20,8 +20,8 @@ func Random(min, max int) int {
 }
 
 // RandomFloat returns a random float in [min, max)
-func RandomFloat(min, max float64) float64 {
-	return min + rand.Float64()*(max-min)
+func RandomFloat(r *rand.Rand, min, max float64) float64 {
+	return min + r.Float64()*(max-min)
 }
 
 // Equals is used to compare floating point numbers

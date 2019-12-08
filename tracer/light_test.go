@@ -3,7 +3,9 @@ package tracer
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 
@@ -136,7 +138,7 @@ func Test_lighting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := lighting(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow, 1, 0, 0)
+			got := lighting(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow, 1, 0, 0, rand.New(rand.NewSource(time.Now().Unix())))
 			diff := cmp.Diff(tt.want, got)
 			assert.Equal(t, "", fmt.Sprint(diff))
 		})
@@ -226,7 +228,7 @@ func TestColorAtPoint(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := ColorAtPoint(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow)
+			got := ColorAtPoint(tt.args.m, tt.o, tt.args.p, tt.args.l, tt.args.eye, tt.args.normal, tt.args.inShadow, rand.New(rand.NewSource(time.Now().Unix())))
 			diff := cmp.Diff(tt.want, got)
 			assert.Equal(t, "", fmt.Sprint(diff))
 		})

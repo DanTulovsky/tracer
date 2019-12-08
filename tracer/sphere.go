@@ -2,6 +2,7 @@ package tracer
 
 import (
 	"math"
+	"math/rand"
 
 	"github.com/DanTulovsky/tracer/utils"
 )
@@ -97,10 +98,10 @@ func (s *Sphere) Includes(s2 Shaper) bool {
 
 // RandomPosition returns a random point on the surface of the sphere
 // http://mathworld.wolfram.com/SpherePointPicking.html
-func (s *Sphere) RandomPosition() Point {
+func (s *Sphere) RandomPosition(rng *rand.Rand) Point {
 
-	u := utils.RandomFloat(0, 1)
-	v := utils.RandomFloat(0, 1)
+	u := utils.RandomFloat(rng, 0, 1)
+	v := utils.RandomFloat(rng, 0, 1)
 
 	theta := math.Pi * 2 * u
 	phi := math.Acos(2*v - 1)

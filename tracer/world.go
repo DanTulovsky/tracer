@@ -3,8 +3,10 @@ package tracer
 import (
 	"log"
 	"math"
+	"math/rand"
 	"sort"
 	"sync"
+	"time"
 
 	"golang.org/x/image/colornames"
 )
@@ -105,7 +107,7 @@ func (w *World) Camera() *Camera {
 }
 
 // ColorAt returns the color in the world where the given ray hits
-func (w *World) ColorAt(r Ray, remaining int, xs Intersections) Color {
+func (w *World) ColorAt(r Ray, remaining int, xs Intersections, rng *rand.Rand) Color {
 	// First solve the visibility problem
 	xs = w.Intersections(r, xs)
 	hit, err := xs.Hit()
@@ -115,26 +117,26 @@ func (w *World) ColorAt(r Ray, remaining int, xs Intersections) Color {
 
 	// Second solve the shading problem
 	state := PrepareComputations(hit, r, xs)
-	return w.shadeHit(state, remaining, xs).Clamp()
+	return w.shadeHit(state, remaining, xs, rng).Clamp()
 }
 
 // ReflectedColor returns the reflected color given an IntersectionState
 // remaining controls how many times a light ray can bounce between the same objects
-func (w *World) ReflectedColor(state *IntersectionState, remaining int, xs Intersections) Color {
+func (w *World) ReflectedColor(state *IntersectionState, remaining int, xs Intersections, rng *rand.Rand) Color {
 	if remaining <= 0 || state.Object.Material().Reflective == 0 {
 		return Black()
 	}
 
 	reflectR := NewRay(state.OverPoint, state.ReflectV)
 	xs = xs[:0]
-	clr := w.ColorAt(reflectR, remaining-1, xs)
+	clr := w.ColorAt(reflectR, remaining-1, xs, rng)
 
 	return clr.Scale(state.Object.Material().Reflective)
 }
 
 // RefractedColor returns the refracted color given an IntersectionState
 // remaining controls how many times a light ray can bounce between the same objects
-func (w *World) RefractedColor(state *IntersectionState, remaining int, xs Intersections) Color {
+func (w *World) RefractedColor(state *IntersectionState, remaining int, xs Intersections, rng *rand.Rand) Color {
 	if remaining <= 0 || state.Object.Material().Transparency == 0 {
 		return Black()
 	}
@@ -167,20 +169,20 @@ func (w *World) RefractedColor(state *IntersectionState, remaining int, xs Inter
 	// find the color of the refracted ray, making sure to multiply
 	// by the transparency value to account for any opacity
 	xs = xs[:0]
-	clr := w.ColorAt(refractedRay, remaining-1, xs).Scale(state.Object.Material().Transparency)
+	clr := w.ColorAt(refractedRay, remaining-1, xs, rng).Scale(state.Object.Material().Transparency)
 
 	return clr
 
 }
 
 // ShadeHit returns the color at the intersection enapsulated by IntersectionState
-func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersections) Color {
+func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersections, rng *rand.Rand) Color {
 
 	xs = xs[:0] // clear intersections
 	var result Color
 
 	for _, l := range w.Lights {
-		inensity := w.IntensityAt(state.OverPoint, l, xs)
+		inensity := w.IntensityAt(state.OverPoint, l, xs, rng)
 
 		surface := lighting(
 			state.Object.Material(),
@@ -192,10 +194,11 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 			inensity,
 			w.Config.AreaLightRays,
 			state.U,
-			state.V)
+			state.V,
+			rng)
 
-		reflected := w.ReflectedColor(state, remaining, xs)
-		refracted := w.RefractedColor(state, remaining, xs)
+		reflected := w.ReflectedColor(state, remaining, xs, rng)
+		refracted := w.RefractedColor(state, remaining, xs, rng)
 
 		m := state.Object.Material()
 		if m.Reflective > 0 && m.Transparency > 0 {
@@ -212,7 +215,7 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 }
 
 // IntensityAt returns the intensity of the light at point p
-func (w *World) IntensityAt(p Point, l Light, xs Intersections) float64 {
+func (w *World) IntensityAt(p Point, l Light, xs Intersections, rng *rand.Rand) float64 {
 	switch l.(type) {
 	case *PointLight:
 		if w.IsShadowed(p, l.Position(), xs) {
@@ -228,7 +231,7 @@ func (w *World) IntensityAt(p Point, l Light, xs Intersections) float64 {
 		}
 		total := 0.0
 		for try := 0; try < w.Config.SoftShadowRays; try++ {
-			if !w.IsShadowed(p, l.RandomPosition(), xs) {
+			if !w.IsShadowed(p, l.RandomPosition(rng), xs) {
 				total = total + 1
 			}
 		}
@@ -277,7 +280,7 @@ type pixel struct {
 }
 
 // Render is the work done by the renderWorker, renders one pixel
-func (p *pixel) Render(w *World, canvas *Canvas, xs Intersections, offset, l float64) {
+func (p *pixel) Render(w *World, canvas *Canvas, xs Intersections, offset, l float64, rng *rand.Rand) {
 	clrs := Colors{}
 
 	// Collect colors for each sub-pixel and average them (antialias), slow and naive implementation
@@ -287,7 +290,7 @@ func (p *pixel) Render(w *World, canvas *Canvas, xs Intersections, offset, l flo
 			b := p.y + offset*(sy*2-1)
 
 			ray := w.Camera().RayForPixel(a, b)
-			clr := w.ColorAt(ray, w.Config.MaxRecusions, xs)
+			clr := w.ColorAt(ray, w.Config.MaxRecusions, xs, rng)
 			clrs = append(clrs, clr)
 		}
 	}
@@ -313,9 +316,11 @@ func (w *World) renderWorker(in chan *pixel, canvas *Canvas) {
 	}
 	rowLength := math.Sqrt(numSquares)
 
+	rng := rand.New(rand.NewSource(time.Now().Unix()))
+
 	for pixel := range in {
 		// render the pixel
-		pixel.Render(w, canvas, xs, offset, rowLength)
+		pixel.Render(w, canvas, xs, offset, rowLength, rng)
 		// clear intersections for next pixel
 		xs = xs[:0]
 	}

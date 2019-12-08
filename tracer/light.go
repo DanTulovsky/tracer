@@ -3,6 +3,7 @@ package tracer
 import (
 	"log"
 	"math"
+	"math/rand"
 
 	"golang.org/x/image/colornames"
 )
@@ -15,7 +16,7 @@ type Light interface {
 	// Center position on the light
 	Position() Point
 	// Random postion on the light
-	RandomPosition() Point
+	RandomPosition(*rand.Rand) Point
 	Shape() Shaper
 }
 
@@ -62,8 +63,8 @@ func (al *AreaLight) Position() Point {
 }
 
 // RandomPosition implements the Light interface
-func (al *AreaLight) RandomPosition() Point {
-	return al.Shaper.RandomPosition()
+func (al *AreaLight) RandomPosition(rng *rand.Rand) Point {
+	return al.Shaper.RandomPosition(rng)
 }
 
 // SetIntensity sets the intensity of the light
@@ -102,7 +103,7 @@ func (pl *PointLight) Position() Point {
 }
 
 // RandomPosition returns the position of the light
-func (pl *PointLight) RandomPosition() Point {
+func (pl *PointLight) RandomPosition(rng *rand.Rand) Point {
 	return pl.position
 }
 
@@ -117,7 +118,7 @@ func (pl *PointLight) IsVisible() bool {
 }
 
 // lighting returns the color for a given point
-func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, intensity float64, rays int, u, v float64) Color {
+func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, intensity float64, rays int, u, v float64, rng *rand.Rand) Color {
 	var ambient, diffuse, specular Color
 
 	clr := m.Color
@@ -164,7 +165,7 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inten
 	for try := 0; try < rays; try++ {
 
 		// find the direction to the light source
-		lightv := l.RandomPosition().SubPoint(p).Normalize()
+		lightv := l.RandomPosition(rng).SubPoint(p).Normalize()
 
 		// lightDotNormal represents the cosine of the angle between the light vector and the normal vector
 		// a negaive number means the light is on the other side of the surface
@@ -199,6 +200,6 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inten
 }
 
 // ColorAtPoint returns the clamped color at the given point
-func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow float64) Color {
-	return lighting(m, o, p, l, eye, normal, inShadow, 1, 0, 0).Clamp()
+func ColorAtPoint(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inShadow float64, rng *rand.Rand) Color {
+	return lighting(m, o, p, l, eye, normal, inShadow, 1, 0, 0, rng).Clamp()
 }

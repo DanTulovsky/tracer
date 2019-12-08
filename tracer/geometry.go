@@ -1,6 +1,8 @@
 package tracer
 
 import (
+	"math/rand"
+
 	"github.com/DanTulovsky/tracer/utils"
 )
 
@@ -30,7 +32,7 @@ type Shaper interface {
 	SetName(string)
 
 	// RandomPosition returns a andom point on the surface of the geometry
-	RandomPosition() Point
+	RandomPosition(*rand.Rand) Point
 
 	SetTransform(Matrix)
 	Transform() Matrix
@@ -171,7 +173,7 @@ func (s *Shape) Bounds() Bound {
 }
 
 // RandomPosition returns a random point on the surface
-func (s *Shape) RandomPosition() Point {
+func (s *Shape) RandomPosition(rng *rand.Rand) Point {
 	minx := s.Bounds().Min.X()
 	miny := s.Bounds().Min.Y()
 	minz := s.Bounds().Min.Z()
@@ -179,9 +181,9 @@ func (s *Shape) RandomPosition() Point {
 	maxy := s.Bounds().Max.Y()
 	maxz := s.Bounds().Max.Z()
 
-	rx := utils.RandomFloat(minx, maxx)
-	ry := utils.RandomFloat(miny, maxy)
-	rz := utils.RandomFloat(minz, maxz)
+	rx := utils.RandomFloat(rng, minx, maxx)
+	ry := utils.RandomFloat(rng, miny, maxy)
+	rz := utils.RandomFloat(rng, minz, maxz)
 
 	p := NewPoint(rx, ry, rz).ToWorldSpace(s)
 	return p
