@@ -99,6 +99,16 @@ func (v Vector) Normalize() Vector {
 	return NewVector(v.X()*m, v.Y()*m, v.Z()*m)
 }
 
+// MagnitudeNormalize returns both the magnitude and the normalized vector
+func (v Vector) MagnitudeNormalize() (float64, Vector) {
+	magnitude := v.Magnitude()
+	if magnitude == 0 {
+		return magnitude, NewVector(0, 0, 0)
+	}
+	m := 1 / magnitude // optimization
+	return magnitude, NewVector(v.X()*m, v.Y()*m, v.Z()*m)
+}
+
 // Dot returns the dot product of the two vectors
 // This is the cosine of the angle between two unit vectors
 func (v Vector) Dot(w Vector) float64 {

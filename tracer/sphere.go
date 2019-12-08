@@ -2,7 +2,6 @@ package tracer
 
 import (
 	"math"
-	"sort"
 
 	"github.com/DanTulovsky/tracer/utils"
 )
@@ -71,7 +70,7 @@ func (s *Sphere) IntersectWith(r Ray, t Intersections) Intersections {
 	t = append(t, NewIntersection(s, (-b-math.Sqrt(d))/(2*a)))
 	t = append(t, NewIntersection(s, (-b+math.Sqrt(d))/(2*a)))
 
-	sort.Sort(byT(t))
+	// sort.Sort(byT(t))
 
 	return t
 }

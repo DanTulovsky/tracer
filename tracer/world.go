@@ -62,7 +62,7 @@ func (w *World) AddObject(o Shaper) {
 	w.Objects = append(w.Objects, o)
 }
 
-// Intersections returns all the intersections in the world with the given ray
+// Intersections returns all the intersections in the world with the given ray (sorted)
 func (w *World) Intersections(r Ray, xs Intersections) Intersections {
 	var is Intersections
 
@@ -240,19 +240,15 @@ func (w *World) IntensityAt(p Point, l Light, xs Intersections) float64 {
 // IsShadowed returns true if p is in a shadow from the given light
 func (w *World) IsShadowed(p Point, lp Point, xs Intersections) bool {
 	v := lp.SubPoint(p)
-	distance := v.Magnitude()
-	direction := v.Normalize()
+	distance, direction := v.MagnitudeNormalize()
 
 	r := NewRay(p, direction)
 
 	intersections := w.Intersections(r, xs)
 
-	// Some objects do not cast shadows, so we need to look at all the objects r intersects with
-	sort.Sort(byT(intersections))
-
+	// intersections must be sorted!
 	for _, it := range intersections {
 		if it.t >= 0 {
-
 			if it.t < distance && it.Object().Material().ShadowCaster {
 				return true
 			}

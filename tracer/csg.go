@@ -1,8 +1,6 @@
 package tracer
 
-import (
-	"sort"
-)
+import "sort"
 
 // Operation defines the operation applied to a CSG
 type Operation int

@@ -2,7 +2,6 @@ package tracer
 
 import (
 	"math"
-	"sort"
 
 	"github.com/DanTulovsky/tracer/constants"
 )
@@ -37,21 +36,21 @@ func (pl *Plane) localNormalAt(unused Point, xs *Intersection) Vector {
 	return NewVector(0, 1, 0)
 }
 
-// IntersectWith returns the 't' values of Ray r intersecting with the plane in sorted order
-func (pl *Plane) IntersectWith(r Ray, t Intersections) Intersections {
+// IntersectWith returns the 't' values of Ray r intersecting with the plane
+func (pl *Plane) IntersectWith(r Ray, xs Intersections) Intersections {
+	// xs comes in empty, optimization to prevent creating it here
 
 	//  common calculation for all shapes
 	r = r.Transform(pl.transformInverse)
 
 	// parallel or coplanar
 	if math.Abs(r.Dir.Y()) < constants.Epsilon {
-		return t
+		return xs
 	}
 
-	t = append(t, NewIntersection(pl, -r.Origin.Y()/r.Dir.Y()))
-	sort.Sort(byT(t))
+	xs = append(xs, NewIntersection(pl, -r.Origin.Y()/r.Dir.Y()))
 
-	return t
+	return xs
 }
 
 // calculateBounds calculates the bounding box of the shape

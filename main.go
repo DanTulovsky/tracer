@@ -1862,7 +1862,7 @@ func emissive() {
 	w := envxy(640, 480)
 	w.Config.Antialias = 3
 	w.Config.SoftShadows = true
-	w.Config.SoftShadowRays = 50
+	w.Config.SoftShadowRays = 10
 	w.Config.AreaLightRays = 5
 	// w.Camera().SetFoV(math.Pi / 4)
 

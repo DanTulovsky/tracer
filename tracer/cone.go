@@ -101,8 +101,6 @@ func (c *Cone) IntersectWith(r Ray, t Intersections) Intersections {
 	// by the inverse, which achieves the same thing
 	r = r.Transform(c.transformInverse)
 
-	// cylinder custom
-
 	// check for intersections with the caps
 	t = c.intersectCaps(r, t)
 

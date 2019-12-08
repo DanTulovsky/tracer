@@ -158,15 +158,15 @@ func (m Matrix) TimesMatrix(m2 Matrix) Matrix {
 		panic("can only handle 4x4 matricies")
 	}
 
-	new := NewMatrix(4, 4)
+	n := NewMatrix(4, 4)
 
 	for x := 0; x < mR; x++ {
 		for y := 0; y < mC; y++ {
-			new[x][y] = m[x][0]*m2[0][y] + m[x][1]*m2[1][y] + m[x][2]*m2[2][y] + m[x][3]*m2[3][y]
+			n[x][y] = m[x][0]*m2[0][y] + m[x][1]*m2[1][y] + m[x][2]*m2[2][y] + m[x][3]*m2[3][y]
 		}
 	}
 
-	return new
+	return n
 }
 
 // Transpose transposes a YxY matrix
