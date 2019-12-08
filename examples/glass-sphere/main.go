@@ -52,7 +52,7 @@ func floor() *tracer.Plane {
 
 func ceiling() *tracer.Plane {
 	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().Translate(0, 5, 0))
+	p.SetTransform(tracer.IM().Translate(0, 5, 0))
 	pp := tracer.NewCheckerPattern(tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 
@@ -61,7 +61,7 @@ func ceiling() *tracer.Plane {
 
 func backWall() *tracer.Plane {
 	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
+	p.SetTransform(tracer.IM().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, 10))
 	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Teal), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
@@ -71,7 +71,7 @@ func backWall() *tracer.Plane {
 
 func frontWall() *tracer.Plane {
 	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, -5))
+	p.SetTransform(tracer.IM().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, -5))
 	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Purple), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
@@ -81,7 +81,7 @@ func frontWall() *tracer.Plane {
 
 func rightWall() *tracer.Plane {
 	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(4, 0, 0))
+	p.SetTransform(tracer.IM().RotateZ(math.Pi/2).Translate(4, 0, 0))
 	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Peachpuff), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
@@ -91,7 +91,7 @@ func rightWall() *tracer.Plane {
 
 func leftWall() *tracer.Plane {
 	p := tracer.NewPlane()
-	p.SetTransform(tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-4, 0, 0))
+	p.SetTransform(tracer.IM().RotateZ(math.Pi/2).Translate(-4, 0, 0))
 	pp := tracer.NewStripedPattern(tracer.ColorName(colornames.Lightgreen), tracer.ColorName(colornames.White))
 	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
@@ -101,7 +101,7 @@ func leftWall() *tracer.Plane {
 
 func sphere() *tracer.Sphere {
 	s := tracer.NewUnitSphere()
-	s.SetTransform(tracer.IdentityMatrix().Scale(.75, .75, .75).Translate(0, 1.75, 0))
+	s.SetTransform(tracer.IM().Scale(.75, .75, .75).Translate(0, 1.75, 0))
 	s.Material().Ambient = 0
 	s.Material().Diffuse = 0
 	s.Material().Reflective = 1.0
@@ -114,7 +114,7 @@ func sphere() *tracer.Sphere {
 
 func pedestal() *tracer.Cube {
 	s := tracer.NewUnitCube()
-	s.SetTransform(tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(0, 0.5, 0))
+	s.SetTransform(tracer.IM().Scale(0.5, 0.5, 0.5).Translate(0, 0.5, 0))
 	s.Material().Color = tracer.ColorName(colornames.Gold)
 
 	return s
@@ -122,7 +122,7 @@ func pedestal() *tracer.Cube {
 
 func cone() *tracer.Cone {
 	s := tracer.NewClosedCone(-2, 0)
-	s.SetTransform(tracer.IdentityMatrix().Translate(0, 2, 0))
+	s.SetTransform(tracer.IM().Translate(0, 2, 0))
 	sp := tracer.NewCheckerPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.Violet))
 	s.Material().SetPattern(sp)
 	return s
@@ -131,7 +131,7 @@ func cone() *tracer.Cone {
 func background() *tracer.Group {
 	g := tracer.NewGroup()
 	g.AddMember(cone())
-	g.SetTransform(tracer.IdentityMatrix().Translate(0, 1, 6))
+	g.SetTransform(tracer.IM().Translate(0, 1, 6))
 	return g
 }
 

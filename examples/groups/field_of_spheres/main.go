@@ -28,7 +28,7 @@ func init() {
 
 // return a sphere at this point, scaled by size
 func sphere(p tracer.Point, size float64) *tracer.Sphere {
-	transform := tracer.IdentityMatrix().Scale(size, size, size).Translate(p.X(), p.Y(), p.Z())
+	transform := tracer.IM().Scale(size, size, size).Translate(p.X(), p.Y(), p.Z())
 
 	s := tracer.NewUnitSphere()
 	s.SetTransform(transform)
@@ -42,7 +42,7 @@ func glassSphere(p tracer.Point, size float64) *tracer.Sphere {
 	randomT := float64(utils.Random(80, 90)) / 100 // [0.5 - 0.7)]
 	randomR := float64(utils.Random(60, 80)) / 100
 
-	transform := tracer.IdentityMatrix().Scale(size, size, size).Translate(p.X(), p.Y(), p.Z())
+	transform := tracer.IM().Scale(size, size, size).Translate(p.X(), p.Y(), p.Z())
 
 	s := tracer.NewUnitSphere()
 	s.SetTransform(transform)
@@ -96,7 +96,7 @@ func scene() {
 	backWall := tracer.NewPlane()
 	pbw := tracer.NewCheckerPattern(tracer.ColorName(colornames.Lightgray), tracer.ColorName(colornames.Gray))
 	backWall.Material().SetPattern(pbw)
-	backWall.SetTransform(tracer.IdentityMatrix().RotateX(math.Pi/2).Translate(0, 0, 30))
+	backWall.SetTransform(tracer.IM().RotateX(math.Pi/2).Translate(0, 0, 30))
 	backWall.Material().Specular = 0
 	backWall.Material().Diffuse = 1
 	w.AddObject(backWall)
@@ -104,9 +104,9 @@ func scene() {
 	// ceiling wall
 	ceiling := tracer.NewPlane()
 	pc := tracer.NewCheckerPattern(tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Yellow))
-	pc.SetTransform(tracer.IdentityMatrix().Scale(3, 3, 3))
+	pc.SetTransform(tracer.IM().Scale(3, 3, 3))
 	ceiling.Material().SetPattern(pc)
-	ceiling.SetTransform(tracer.IdentityMatrix().Translate(0, 5, 0))
+	ceiling.SetTransform(tracer.IM().Translate(0, 5, 0))
 	ceiling.Material().Specular = 0
 	ceiling.Material().Diffuse = 1
 	w.AddObject(ceiling)

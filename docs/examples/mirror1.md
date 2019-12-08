@@ -36,7 +36,7 @@
     leftWall.Material().Specular = 0
     leftWall.Material().Reflective = 0
     leftWall.SetTransform(
-        tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(-15, 0, 0))
+        tracer.IM().RotateZ(math.Pi/2).Translate(-15, 0, 0))
     w.AddObject(leftWall)
 
     rightWall := tracer.NewPlane()
@@ -44,13 +44,13 @@
     rightWall.Material().Specular = 0
     rightWall.Material().Reflective = 0
     rightWall.SetTransform(
-        tracer.IdentityMatrix().RotateZ(math.Pi/2).Translate(15, 0, 0))
+        tracer.IM().RotateZ(math.Pi/2).Translate(15, 0, 0))
     w.AddObject(rightWall)
 
     // mirror1
     cube1 := tracer.NewUnitCube()
     cube1.SetTransform(
-        tracer.IdentityMatrix().Scale(0.01, 1.5, 3).Translate(-2, 1.9, 0))
+        tracer.IM().Scale(0.01, 1.5, 3).Translate(-2, 1.9, 0))
     cube1.Material().Reflective = 1
     cube1.Material().Color = tracer.ColorName(colornames.Black)
     w.AddObject(cube1)
@@ -58,39 +58,39 @@
     // border
     borderStripes := tracer.NewStripedPattern(
         tracer.ColorName(colornames.Lightgray), tracer.ColorName(colornames.White))
-    borderStripes.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1, 1).RotateY(math.Pi / 2))
+    borderStripes.SetTransform(tracer.IM().Scale(0.01, 1, 1).RotateY(math.Pi / 2))
     borderP := tracer.NewPertrubedPattern(borderStripes, 0.1)
     // this produces a completely different pattern than applying the transform on the inner pattern
-    // borderP.SetTransform(tracer.IdentityMatrix().Scale(0.1, 1, 1).RotateY(math.Pi / 2))
+    // borderP.SetTransform(tracer.IM().Scale(0.1, 1, 1).RotateY(math.Pi / 2))
 
     // top border
     topBorder := tracer.NewUnitCube()
-    topBorder.SetTransform(tracer.IdentityMatrix().Scale(0.01, .2, 3).Translate(-2, 3.6, 0))
+    topBorder.SetTransform(tracer.IM().Scale(0.01, .2, 3).Translate(-2, 3.6, 0))
     topBorder.Material().SetPattern(borderP)
     w.AddObject(topBorder)
 
     // bottom border
     bottomBorder := tracer.NewUnitCube()
-    bottomBorder.SetTransform(tracer.IdentityMatrix().Scale(0.01, .2, 3).Translate(-2, 0.2, 0))
+    bottomBorder.SetTransform(tracer.IM().Scale(0.01, .2, 3).Translate(-2, 0.2, 0))
     bottomBorder.Material().SetPattern(borderP)
     w.AddObject(bottomBorder)
 
     // left border
     leftBorder := tracer.NewUnitCube()
-    leftBorder.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1.9, 0.2).Translate(-2, 1.9, -3.2))
+    leftBorder.SetTransform(tracer.IM().Scale(0.01, 1.9, 0.2).Translate(-2, 1.9, -3.2))
     leftBorder.Material().SetPattern(borderP)
     w.AddObject(leftBorder)
 
     // right border
     rightBorder := tracer.NewUnitCube()
-    rightBorder.SetTransform(tracer.IdentityMatrix().Scale(0.01, 1.9, 0.2).Translate(-2, 1.9, 3.2))
+    rightBorder.SetTransform(tracer.IM().Scale(0.01, 1.9, 0.2).Translate(-2, 1.9, 3.2))
     rightBorder.Material().SetPattern(borderP)
     w.AddObject(rightBorder)
 
     // table
     table := tracer.NewUnitCube()
     table.SetTransform(
-        tracer.IdentityMatrix().Scale(0.5, 0.5, 0.5).Translate(0, 0.5, 0))
+        tracer.IM().Scale(0.5, 0.5, 0.5).Translate(0, 0.5, 0))
     table.Material().Reflective = 0
     table.Material().Color = tracer.ColorName(colornames.Lightslategray)
     w.AddObject(table)
@@ -98,11 +98,11 @@
     // sphere1
     sphere1 := tracer.NewUnitSphere()
     sphere1.SetTransform(
-        tracer.IdentityMatrix().Scale(.5, .5, .5).Translate(0, 1.5, 0)) // half sphere + full cube (scaled by half())
+        tracer.IM().Scale(.5, .5, .5).Translate(0, 1.5, 0)) // half sphere + full cube (scaled by half())
     // sphere1.Material().Color = tracer.ColorName(colornames.Yellow)
     sphere1pattern := tracer.NewStripedPattern(
         tracer.ColorName(colornames.Blue), tracer.ColorName(colornames.Purple))
-    sphere1pattern.SetTransform(tracer.IdentityMatrix().Scale(0.2, 1, 1))
+    sphere1pattern.SetTransform(tracer.IM().Scale(0.2, 1, 1))
     sphere1.Material().SetPattern(sphere1pattern)
     w.AddObject(sphere1)
 

@@ -26,14 +26,14 @@ func init() {
 
 func corner() *tracer.Sphere {
 	s := tracer.NewUnitSphere()
-	s.SetTransform(tracer.IdentityMatrix().Scale(0.25, 0.25, 0.25).Translate(0, 0, -1))
+	s.SetTransform(tracer.IM().Scale(0.25, 0.25, 0.25).Translate(0, 0, -1))
 	return s
 }
 
 func edge() *tracer.Cylinder {
 	c := tracer.NewCylinder(0, 1)
 	c.SetTransform(
-		tracer.IdentityMatrix().Scale(0.25, 1, 0.25).RotateZ(-math.Pi/2).RotateY(-math.Pi/6).Translate(0, 0, -1))
+		tracer.IM().Scale(0.25, 1, 0.25).RotateZ(-math.Pi/2).RotateY(-math.Pi/6).Translate(0, 0, -1))
 	return c
 }
 
@@ -79,11 +79,11 @@ func hexagon() {
 
 	for n := 0.0; n < 6; n++ {
 		s := side()
-		s.SetTransform(tracer.IdentityMatrix().RotateY(n * math.Pi / 3))
+		s.SetTransform(tracer.IM().RotateY(n * math.Pi / 3))
 		hex.AddMember(s)
 	}
 
-	hex.SetTransform(tracer.IdentityMatrix().RotateX(-math.Pi / 12))
+	hex.SetTransform(tracer.IM().RotateX(-math.Pi / 12))
 
 	w.AddObject(hex)
 
