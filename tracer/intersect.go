@@ -219,5 +219,6 @@ func Schlick(s *IntersectionState) float64 {
 
 	r0 := ((s.N1 - s.N2) / (s.N1 + s.N2)) * ((s.N1 - s.N2) / (s.N1 + s.N2))
 
-	return r0 + (1-r0)*math.Pow((1-cos), 5)
+	c := (1 - cos) * (1 - cos) * (1 - cos) * (1 - cos) * (1 - cos)
+	return r0 + (1-r0)*c
 }
