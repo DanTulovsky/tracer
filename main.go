@@ -1986,8 +1986,8 @@ func areaspotlight() {
 	angle := math.Pi / 5
 
 	w := envxyareaspotlight(640, 480, angle, to)
-	w.Config.Antialias = 4
-	w.Config.SoftShadowRays = 400
+	w.Config.Antialias = 2
+	w.Config.SoftShadowRays = 100
 
 	sphere := tracer.NewUnitSphere()
 	// sphere.SetTransform(tracer.IM().Scale(2, 2, 2))
