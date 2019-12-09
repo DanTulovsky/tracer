@@ -354,18 +354,21 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 
 	offset := float64(w.Config.RenderPasses)
 	for i := 0.0; i < offset; i++ {
-		for y := i; y < camera.Vsize; y = y + offset {
-			for x := 0.0; x < camera.Hsize; x++ {
-				// send work to workers
-				pending <- &pixel{x: x, y: y}
-				done++
-				last = showProgress(total, done, last)
+		for j := 0.0; j < offset; j++ {
+			for y := i; y < camera.Vsize; y = y + offset {
+				for x := j; x < camera.Hsize; x = x + offset {
+					// send work to workers
+					pending <- &pixel{x: x, y: y}
+					done++
+					last = showProgress(total, done, last)
+				}
 			}
 		}
 	}
 	close(pending)
 	wg.Wait()
 
+	log.Println(done)
 	log.Print("Render finished!")
 	return canvas
 }

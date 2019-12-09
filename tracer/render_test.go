@@ -73,7 +73,7 @@ func floor(y float64) *Plane {
 func room(left, front, right, back, clng, flr float64) *Group {
 	g := NewGroup()
 	g.AddMember(floor(flr))
-	g.AddMember(backWall(back))
+	g.AddMember(backWallGhost(back))
 	g.AddMember(leftWall(left))
 	g.AddMember(rightWall(right))
 	g.AddMember(frontWall(front))
@@ -110,6 +110,21 @@ func backWall(z float64) *Plane {
 	p.SetTransform(
 		IM().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, z))
 	p.Material().Color = ColorName(colornames.Lightpink)
+	p.Material().Specular = 0
+
+	return p
+}
+func backWallGhost(z float64) *Plane {
+	p := NewPlane()
+	p.SetTransform(
+		IM().RotateX(math.Pi/2).RotateZ(math.Pi/2).Translate(0, 0, z))
+	ppuv, err := NewUVImagePattern("/Users/dant/go/src/github.com/DanTulovsky/tracer/images/ghost.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pp := NewTextureMapPattern(ppuv, NewPlaneMap())
+	pp.SetTransform(IM().Scale(10, 5, 5).RotateY(math.Pi/2).Translate(0, 0, -3))
+	p.Material().SetPattern(pp)
 	p.Material().Specular = 0
 
 	return p

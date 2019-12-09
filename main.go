@@ -1987,7 +1987,7 @@ func areaspotlight() {
 
 	w := envxyareaspotlight(1024, 768, angle, to)
 	w.Config.Antialias = 4
-	w.Config.SoftShadowRays = 100
+	w.Config.SoftShadowRays = 400
 	w.Config.SoftShadows = true
 
 	sphere := tracer.NewUnitSphere()
@@ -2105,18 +2105,17 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	areaspotlight()
+	// areaspotlight()
 	// spotlight()
 	// var dir string
 	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
-	// heightmapplane(path.Join(dir, "heightmap.png"))
-	// heightmapcube(path.Join(dir, "brick_bump.png"))
+	// heightmapplane(path.Join(dir, "height.png"))
 	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
 	// brickwall(dir)
 	// simplesphere()
 	// heightmapsphere(path.Join(dir, "brick_bump.png"))
 	// simpleroom()
-	// emissive()
+	emissive()
 	// simpletexturewall(path.Join(dir, "brick_bump.png"))
 	// simplecone()
 	// simplecylinder()
