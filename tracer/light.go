@@ -13,6 +13,7 @@ type Light interface {
 	Intensity() Color
 	SetIntensity(Color)
 	IsVisible() bool
+
 	// Center position on the light
 	Position() Point
 	// Random postion on the light
@@ -22,12 +23,6 @@ type Light interface {
 
 // Lights is a collection of Light
 type Lights []Light
-
-// PointLight implements the light interface and is a single point light with no size
-type PointLight struct {
-	position  Point
-	intensity Color
-}
 
 // AreaLight shines in all directions and is a shape
 type AreaLight struct {
@@ -82,6 +77,12 @@ func (al *AreaLight) IsVisible() bool {
 	return al.visible
 }
 
+// PointLight implements the light interface and is a single point light with no size
+type PointLight struct {
+	position  Point
+	intensity Color
+}
+
 // NewPointLight returns a new point light
 func NewPointLight(p Point, i Color) *PointLight {
 	return &PointLight{position: p, intensity: i}
@@ -117,10 +118,68 @@ func (pl *PointLight) IsVisible() bool {
 	return false
 }
 
+// SpotLight implements the light interface and is a single point light with no size
+type SpotLight struct {
+	position  Point
+	intensity Color
+	angle     float64
+	direction Vector
+}
+
+// NewSpotLight returns a new spot light
+func NewSpotLight(from Point, i Color, angle float64, to Point) *SpotLight {
+	sl := &SpotLight{
+		position:  from,
+		intensity: i,
+		angle:     angle,
+	}
+	sl.direction = to.SubPoint(from).Normalize()
+	return sl
+}
+
+// Intensity returns the intensity of the light
+func (l *SpotLight) Intensity() Color {
+	return l.intensity
+}
+
+// SetIntensity sets the intensity of the light
+func (l *SpotLight) SetIntensity(c Color) {
+	l.intensity = c
+}
+
+// Position returns the position of the light
+func (l *SpotLight) Position() Point {
+	return l.position
+}
+
+// RandomPosition returns the position of the light
+func (l *SpotLight) RandomPosition(rng *rand.Rand) Point {
+	return l.position
+}
+
+// Shape returns the Shaper object of this light, spot lights have no shape
+func (l *SpotLight) Shape() Shaper {
+	return nil
+}
+
+// IsVisible returns true if light is visible, spot lights are never visible.
+func (l *SpotLight) IsVisible() bool {
+	return false
+}
+
+// Direction returns the direction of the spotlight
+func (l *SpotLight) Direction() Vector {
+	return l.direction
+}
+
+// Angle returns the angle of the spot light
+func (l *SpotLight) Angle() float64 {
+	return l.angle
+}
+
 // lighting returns the color for a given point
 func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, intensity float64, rays int, u, v float64, rng *rand.Rand) Color {
 	var ambient, diffuse, specular Color
-
 	clr := m.Color
 
 	if m.HasPattern() {
@@ -159,24 +218,45 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inten
 
 	switch l.(type) {
 	case *PointLight:
-		rays = 1 // RandomPosition on PointLight always returns the same
+		rays = 1 // randomposition on pointlight always returns the same
+	case *SpotLight:
+		rays = 1 // RandomPosition on SpotLight always returns the same
 	}
 
 	for try := 0; try < rays; try++ {
-
 		// find the direction to the light source
 		lightv := l.RandomPosition(rng).SubPoint(p).Normalize()
 
 		// lightDotNormal represents the cosine of the angle between the light vector and the normal vector
-		// a negaive number means the light is on the other side of the surface
+		// a negative number means the light is on the other side of the surface
 		// a very small number here means the angle is very close to 90 degree, this number is used
 		// to scale the diffuse contribution
 		lightDotNormal := lightv.Dot(normal)
 
+		visible := true
+
 		if lightDotNormal < 0 {
 			diffuse = ColorName(colornames.Black)
 			specular = ColorName(colornames.Black)
+			visible = false
 		} else {
+			// handle spotlights
+			switch l.(type) {
+			case *SpotLight:
+				sl := l.(*SpotLight)
+				// calculate the angle between the light direction vector and lightv
+				dp := sl.Direction().Dot(lightv) // cosine of the angle
+				angle := math.Pi - math.Acos(dp)
+				// compare to the angle of the spotlight
+				if angle > sl.Angle()/2 {
+					diffuse = ColorName(colornames.Black)
+					specular = ColorName(colornames.Black)
+					visible = false
+				}
+			}
+		}
+
+		if visible {
 			// compute the diffuse contribution
 			diffuse = effectiveColor.Scale(m.Diffuse).Scale(lightDotNormal)
 
@@ -193,7 +273,6 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inten
 				specular = l.Intensity().Scale(m.Specular).Scale(factor)
 			}
 		}
-
 		sum = sum.Add(diffuse).Add(specular)
 	}
 	return emissive.Add(ambient).Add(sum.Scale(1.0 / float64(rays)).Scale(intensity))

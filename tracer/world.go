@@ -222,6 +222,11 @@ func (w *World) IntensityAt(p Point, l Light, xs Intersections, rng *rand.Rand) 
 			return 0
 		}
 		return 1
+	case *SpotLight:
+		if w.IsShadowed(p, l.Position(), xs) {
+			return 0
+		}
+		return 1
 	case *AreaLight:
 		if !w.Config.SoftShadows {
 			if w.IsShadowed(p, l.Position(), xs) {

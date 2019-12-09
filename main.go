@@ -1967,6 +1967,45 @@ func simpletexturewall(filename string) {
 	tracer.Render(w)
 }
 
+func spotlight() {
+	from := tracer.NewPoint(10, 10, -10)
+	to := tracer.NewPoint(0, 0, 0)
+	angle := math.Pi / 15
+	w := envxyspotlight(640, 480, angle, from, to)
+	w.Config.Antialias = 3
+
+	sphere := tracer.NewUnitSphere()
+	// sphere.SetTransform(tracer.IM().Scale(2, 2, 2))
+
+	w.AddObject(sphere)
+	w.AddObject(floor(-1))
+
+	tracer.Render(w)
+
+}
+
+func envxyspotlight(width, height, angle float64, from, to tracer.Point) *tracer.World {
+
+	w := tracer.NewDefaultWorld(width, height)
+	w.Config.Parallelism = 1
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewSpotLight(from, tracer.NewColor(1, 1, 1), angle, to),
+		// tracer.NewPointLight(from, tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	cFrom := tracer.NewPoint(0, 4, -9)
+	cTo := tracer.NewPoint(0, 0, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(cFrom, cTo, up)
+	w.Camera().SetTransform(cameraTransform)
+	w.Camera().SetFoV(math.Pi / 3)
+
+	return w
+}
+
 func envxy(width, height float64) *tracer.World {
 	// setup world, default light and camera
 	w := tracer.NewDefaultWorld(width, height)
@@ -2007,6 +2046,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	spotlight()
 	// var dir string
 	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
 	// heightmapplane(path.Join(dir, "heightmap.png"))
@@ -2016,7 +2056,7 @@ func main() {
 	// simplesphere()
 	// heightmapsphere(path.Join(dir, "brick_bump.png"))
 	// simpleroom()
-	emissive()
+	// emissive()
 	// simpletexturewall(path.Join(dir, "brick_bump.png"))
 	// simplecone()
 	// simplecylinder()
