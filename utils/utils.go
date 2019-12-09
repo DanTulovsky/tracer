@@ -24,6 +24,11 @@ func RandomFloat(r *rand.Rand, min, max float64) float64 {
 	return min + r.Float64()*(max-min)
 }
 
+// RandomDefaultFloat returns a random float in [min, max)
+func RandomDefaultFloat(min, max float64) float64 {
+	return min + rand.Float64()*(max-min)
+}
+
 // Equals is used to compare floating point numbers
 func Equals(a, b float64) bool {
 	return math.Abs(a-b) < constants.Epsilon

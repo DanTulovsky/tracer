@@ -73,7 +73,7 @@ func TestRandomFloat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := RandomFloat(tt.args.min, tt.args.max)
+			got := RandomDefaultFloat(tt.args.min, tt.args.max)
 
 			assert.GreaterOrEqual(t, got, tt.args.min, "should be >=")
 			assert.Less(t, got, tt.args.max, "should be >=")

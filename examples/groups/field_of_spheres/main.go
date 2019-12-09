@@ -118,10 +118,10 @@ func scene() {
 
 	// spheres
 	for i := 0; i < numSpheres; i++ {
-		x := utils.RandomFloat(-4, 4)
-		z := utils.RandomFloat(1, 15)
+		x := utils.RandomDefaultFloat(-4, 4)
+		z := utils.RandomDefaultFloat(1, 15)
 
-		size := utils.RandomFloat(0.5, 0.9)
+		size := utils.RandomDefaultFloat(0.5, 0.9)
 		center := tracer.NewPoint(x, size, z)
 		var s *tracer.Sphere
 
