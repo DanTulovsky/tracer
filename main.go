@@ -1988,10 +1988,10 @@ func areaspotlight() {
 	w := envxyareaspotlight(1024, 768, angle, to)
 	w.Config.Antialias = 4
 	w.Config.SoftShadowRays = 100
-	w.Config.SoftShadows = false
+	w.Config.SoftShadows = true
 
 	sphere := tracer.NewUnitSphere()
-	// sphere.SetTransform(tracer.IM().Scale(2, 2, 2))
+	sphere.SetTransform(tracer.IM().Scale(2, 2, 2))
 
 	w.AddObject(sphere)
 	w.AddObject(floor(-1))
@@ -2011,8 +2011,8 @@ func envxyareaspotlight(width, height, angle float64, to tracer.Point) *tracer.W
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewAreaSpotLight(light, tracer.NewColor(1, 1, 1), true, angle, to),
-		tracer.NewAreaSpotLight(light2, tracer.NewColor(1, 1, 1), true, angle, to),
+		// tracer.NewAreaSpotLight(light, tracer.NewColor(1, 1, 1), true, angle, to),
+		tracer.NewAreaSpotLight(light2, tracer.NewColor(1, 1, 1), true, angle*2, to),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"

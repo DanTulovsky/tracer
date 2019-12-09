@@ -349,6 +349,7 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 	}
 
 	total := (camera.Vsize - 1) * (camera.Hsize - 1)
+	done := 0.0
 	last := 0.0
 
 	offset := float64(w.Config.RenderPasses)
@@ -357,7 +358,8 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 			for x := 0.0; x < camera.Hsize; x++ {
 				// send work to workers
 				pending <- &pixel{x: x, y: y}
-				last = showProgress(total, last, camera.Vsize-1, camera.Hsize-1, x, y)
+				done++
+				last = showProgress(total, done, last)
 			}
 		}
 	}
