@@ -21,6 +21,9 @@ type WorldConfig struct {
 
 	// AreaLightRays specifies how many rays to cast for area lights
 	AreaLightRays int
+
+	// RenderPasses controls the display of the render to the screen
+	RenderPasses int
 }
 
 // NewWorldConfig returns a new world config with default settings
@@ -32,5 +35,6 @@ func NewWorldConfig() *WorldConfig {
 		Parallelism:    runtime.NumCPU(),
 		SoftShadows:    true,
 		SoftShadowRays: 6,
+		RenderPasses:   8,
 	}
 }

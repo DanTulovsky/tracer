@@ -1985,8 +1985,8 @@ func areaspotlight() {
 	to := tracer.NewPoint(0, 0, 0)
 	angle := math.Pi / 5
 
-	w := envxyareaspotlight(640, 480, angle, to)
-	w.Config.Antialias = 1
+	w := envxyareaspotlight(1024, 768, angle, to)
+	w.Config.Antialias = 4
 	w.Config.SoftShadowRays = 100
 	w.Config.SoftShadows = false
 
@@ -2030,7 +2030,7 @@ func spotlight() {
 	to := tracer.NewPoint(0, 0, 0)
 	angle := math.Pi / 15
 
-	w := envxyspotlight(640, 480, angle, from, to)
+	w := envxyspotlight(1024, 768, angle, from, to)
 	w.Config.Antialias = 3
 	w.Config.SoftShadowRays = 100
 
@@ -2105,8 +2105,8 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	// areaspotlight()
-	spotlight()
+	areaspotlight()
+	// spotlight()
 	// var dir string
 	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
 	// heightmapplane(path.Join(dir, "heightmap.png"))
