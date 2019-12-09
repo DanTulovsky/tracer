@@ -86,6 +86,8 @@ func (w *World) SetLights(l Lights) {
 			switch l.(type) {
 			case *AreaLight:
 				w.AddObject(l.(*AreaLight))
+			case *AreaSpotLight:
+				w.AddObject(l.(*AreaSpotLight))
 			}
 		}
 	}
@@ -217,17 +219,12 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 // IntensityAt returns the intensity of the light at point p
 func (w *World) IntensityAt(p Point, l Light, xs Intersections, rng *rand.Rand) float64 {
 	switch l.(type) {
-	case *PointLight:
+	case *PointLight, *SpotLight:
 		if w.IsShadowed(p, l.Position(), xs) {
 			return 0
 		}
 		return 1
-	case *SpotLight:
-		if w.IsShadowed(p, l.Position(), xs) {
-			return 0
-		}
-		return 1
-	case *AreaLight:
+	case *AreaLight, *AreaSpotLight:
 		if !w.Config.SoftShadows {
 			if w.IsShadowed(p, l.Position(), xs) {
 				return 0
@@ -374,7 +371,7 @@ func (w *World) ShowInfo() {
 
 	for _, l := range w.Lights {
 		switch l.(type) {
-		case *AreaLight:
+		case *AreaLight, *AreaSpotLight:
 			haveAreaLight = true
 		}
 	}

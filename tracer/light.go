@@ -118,6 +118,75 @@ func (pl *PointLight) IsVisible() bool {
 	return false
 }
 
+// AreaSpotLight shines in a direction and is a shape
+type AreaSpotLight struct {
+	Shaper
+	intensity Color
+	visible   bool
+	angle     float64
+	direction Vector
+}
+
+// NewAreaSpotLight returns a new area light
+func NewAreaSpotLight(s Shaper, i Color, v bool, angle float64, to Point) *AreaSpotLight {
+	s.Material().Emissive = i
+	s.Material().ShadowCaster = false
+	s.Material().Diffuse = 0
+	s.Material().Specular = 0
+	s.Material().Reflective = 0
+	s.Material().Transparency = 1
+
+	asl := &AreaSpotLight{
+		Shaper:    s,
+		intensity: i,
+		visible:   v,
+		angle:     angle,
+	}
+	asl.direction = to.SubPoint(asl.Position()).Normalize()
+	return asl
+}
+
+// Intensity implements the Light interface
+func (al *AreaSpotLight) Intensity() Color {
+	return al.intensity
+}
+
+// Position implements the Light interface
+func (al *AreaSpotLight) Position() Point {
+	return al.Shaper.Bounds().Center().ToWorldSpace(al.Shaper)
+}
+
+// RandomPosition implements the Light interface
+func (al *AreaSpotLight) RandomPosition(rng *rand.Rand) Point {
+	return al.Shaper.RandomPosition(rng)
+}
+
+// SetIntensity sets the intensity of the light
+func (al *AreaSpotLight) SetIntensity(c Color) {
+	al.intensity = c
+}
+
+// Shape returns the Shaper object of this light
+func (al *AreaSpotLight) Shape() Shaper {
+	return al.Shaper
+}
+
+// IsVisible returns true if the  light shape should be visible.
+func (al *AreaSpotLight) IsVisible() bool {
+	return al.visible
+}
+
+// Direction returns the direction of the spotlight
+func (al *AreaSpotLight) Direction() Vector {
+	// return to.SubPoint(asl.Position()).Normalize()
+	return al.direction
+}
+
+// Angle returns the angle of the spot light
+func (al *AreaSpotLight) Angle() float64 {
+	return al.angle
+}
+
 // SpotLight implements the light interface and is a single point light with no size
 type SpotLight struct {
 	position  Point
@@ -244,6 +313,18 @@ func lighting(m *Material, o Shaper, p Point, l Light, eye, normal Vector, inten
 			switch l.(type) {
 			case *SpotLight:
 				sl := l.(*SpotLight)
+				// calculate the angle between the light direction vector and lightv
+				dp := sl.Direction().Dot(lightv) // cosine of the angle
+				angle := math.Pi - math.Acos(dp)
+				// compare to the angle of the spotlight
+				if angle > sl.Angle()/2 {
+					diffuse = ColorName(colornames.Black)
+					specular = ColorName(colornames.Black)
+					visible = false
+				}
+				// TODO: Fix this to remove repetition
+			case *AreaSpotLight:
+				sl := l.(*AreaSpotLight)
 				// calculate the angle between the light direction vector and lightv
 				dp := sl.Direction().Dot(lightv) // cosine of the angle
 				angle := math.Pi - math.Acos(dp)

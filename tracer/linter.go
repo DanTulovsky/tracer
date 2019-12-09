@@ -44,7 +44,7 @@ func (w *World) lintLights(lights []Light) {
 
 	for _, l := range lights {
 		switch l.(type) {
-		case *AreaLight:
+		case *AreaLight, *AreaSpotLight:
 			haveAreaLights = true
 			if !w.Config.SoftShadows {
 				log.Printf("[warning] Have area lights, but soft shadows are off.")

@@ -1981,6 +1981,46 @@ func simpletexturewall(filename string) {
 	tracer.Render(w)
 }
 
+func areaspotlight() {
+	to := tracer.NewPoint(0, 0, 0)
+	angle := math.Pi / 5
+
+	w := envxyareaspotlight(640, 480, angle, to)
+	w.Config.Antialias = 4
+	w.Config.SoftShadowRays = 400
+
+	sphere := tracer.NewUnitSphere()
+	// sphere.SetTransform(tracer.IM().Scale(2, 2, 2))
+
+	w.AddObject(sphere)
+	w.AddObject(mirrorfloor(-1))
+
+	tracer.Render(w)
+}
+
+func envxyareaspotlight(width, height, angle float64, to tracer.Point) *tracer.World {
+
+	w := tracer.NewDefaultWorld(width, height)
+
+	light := tracer.NewUnitSphere()
+	light.SetTransform(tracer.IM().Scale(.1, .1, .1).Translate(2, 4, -4))
+
+	// override light here
+	w.SetLights([]tracer.Light{
+		tracer.NewAreaSpotLight(light, tracer.NewColor(1, 1, 1), true, angle, to),
+		// tracer.NewPointLight(from, tracer.NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	cFrom := tracer.NewPoint(0, 4, -9)
+	cTo := tracer.NewPoint(0, 0, 0)
+	up := tracer.NewVector(0, 1, 0)
+	cameraTransform := tracer.ViewTransform(cFrom, cTo, up)
+	w.Camera().SetTransform(cameraTransform)
+	w.Camera().SetFoV(math.Pi / 3)
+
+	return w
+}
 func spotlight() {
 	from := tracer.NewPoint(10, 10, -10)
 	to := tracer.NewPoint(0, 0, 0)
@@ -2060,7 +2100,8 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	spotlight()
+	areaspotlight()
+	// spotlight()
 	// var dir string
 	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
 	// heightmapplane(path.Join(dir, "heightmap.png"))
