@@ -1058,6 +1058,20 @@ func glassplane() *tracer.Plane {
 	return p
 }
 
+func mirrorfloor(y float64) *tracer.Plane {
+	p := tracer.NewPlane()
+	p.SetTransform(tracer.IM().Translate(0, y, 0))
+	pp := tracer.NewCheckerPattern(
+		tracer.ColorName(colornames.Gray), tracer.ColorName(colornames.White))
+	p.Material().SetPattern(pp)
+	// p.Material().Ambient = 0.1
+	// p.Material().Diffuse = 0.1
+	p.Material().Reflective = 0.7
+	p.Material().Transparency = 0
+	p.Material().ShadowCaster = true
+
+	return p
+}
 func floor(y float64) *tracer.Plane {
 	p := tracer.NewPlane()
 	p.SetTransform(tracer.IM().Translate(0, y, 0))
@@ -1971,23 +1985,23 @@ func spotlight() {
 	from := tracer.NewPoint(10, 10, -10)
 	to := tracer.NewPoint(0, 0, 0)
 	angle := math.Pi / 15
+
 	w := envxyspotlight(640, 480, angle, from, to)
 	w.Config.Antialias = 3
+	w.Config.SoftShadowRays = 100
 
 	sphere := tracer.NewUnitSphere()
 	// sphere.SetTransform(tracer.IM().Scale(2, 2, 2))
 
 	w.AddObject(sphere)
-	w.AddObject(floor(-1))
+	w.AddObject(mirrorfloor(-1))
 
 	tracer.Render(w)
-
 }
 
 func envxyspotlight(width, height, angle float64, from, to tracer.Point) *tracer.World {
 
 	w := tracer.NewDefaultWorld(width, height)
-	w.Config.Parallelism = 1
 
 	// override light here
 	w.SetLights([]tracer.Light{

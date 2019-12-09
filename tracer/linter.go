@@ -13,7 +13,7 @@ func (w *World) LintWorld() {
 	}
 
 	w.lintLights(w.Lights)
-
+	log.Println()
 }
 
 // LintObject runs linter checks for objects
@@ -39,13 +39,21 @@ func lintMaterial(m *Material, o Shaper) {
 }
 
 func (w *World) lintLights(lights []Light) {
+
+	haveAreaLights := false
+
 	for _, l := range lights {
 		switch l.(type) {
 		case *AreaLight:
+			haveAreaLights = true
 			if !w.Config.SoftShadows {
 				log.Printf("[warning] Have area lights, but soft shadows are off.")
 			}
 		}
+	}
+
+	if !haveAreaLights && w.Config.SoftShadows {
+		log.Printf("[warning] Soft shadows are enabled, but no area lights present.")
 	}
 
 }

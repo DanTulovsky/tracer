@@ -370,6 +370,15 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 
 // ShowInfo dumps info about the world
 func (w *World) ShowInfo() {
+	haveAreaLight := false
+
+	for _, l := range w.Lights {
+		switch l.(type) {
+		case *AreaLight:
+			haveAreaLight = true
+		}
+	}
+
 	log.Printf("Camera HSize: %v", w.Camera().Hsize)
 	log.Printf("Camera WSize: %v", w.Camera().Vsize)
 	log.Printf("Camera Pixel Size: %.4f", w.Camera().PixelSize)
@@ -378,7 +387,10 @@ func (w *World) ShowInfo() {
 	log.Printf("Antialiasing: %v", w.Config.Antialias)
 	log.Printf("Parallelism: %v", w.Config.Parallelism)
 	log.Printf("Max Recursion: %v", w.Config.MaxRecusions)
-	log.Printf("Area Light Rays: %v", w.Config.AreaLightRays)
+	log.Printf("Have Area Lights? -> %v", haveAreaLight)
+	if haveAreaLight {
+		log.Printf("  Area Light Rays: %v", w.Config.AreaLightRays)
+	}
 	log.Printf("Soft Shadows enabled? -> %v", w.Config.SoftShadows)
 	if w.Config.SoftShadows {
 		log.Printf("  Soft shadow rays: %v", w.Config.SoftShadowRays)
