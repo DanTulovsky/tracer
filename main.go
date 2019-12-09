@@ -1986,14 +1986,15 @@ func areaspotlight() {
 	angle := math.Pi / 5
 
 	w := envxyareaspotlight(640, 480, angle, to)
-	w.Config.Antialias = 2
+	w.Config.Antialias = 1
 	w.Config.SoftShadowRays = 100
+	w.Config.SoftShadows = false
 
 	sphere := tracer.NewUnitSphere()
 	// sphere.SetTransform(tracer.IM().Scale(2, 2, 2))
 
 	w.AddObject(sphere)
-	w.AddObject(mirrorfloor(-1))
+	w.AddObject(floor(-1))
 
 	tracer.Render(w)
 }
@@ -2005,10 +2006,13 @@ func envxyareaspotlight(width, height, angle float64, to tracer.Point) *tracer.W
 	light := tracer.NewUnitSphere()
 	light.SetTransform(tracer.IM().Scale(.1, .1, .1).Translate(2, 4, -4))
 
+	light2 := tracer.NewUnitSphere()
+	light2.SetTransform(tracer.IM().Scale(.1, .1, .1).Translate(-2, 4, -4))
+
 	// override light here
 	w.SetLights([]tracer.Light{
 		tracer.NewAreaSpotLight(light, tracer.NewColor(1, 1, 1), true, angle, to),
-		// tracer.NewPointLight(from, tracer.NewColor(1, 1, 1)),
+		tracer.NewAreaSpotLight(light2, tracer.NewColor(1, 1, 1), true, angle, to),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -2034,7 +2038,7 @@ func spotlight() {
 	// sphere.SetTransform(tracer.IM().Scale(2, 2, 2))
 
 	w.AddObject(sphere)
-	w.AddObject(mirrorfloor(-1))
+	w.AddObject(floor(-1))
 
 	tracer.Render(w)
 }
@@ -2044,9 +2048,10 @@ func envxyspotlight(width, height, angle float64, from, to tracer.Point) *tracer
 	w := tracer.NewDefaultWorld(width, height)
 
 	// override light here
+	from2 := tracer.NewPoint(-from.X(), from.Y(), from.Z())
 	w.SetLights([]tracer.Light{
 		tracer.NewSpotLight(from, tracer.NewColor(1, 1, 1), angle, to),
-		// tracer.NewPointLight(from, tracer.NewColor(1, 1, 1)),
+		tracer.NewSpotLight(from2, tracer.NewColor(1, 1, 1), angle, to),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -2100,8 +2105,8 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	areaspotlight()
-	// spotlight()
+	// areaspotlight()
+	spotlight()
 	// var dir string
 	// dir = fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/images/da"))
 	// heightmapplane(path.Join(dir, "heightmap.png"))
