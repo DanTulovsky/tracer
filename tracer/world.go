@@ -69,6 +69,7 @@ func (w *World) Intersections(r Ray, xs Intersections) Intersections {
 	var is Intersections
 
 	for _, o := range w.Objects {
+		// Note that these come unsorted!
 		iso := o.IntersectWith(r, xs)
 		is = append(is, iso...)
 	}

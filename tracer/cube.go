@@ -2,7 +2,6 @@ package tracer
 
 import (
 	"math"
-	"sort"
 
 	"github.com/DanTulovsky/tracer/constants"
 )
@@ -79,7 +78,7 @@ func (c *Cube) IntersectWith(r Ray, t Intersections) Intersections {
 	t = append(t, NewIntersection(c, tmin))
 	t = append(t, NewIntersection(c, tmax))
 
-	sort.Sort(byT(t))
+	// sort.Sort(byT(t))
 
 	return t
 }

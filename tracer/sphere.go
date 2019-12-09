@@ -45,7 +45,7 @@ func NewGlassSphere() *Sphere {
 	return s
 }
 
-// IntersectWith returns the 't' values of Ray r intersecting with the Sphere in sorted order
+// IntersectWith returns the 't' values of Ray r intersecting with the Sphere
 func (s *Sphere) IntersectWith(r Ray, t Intersections) Intersections {
 	// transform the ray by the inverse of the sphere transfrom matrix
 	// instead of changing the sphere, we change the ray coming from the camera

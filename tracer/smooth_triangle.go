@@ -1,7 +1,5 @@
 package tracer
 
-import "sort"
-
 // SmoothTriangle is a triangle defined by 3 points in 3d space and the normals at those points
 type SmoothTriangle struct {
 	P1, P2, P3 Point
@@ -65,7 +63,7 @@ func (t *SmoothTriangle) IntersectWith(r Ray, xs Intersections) Intersections {
 	}
 
 	xs = append(xs, NewIntersectionUV(t, tval, u, v))
-	sort.Sort(byT(xs))
+	// sort.Sort(byT(xs))
 	return xs
 }
 

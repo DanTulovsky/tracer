@@ -2,7 +2,6 @@ package tracer
 
 import (
 	"math"
-	"sort"
 	"sync"
 
 	"github.com/DanTulovsky/tracer/constants"
@@ -95,7 +94,7 @@ func (t *Triangle) IntersectWith(r Ray, xs Intersections) Intersections {
 		return xs
 	}
 	xs = append(xs, NewIntersection(t, tval))
-	sort.Sort(byT(xs))
+	// sort.Sort(byT(xs))
 	return xs
 }
 

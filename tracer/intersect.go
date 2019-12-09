@@ -50,13 +50,15 @@ type Intersections []*Intersection
 
 // NewIntersections aggregates the given intersections into a sorted list
 func NewIntersections(i ...*Intersection) Intersections {
-	is := Intersections{}
+	is := make(Intersections, 0, 4)
 
 	for _, int := range i {
 		is = append(is, int)
 	}
 
-	sort.Sort(byT(is))
+	if len(is) > 1 {
+		sort.Sort(byT(is))
+	}
 	return is
 }
 

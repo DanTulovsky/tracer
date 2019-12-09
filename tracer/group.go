@@ -116,7 +116,7 @@ func (g *Group) IntersectWithBoundingBox(r Ray, b Bound) bool {
 	return true
 }
 
-// IntersectWith returns the 't' values of Ray r intersecting with the group in sorted order
+// IntersectWith returns the 't' values of Ray r intersecting with the group
 func (g *Group) IntersectWith(r Ray, t Intersections) Intersections {
 	// transform the ray by the inverse of the group transfrom matrix
 	// instead of changing the group, we change the ray coming from the camera
@@ -136,7 +136,7 @@ func (g *Group) IntersectWith(r Ray, t Intersections) Intersections {
 		xs = xs[:0]
 	}
 
-	sort.Sort(byT(t))
+	// sort.Sort(byT(t))
 	return t
 }
 

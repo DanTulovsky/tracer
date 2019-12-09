@@ -2,7 +2,6 @@ package tracer
 
 import (
 	"math"
-	"sort"
 
 	"github.com/DanTulovsky/tracer/constants"
 )
@@ -140,7 +139,7 @@ func (c *Cylinder) IntersectWith(r Ray, t Intersections) Intersections {
 		t = append(t, NewIntersection(c, t1))
 	}
 
-	sort.Sort(byT(t))
+	// sort.Sort(byT(t))
 	return t
 }
 

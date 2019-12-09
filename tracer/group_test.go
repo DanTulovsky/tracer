@@ -3,6 +3,7 @@ package tracer
 import (
 	"fmt"
 	"math"
+	"sort"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -210,6 +211,7 @@ func TestGroup_IntersectWith(t *testing.T) {
 			tt.group.PrecomputeValues()
 
 			got := tt.group.IntersectWith(tt.args.r, NewIntersections())
+			sort.Sort(byT(got))
 
 			assert.Equal(t, tt.wantXS, len(got), "should be equal")
 

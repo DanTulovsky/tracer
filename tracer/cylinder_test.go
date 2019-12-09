@@ -3,6 +3,7 @@ package tracer
 import (
 	"fmt"
 	"math"
+	"sort"
 	"testing"
 
 	"github.com/DanTulovsky/tracer/constants"
@@ -163,8 +164,8 @@ func TestCylinder_IntersectWith(t *testing.T) {
 			},
 			c:      NewClosedCylinder(1, 2),
 			wantXS: 2,
-			wantT1: 2,
-			wantT2: 1,
+			wantT1: 1,
+			wantT2: 2,
 		},
 		{
 			name: "closed 2",
@@ -216,6 +217,7 @@ func TestCylinder_IntersectWith(t *testing.T) {
 				want = append(want, NewIntersection(tt.c, tt.wantT2))
 			}
 			got := tt.c.IntersectWith(tt.args.r, NewIntersections())
+			sort.Sort(byT(got))
 
 			assert.Equal(t, len(want), len(got), "should equal")
 			if tt.wantXS > 0 {

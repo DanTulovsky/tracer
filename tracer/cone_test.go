@@ -3,6 +3,7 @@ package tracer
 import (
 	"fmt"
 	"math"
+	"sort"
 	"testing"
 
 	"github.com/DanTulovsky/tracer/constants"
@@ -167,7 +168,7 @@ func TestCone_IntersectWith(t *testing.T) {
 				r: NewRay(NewPoint(0, 0, -0.25), NewVector(0, 1, 1).Normalize()),
 			},
 			c:     NewClosedCone(-0.5, 0.5),
-			wantT: []float64{0.707106, 0.088388},
+			wantT: []float64{0.088388, 0.707106},
 		},
 		{
 			name: "end cap3",
@@ -187,6 +188,7 @@ func TestCone_IntersectWith(t *testing.T) {
 			}
 
 			got := tt.c.IntersectWith(tt.args.r, NewIntersections())
+			sort.Sort(byT(got))
 
 			assert.Equal(t, len(want), len(got), "should equal")
 
