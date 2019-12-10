@@ -1844,6 +1844,7 @@ func hollowsphere(wallWidth float64) *tracer.Group {
 func hollowsphere1() {
 	w := envxy(1024, 768)
 	w.Config.Antialias = 4
+	// w.Config.SoftShadowRays = 300
 
 	// width of the sphere wall: (0, 1)
 	wallWidth := 0.02
@@ -2134,7 +2135,7 @@ func main() {
 	// glass()
 
 	// window()
-	// pond()
+	pond()
 	// spherewarp()
 	// cylinder()
 	// cone()

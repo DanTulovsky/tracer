@@ -208,7 +208,8 @@ func (w *World) shadeHit(state *IntersectionState, remaining int, xs Intersectio
 			// Use Schlick approximation for the Fresnel Effect
 			reflectance := Schlick(state)
 
-			result = surface.Add(reflected.Scale(reflectance)).Add(refracted.Scale((1 - reflectance)))
+			// result = surface.Add(reflected.Scale(reflectance)).Add(refracted.Scale((1 - reflectance)))
+			result = result.Add(surface.Add(reflected.Scale(reflectance)).Add(refracted.Scale((1 - reflectance))))
 		} else {
 			result = result.Add(surface.Add(reflected.Add(refracted)))
 		}
