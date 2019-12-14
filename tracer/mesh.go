@@ -14,9 +14,12 @@ type TriangleMesh struct {
 	// per vertex normal
 	Vn []Vector
 	// per vertex texture coordinate, only x,y is used
-	Vt []Point
-	// each number is the index in 'v', three consecutive numbers form a triangle
-	TrisIndex []int
+	Vt           []Point
+	TrisIndex    []int // indexed into V
+	NormalIndex  []int // indexed into Vn
+	TextureIndex []int // indexed into Vt
+
+	Triangles []*SmoothTriangle
 
 	Shape
 }
@@ -26,14 +29,19 @@ type TriangleMesh struct {
 // faceIndex: how many vertices each face is made of
 // vertexIndex:  lists the vertecies (indexed into verts) for each face
 // verts: list of vertices
-func NewMesh(numFaces int, faceIndex, vertexIndex []int, verts []Point, normals []Vector, textures []Point) *TriangleMesh {
+func NewMesh(numFaces int, faceIndex, vertexIndex, normalIndex, textureIndex, materialIndex []int,
+	verts []Point, normals []Vector, textures []Point, materials []*Material) *TriangleMesh {
 	// how many triangles we need to create
 	var numTris int
 	// total number of vertices
 	var k int
 
+	// log.Println(materialIndex)
+	// log.Println(materials)
 	// largest vertex index in vertexIndex
 	var maxVertIndex int
+	var maxNormalIndex int
+	var maxTextureIndex int
 
 	for i := 0; i < numFaces; i++ {
 		numTris = numTris + faceIndex[i] - 2
@@ -41,40 +49,92 @@ func NewMesh(numFaces int, faceIndex, vertexIndex []int, verts []Point, normals 
 			if vertexIndex[k+j] > maxVertIndex {
 				maxVertIndex = vertexIndex[k+j]
 			}
+			if normalIndex[k+j] > maxNormalIndex {
+				maxNormalIndex = normalIndex[k+j]
+			}
+			if textureIndex[k+j] > maxTextureIndex {
+				maxTextureIndex = textureIndex[k+j]
+			}
 		}
 		k = k + faceIndex[i]
 	}
 	maxVertIndex = maxVertIndex + 1
+	maxNormalIndex = maxNormalIndex + 1
+	maxTextureIndex = maxTextureIndex + 1
 
 	// store only those vertices we use
 	v := make([]Point, maxVertIndex)
-	vn := make([]Vector, maxVertIndex)
-	vt := make([]Point, maxVertIndex)
+	vn := make([]Vector, maxNormalIndex)
+	vt := make([]Point, maxTextureIndex)
 	for i := 0; i < maxVertIndex; i++ {
 		v[i] = verts[i]
+	}
+	for i := 0; i < maxNormalIndex; i++ {
 		vn[i] = normals[i]
+	}
+	for i := 0; i < maxTextureIndex; i++ {
 		vt[i] = textures[i]
 	}
 
 	trisIndex := make([]int, numTris*3)
+	ni := make([]int, numTris*3)
+	ti := make([]int, numTris*3)
+	mi := make([]int, numTris)
 
 	var l int
 	k = 0
+	z := 0
 	for i := 0; i < numFaces; i++ { // for each face
 		for j := 0; j < faceIndex[i]-2; j++ { // for each triangle
 			trisIndex[l] = vertexIndex[k]
 			trisIndex[l+1] = vertexIndex[k+j+1]
 			trisIndex[l+2] = vertexIndex[k+j+2]
+
+			ni[l] = normalIndex[k]
+			ni[l+1] = normalIndex[k+j+1]
+			ni[l+2] = normalIndex[k+j+2]
+
+			ti[l] = textureIndex[k]
+			ti[l+1] = normalIndex[k+j+1]
+			ti[l+2] = textureIndex[k+j+2]
+
 			l = l + 3
+
+			mi[z] = materialIndex[i]
+			z++
+			// log.Printf("z: %v, j: %v, materialIndex[%v]: %v", z, j, i, materialIndex[i])
+			// log.Println(mi)
 		}
 		k = k + faceIndex[i]
 	}
 
+	tris := make([]*SmoothTriangle, numTris)
+
+	var j int
+	for i := 0; i < numTris; i++ {
+		tri := NewSmoothTriangle(
+			v[trisIndex[j]], v[trisIndex[j+1]], v[trisIndex[j+2]],
+			vn[ni[j]], vn[ni[j+1]], vn[ni[j+2]],
+			vt[ti[j]], vt[ti[j+1]], vt[ti[j+2]],
+		)
+		// index := int(math.Floor(float64(i) / 3.0))
+		mat := materials[mi[i]]
+		tri.SetMaterial(mat)
+		// log.Printf("mi: %v", mi)
+		// log.Printf("i: %v, (%v)", i, mat.Color)
+		j = j + 3
+
+		tris[i] = tri
+	}
+
 	m := &TriangleMesh{
-		V:         v,
-		Vn:        vn,
-		Vt:        vt,
-		TrisIndex: trisIndex,
+		V:            v,
+		Vn:           vn,
+		Vt:           vt,
+		TrisIndex:    trisIndex,
+		NormalIndex:  ni,
+		TextureIndex: ti,
+		Triangles:    tris,
 		Shape: Shape{
 			transform:        IM(),
 			transformInverse: IM().Inverse(),
@@ -171,21 +231,26 @@ func (m *TriangleMesh) IntersectWith(r Ray, t Intersections) Intersections {
 
 	xs := NewIntersections()
 
-	numTris := len(m.TrisIndex) / 3.0
+	// numTris := len(m.TrisIndex) / 3.0
 	// check for intersection with every triangle
-	j := 0
-	for i := 0; i < numTris; i++ {
-		tri := NewSmoothTriangle(
-			m.V[m.TrisIndex[j]], m.V[m.TrisIndex[j+1]], m.V[m.TrisIndex[j+2]],
-			m.Vn[m.TrisIndex[j]], m.Vn[m.TrisIndex[j+1]], m.Vn[m.TrisIndex[j+2]],
-			m.Vt[m.TrisIndex[j]], m.Vt[m.TrisIndex[j+1]], m.Vt[m.TrisIndex[j+2]],
-		)
-		j = j + 3
-
+	for _, tri := range m.Triangles {
 		txs := tri.IntersectWith(r, xs)
 		t = append(t, txs...)
 		xs = xs[:0]
 	}
+	// j := 0
+	// for i := 0; i < numTris; i++ {
+	// 	tri := NewSmoothTriangle(
+	// 		m.V[m.TrisIndex[j]], m.V[m.TrisIndex[j+1]], m.V[m.TrisIndex[j+2]],
+	// 		m.Vn[m.NormalIndex[j]], m.Vn[m.NormalIndex[j+1]], m.Vn[m.NormalIndex[j+2]],
+	// 		m.Vt[m.TextureIndex[j]], m.Vt[m.TextureIndex[j+1]], m.Vt[m.TextureIndex[j+2]],
+	// 	)
+	// 	j = j + 3
+
+	// 	txs := tri.IntersectWith(r, xs)
+	// 	t = append(t, txs...)
+	// 	xs = xs[:0]
+	// }
 
 	return t
 }

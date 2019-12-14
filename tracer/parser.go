@@ -281,44 +281,54 @@ func toMesh(model *obj.Model, o *obj.Object, lib *mtl.Library, dir string) (*Tri
 	var vertices []Point
 	var normals []Vector
 	var textures []Point
+	var materials []*Material
 	var faceIndex []int
+	var materialIndex []int
 	var vertexIndex []int
+	var normalIndex []int
+	var textureIndex []int
 
-	for _, m := range o.Meshes {
+	for c, m := range o.Meshes {
 		log.Printf("  material: %v\n", m.MaterialName)
-		// TODO: handle materials
-		// mat, ok := lib.FindMaterial(m.MaterialName)
-		// if !ok {
-		// 	return nil, fmt.Errorf("Unable to find material %v in lib", m.MaterialName)
-		// }
+		mat, ok := lib.FindMaterial(m.MaterialName)
+		if !ok {
+			return nil, fmt.Errorf("Unable to find material %v in lib", m.MaterialName)
+		}
 
-		// omat, err := convertMaterial(mat, dir)
-		// if err != nil {
-		// 	return nil, err
-		// }
+		omat, err := convertMaterial(mat, dir)
+		if err != nil {
+			return nil, err
+		}
+		materials = append(materials, omat)
 
 		log.Println("  Faces:")
+
+		for _, v := range model.Vertices {
+			vertices = append(vertices, NewPoint(v.X, v.Y, -v.Z))
+		}
+		for _, n := range model.Normals {
+			normals = append(normals, NewVector(n.X, n.Y, -n.Z))
+		}
+		for _, v := range model.TexCoords {
+			textures = append(textures, NewPoint(v.U, 1-v.V, v.W))
+		}
+
 		for _, f := range m.Faces {
 			vcount := 0
 			for _, r := range f.References {
-				v := model.GetVertexFromReference(r)
-				// negate Z because OBJ uses right-handed coordinates, and we use left-handed coordinates
-				vertices = append(vertices, NewPoint(v.X, v.Y, -v.Z))
-
-				n := model.GetNormalFromReference(r)
-				normals = append(normals, NewVector(n.X, n.Y, -n.Z))
-
-				t := model.GetTexCoordFromReference(r)
-				textures = append(textures, NewPoint(t.U, 1-t.V, t.W))
-				vertexIndex = append(vertexIndex, vcount)
+				vertexIndex = append(vertexIndex, int(r.VertexIndex))
+				normalIndex = append(normalIndex, int(r.NormalIndex))
+				textureIndex = append(textureIndex, int(r.TexCoordIndex))
 
 				vcount++
 			}
 			faceIndex = append(faceIndex, vcount)
+			materialIndex = append(materialIndex, c)
 		}
-		numFaces := len(m.Faces)
-		tri = NewMesh(numFaces, faceIndex, vertexIndex, vertices, normals, textures)
 	}
+	numFaces := len(faceIndex)
+	vertices = normalizeOBJ(vertices)
+	tri = NewMesh(numFaces, faceIndex, vertexIndex, normalIndex, textureIndex, materialIndex, vertices, normals, textures, materials)
 
 	return tri, nil
 }

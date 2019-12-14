@@ -844,19 +844,21 @@ func objParse(f string) {
 	w := envxy(640, 480)
 	// w.Config.Parallelism = 1
 	w.Config.SoftShadows = false
+	w.Config.Antialias = 3
 
 	// override light here
 	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(10, 50, -30), tracer.NewColor(1, 1, 1)),
+		tracer.NewPointLight(tracer.NewPoint(0, 10, -5), tracer.NewColor(1, 1, 1)),
+		// tracer.NewPointLight(tracer.NewPoint(-10, -10, -10), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 10, -30)
-	to := tracer.NewPoint(0, 0, 40)
+	from := tracer.NewPoint(0, 2, -8)
+	to := tracer.NewPoint(0, 1, 0)
 	up := tracer.NewVector(0, 1, 0)
 	cameraTransform := tracer.ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
-	w.Camera().SetFoV(math.Pi / 3.5)
+	w.Camera().SetFoV(math.Pi / 8.5)
 
 	g, err := tracer.ParseOBJ(f)
 	if err != nil {
@@ -864,7 +866,7 @@ func objParse(f string) {
 	}
 
 	// g.SetTransform(tracer.IM().RotateY(math.Pi/5).RotateX(math.Pi/3).Translate(0, 2, 0))
-	g.SetTransform(tracer.IM().Scale(6.5, 6.5, 6.5).RotateY(math.Pi/7).Translate(0, 4, 0))
+	g.SetTransform(tracer.IM().Scale(3.0, 3.0, 3.0).Translate(0, 1, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
@@ -2034,9 +2036,10 @@ func main() {
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// f := path.Join(dir, "cubes2.obj")
-	f := path.Join(dir, "monkey-smooth.obj")
+	// f := path.Join(dir, "monkey-smooth.obj")
+	// f := path.Join(dir, "cube-plane.obj")
 	// f := path.Join(dir, "texture2.obj")
-	// f := path.Join(dir, "simple-human-shape1.obj")
+	f := path.Join(dir, "simple-human-shape1.obj")
 	objParse(f)
 
 	if *memprofile != "" {
