@@ -2036,10 +2036,10 @@ func main() {
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// f := path.Join(dir, "cubes2.obj")
-	// f := path.Join(dir, "monkey-smooth.obj")
+	f := path.Join(dir, "monkey-smooth.obj")
 	// f := path.Join(dir, "cube-plane.obj")
 	// f := path.Join(dir, "texture2.obj")
-	f := path.Join(dir, "simple-human-shape1.obj")
+	// f := path.Join(dir, "simple-human-shape1.obj")
 	objParse(f)
 
 	if *memprofile != "" {

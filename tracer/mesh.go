@@ -12,12 +12,12 @@ type TriangleMesh struct {
 	// vertices of the mesh
 	V []Point
 	// per vertex normal
-	Vn []Vector
-	// per vertex texture coordinate, only x,y is used
-	Vt           []Point
-	TrisIndex    []int // indexed into V
-	NormalIndex  []int // indexed into Vn
-	TextureIndex []int // indexed into Vt
+	// Vn []Vector
+	// // per vertex texture coordinate, only x,y is used
+	// Vt           []Point
+	// TrisIndex    []int // indexed into V
+	// NormalIndex  []int // indexed into Vn
+	// TextureIndex []int // indexed into Vt
 
 	Triangles []*SmoothTriangle
 
@@ -128,13 +128,13 @@ func NewMesh(numFaces int, faceIndex, vertexIndex, normalIndex, textureIndex, ma
 	}
 
 	m := &TriangleMesh{
-		V:            v,
-		Vn:           vn,
-		Vt:           vt,
-		TrisIndex:    trisIndex,
-		NormalIndex:  ni,
-		TextureIndex: ti,
-		Triangles:    tris,
+		V: v, // used to construct bounding box
+		// Vn:           vn, // unused
+		// Vt:           vt,
+		// TrisIndex:    trisIndex,
+		// NormalIndex:  ni,
+		// TextureIndex: ti,
+		Triangles: tris,
 		Shape: Shape{
 			transform:        IM(),
 			transformInverse: IM().Inverse(),
@@ -149,10 +149,11 @@ func NewMesh(numFaces int, faceIndex, vertexIndex, normalIndex, textureIndex, ma
 // Equal returns true if the meshes are equal
 func (m *TriangleMesh) Equal(m2 *TriangleMesh) bool {
 	return m.Shape.Equal(&m2.Shape) &&
-		cmp.Equal(m.V, m2.V) &&
-		cmp.Equal(m.Vn, m2.Vn) &&
-		cmp.Equal(m.Vt, m2.Vt) &&
-		cmp.Equal(m.TrisIndex, m2.TrisIndex)
+		cmp.Equal(m.V, m2.V)
+	// cmp.Equal(m.Triangles, &m2.Triangles)
+	// cmp.Equal(m.Vn, m2.Vn) &&
+	// cmp.Equal(m.Vt, m2.Vt) &&
+	// cmp.Equal(m.TrisIndex, m2.TrisIndex)
 }
 
 // calculateBounds sets the m.bound variable
@@ -231,26 +232,12 @@ func (m *TriangleMesh) IntersectWith(r Ray, t Intersections) Intersections {
 
 	xs := NewIntersections()
 
-	// numTris := len(m.TrisIndex) / 3.0
 	// check for intersection with every triangle
 	for _, tri := range m.Triangles {
 		txs := tri.IntersectWith(r, xs)
 		t = append(t, txs...)
 		xs = xs[:0]
 	}
-	// j := 0
-	// for i := 0; i < numTris; i++ {
-	// 	tri := NewSmoothTriangle(
-	// 		m.V[m.TrisIndex[j]], m.V[m.TrisIndex[j+1]], m.V[m.TrisIndex[j+2]],
-	// 		m.Vn[m.NormalIndex[j]], m.Vn[m.NormalIndex[j+1]], m.Vn[m.NormalIndex[j+2]],
-	// 		m.Vt[m.TextureIndex[j]], m.Vt[m.TextureIndex[j+1]], m.Vt[m.TextureIndex[j+2]],
-	// 	)
-	// 	j = j + 3
-
-	// 	txs := tri.IntersectWith(r, xs)
-	// 	t = append(t, txs...)
-	// 	xs = xs[:0]
-	// }
 
 	return t
 }

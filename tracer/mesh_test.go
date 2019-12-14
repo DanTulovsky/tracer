@@ -10,12 +10,16 @@ import (
 
 func TestNewMesh(t *testing.T) {
 	type args struct {
-		numFaces    int
-		faceIndex   []int
-		vertexIndex []int
-		p           []Point
-		normals     []Vector
-		textures    []Point
+		numFaces      int
+		faceIndex     []int
+		vertexIndex   []int
+		normalIndex   []int
+		textureIndex  []int
+		materialIndex []int
+		p             []Point
+		normals       []Vector
+		textures      []Point
+		materials     []*Material
 	}
 	tests := []struct {
 		name string
@@ -31,6 +35,15 @@ func TestNewMesh(t *testing.T) {
 					0, 1, 2, 3, // first face
 					0, 3, 4, 5, // second face
 				},
+				normalIndex: []int{
+					0, 1, 2, 3, // first face
+					0, 3, 4, 5, // second face
+				},
+				textureIndex: []int{
+					0, 1, 2, 3, // first face
+					0, 3, 4, 5, // second face
+				},
+				materialIndex: []int{0, 1},
 				p: []Point{
 					NewPoint(-5, -5, 5),
 					NewPoint(5, -5, 5),
@@ -55,6 +68,10 @@ func TestNewMesh(t *testing.T) {
 					NewPoint(0, 0, 0),
 					NewPoint(0, 0, 0),
 				},
+				materials: []*Material{
+					NewDefaultMaterial(),
+					NewDefaultMaterial(),
+				},
 			},
 			want: &TriangleMesh{
 				V: []Point{
@@ -64,28 +81,6 @@ func TestNewMesh(t *testing.T) {
 					NewPoint(-5, -5, -5),
 					NewPoint(-5, 5, -5),
 					NewPoint(5, -5, -5),
-				},
-				Vn: []Vector{
-					NewVector(0, 0, 0),
-					NewVector(0, 0, 0),
-					NewVector(0, 0, 0),
-					NewVector(0, 0, 0),
-					NewVector(0, 0, 0),
-					NewVector(0, 0, 0),
-				},
-				Vt: []Point{
-					NewPoint(0, 0, 0),
-					NewPoint(0, 0, 0),
-					NewPoint(0, 0, 0),
-					NewPoint(0, 0, 0),
-					NewPoint(0, 0, 0),
-					NewPoint(0, 0, 0),
-				},
-				TrisIndex: []int{
-					0, 1, 2, // tri1
-					0, 2, 3, // tri2
-					0, 3, 4, // tri3
-					0, 4, 5, // tri4
 				},
 				Shape: Shape{
 					transform:        IM(),
@@ -98,10 +93,11 @@ func TestNewMesh(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewMesh(tt.args.numFaces, tt.args.faceIndex, tt.args.vertexIndex, tt.args.p, tt.args.normals, tt.args.textures)
+			got := NewMesh(tt.args.numFaces,
+				tt.args.faceIndex, tt.args.vertexIndex, tt.args.normalIndex, tt.args.textureIndex, tt.args.materialIndex,
+				tt.args.p, tt.args.normals, tt.args.textures, tt.args.materials)
 			diff := cmp.Diff(tt.want, got)
 			assert.Equal(t, "", fmt.Sprint(diff))
-			assert.Equal(t, 4*3, len(got.TrisIndex)) // 4 triangles * 3 vertices
 
 			bound := Bound{
 				Min: NewPoint(-5, -5, -5),
