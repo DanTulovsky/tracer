@@ -201,24 +201,24 @@ func group(s ...Shaper) *Group {
 	return g
 }
 
-func env() *World {
-	// width, height := 150.0, 100.0
-	width, height := 400.0, 300.0
-	// width, height := 1000.0, 1000.0
+func testenv() *World {
+	width, height := 640.0, 480.0
 
 	// setup world, default light and camera
 	w := NewDefaultWorld(width, height)
 	w.Config.MaxRecusions = 5
+	w.Config.SoftShadows = false
+	w.Config.Antialias = 4
 
 	// override light here
 	w.SetLights([]Light{
-		NewPointLight(NewPoint(1, 4, -1), NewColor(1, 1, 1)),
+		NewPointLight(NewPoint(1, 3, -1), NewColor(1, 1, 1)),
 		// NewPointLight(NewPoint(-9, 10, 10), NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
 	from := NewPoint(0, 1.7, -4.7)
-	to := NewPoint(0, -1, 10)
+	to := NewPoint(0, 0, 10)
 	up := NewVector(0, 1, 0)
 	cameraTransform := ViewTransform(from, to, up)
 	w.Camera().SetTransform(cameraTransform)
@@ -227,13 +227,13 @@ func env() *World {
 }
 
 func scene() *World {
-	w := env()
+	w := testenv()
 
-	w.AddObject(backWall(0))
-	w.AddObject(frontWall(0))
-	w.AddObject(rightWall(0))
-	w.AddObject(leftWall(0))
-	w.AddObject(ceiling(0))
+	w.AddObject(backWall(10))
+	w.AddObject(frontWall(-5))
+	w.AddObject(rightWall(4))
+	w.AddObject(leftWall(-4))
+	w.AddObject(ceiling(4))
 	w.AddObject(floor(0))
 
 	w.AddObject(group(sphere(), pedestal()))
@@ -242,7 +242,72 @@ func scene() *World {
 	return w
 }
 
+func testenvxy(width, height float64) *World {
+	// setup world, default light and camera
+	w := NewDefaultWorld(width, height)
+	w.Config.MaxRecusions = 5
+
+	// override light here
+	w.SetLights([]Light{
+		// NewPointLight(NewPoint(0, 4, 5), NewColor(1, 1, 1)),
+		// NewPointLight(NewPoint(2, -10, -10), NewColor(1, 1, 1)),
+		NewPointLight(NewPoint(-6, 10, -10), NewColor(1, 1, 1)),
+	})
+
+	// where the camera is and where it's pointing; also which way is "up"
+	from := NewPoint(0, 10, -30)
+	to := NewPoint(0, 0, 40)
+	up := NewVector(0, 1, 0)
+	cameraTransform := ViewTransform(from, to, up)
+	w.Camera().SetTransform(cameraTransform)
+	w.Camera().SetFoV(math.Pi / 3.5)
+
+	return w
+}
+func BenchmarkRenderMonkey(b *testing.B) {
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/bench/"))
+	f := path.Join(dir, "obj", "monkey.obj")
+	w := testenvxy(640, 480)
+	w.Config.Antialias = 3
+	w.Config.SoftShadows = false
+
+	g, err := ParseOBJ(f)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	g.SetTransform(IM().Scale(6.5, 6.5, 6.5).RotateY(math.Pi/7).Translate(0, 4, 0))
+
+	w.AddObject(g)
+	for n := 0; n < b.N; n++ {
+		output := path.Join(dir, "output", "monkey.png")
+		RenderToFile(w, output)
+	}
+
+}
+func BenchmarkRenderSmoothMonkey(b *testing.B) {
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/bench/"))
+	f := path.Join(dir, "obj", "monkey-smooth.obj")
+	w := testenvxy(640, 480)
+	w.Config.Antialias = 3
+	w.Config.SoftShadows = false
+
+	g, err := ParseOBJ(f)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	g.SetTransform(IM().Scale(6.5, 6.5, 6.5).RotateY(math.Pi/7).Translate(0, 4, 0))
+
+	w.AddObject(g)
+	for n := 0; n < b.N; n++ {
+		output := path.Join(dir, "output", "monkey-smooth.png")
+		RenderToFile(w, output)
+	}
+
+}
 func BenchmarkRenderEmmisive(b *testing.B) {
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/bench/"))
 	w := envxy(640, 480)
 	w.Config.Antialias = 3
 	w.Config.SoftShadows = true
@@ -270,11 +335,13 @@ func BenchmarkRenderEmmisive(b *testing.B) {
 	w.AddObject(defaultroom())
 
 	for n := 0; n < b.N; n++ {
-		RenderToFile(w, "/tmp/output.png")
+		output := path.Join(dir, "output", "emmisive.png")
+		RenderToFile(w, output)
 	}
 }
 
 func BenchmarkRenderSphere(b *testing.B) {
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/bench/"))
 	width, height := 300.0, 300.0
 	w := NewDefaultWorld(width, height)
 
@@ -288,59 +355,16 @@ func BenchmarkRenderSphere(b *testing.B) {
 	w.AddObject(s1)
 
 	for n := 0; n < b.N; n++ {
-		RenderToFile(w, "/tmp/output.png")
+		output := path.Join(dir, "output", "sphere.png")
+		RenderToFile(w, output)
 	}
 }
 
 func BenchmarkRenderGlassSphere(b *testing.B) {
-
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/bench/"))
 	w := scene()
 	for n := 0; n < b.N; n++ {
-		RenderToFile(w, "/tmp/output.png")
+		output := path.Join(dir, "output", "glasssphere.png")
+		RenderToFile(w, output)
 	}
 }
-
-func benchmarkRenderObjParse(filename string, b *testing.B) {
-	// func BenchmarkRenderObjParse(b *testing.B) {
-	// for profiling
-	// filename := "complex-smooth1.obj"
-
-	// width, height := 640.0, 480.0
-	width, height := 1400.0, 1000.0
-
-	// setup world, default light and camera
-	w := NewDefaultWorld(width, height)
-
-	// override light here
-	w.SetLights([]Light{
-		NewPointLight(NewPoint(3, 4, -30), NewColor(1, 1, 1)),
-		// NewPointLight(NewPoint(-5, 4, -1), NewColor(1, 1, 1)),
-	})
-
-	// where the camera is and where it's pointing; also which way is "up"
-	from := NewPoint(0, 6, -8)
-	to := NewPoint(0, 0, 4)
-	up := NewVector(0, 1, 0)
-	cameraTransform := ViewTransform(from, to, up)
-	w.Camera().SetTransform(cameraTransform)
-	w.Camera().SetFoV(math.Pi / 3)
-
-	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/obj"))
-	g, err := ParseOBJ(path.Join(dir, filename))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	g.SetTransform(IM().Translate(0, 2, 0))
-
-	w.AddObject(g)
-
-	for n := 0; n < b.N; n++ {
-		RenderToFile(w, "/tmp/output.png")
-	}
-}
-
-func BenchmarkRenderObjParse0(b *testing.B) { benchmarkRenderObjParse("complex-smooth.obj", b) }
-func BenchmarkRenderObjParse1(b *testing.B) { benchmarkRenderObjParse("complex-smooth1.obj", b) }
-func BenchmarkRenderObjParse2(b *testing.B) { benchmarkRenderObjParse("complex-smooth2.obj", b) }
-func BenchmarkRenderObjParse3(b *testing.B) { benchmarkRenderObjParse("monkey", b) }

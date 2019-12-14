@@ -7,14 +7,14 @@ type SmoothTriangle struct {
 	// Normals at each point
 	N1, N2, N3 Vector
 
-	// Texture vectors at each point
-	VT1, VT2, VT3 Vector
+	// Texture coordinates at each point
+	VT1, VT2, VT3 Point
 
 	Triangle
 }
 
 // NewSmoothTriangle returns a new triangle
-func NewSmoothTriangle(p1, p2, p3 Point, n1, n2, n3 Vector, vt1, vt2, vt3 Vector) *SmoothTriangle {
+func NewSmoothTriangle(p1, p2, p3 Point, n1, n2, n3 Vector, vt1, vt2, vt3 Point) *SmoothTriangle {
 	t := &SmoothTriangle{
 		N1:  n1,
 		N2:  n2,
@@ -54,8 +54,6 @@ func (t *SmoothTriangle) Equal(t2 *SmoothTriangle) bool {
 // IntersectWith returns the 't' value of Ray r intersecting with the triangle in sorted order
 func (t *SmoothTriangle) IntersectWith(r Ray, xs Intersections) Intersections {
 	r = r.Transform(t.transformInverse)
-	// rval, _ := t.RayTransformCache.LoadOrStore(r, r.Transform(t.transformInverse))
-	// r = rval.(Ray)
 
 	tval, u, v, found := t.sharedIntersectWith(r)
 	if !found {
@@ -63,17 +61,8 @@ func (t *SmoothTriangle) IntersectWith(r Ray, xs Intersections) Intersections {
 	}
 
 	xs = append(xs, NewIntersectionUV(t, tval, u, v))
-	// sort.Sort(byT(xs))
 	return xs
 }
-
-// NormalAt returns the normal of the triangle at u,v stored in hit
-// func (t *SmoothTriangle) NormalAt(p Point, hit *Intersection) Vector {
-// 	op := p.ToObjectSpace(t)
-// 	on := t.localNormalAt(op, hit)
-// 	on = t.Material().PerturbNormal(on, op)
-// 	return on.NormalToWorldSpace(t).Normalize()
-// }
 
 func (t *SmoothTriangle) localNormalAt(unused Point, hit *Intersection) Vector {
 	return t.N2.Scale(hit.u).AddVector(t.N3.Scale(hit.v)).AddVector(t.N1.Scale(1 - hit.u - hit.v))

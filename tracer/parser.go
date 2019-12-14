@@ -126,7 +126,7 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 	var tri []Shaper
 	var vertecies []Point
 	var normals []Vector
-	var textures []Vector
+	var textures []Point
 
 	for _, r := range f.References {
 		v := model.GetVertexFromReference(r)
@@ -137,7 +137,7 @@ func triangulate(model *obj.Model, f *obj.Face, mat *Material) []Shaper {
 		normals = append(normals, NewVector(n.X, n.Y, -n.Z))
 
 		t := model.GetTexCoordFromReference(r)
-		textures = append(textures, NewVector(t.U, 1-t.V, t.W))
+		textures = append(textures, NewPoint(t.U, 1-t.V, t.W))
 	}
 
 	// TODO: Run this for ALL vertecies at the same time, here it's just one face at a time
@@ -275,6 +275,69 @@ func convertData(model *obj.Model, lib *mtl.Library, dir string) (*Group, error)
 	return g, nil
 }
 
+// toMesh converts an object to a TriangleMesh
+func toMesh(model *obj.Model, o *obj.Object, lib *mtl.Library, dir string) (*TriangleMesh, error) {
+	var tri *TriangleMesh
+	var vertices []Point
+	var normals []Vector
+	var textures []Point
+	var faceIndex []int
+	var vertexIndex []int
+
+	for _, m := range o.Meshes {
+		log.Printf("  material: %v\n", m.MaterialName)
+		// TODO: handle materials
+		// mat, ok := lib.FindMaterial(m.MaterialName)
+		// if !ok {
+		// 	return nil, fmt.Errorf("Unable to find material %v in lib", m.MaterialName)
+		// }
+
+		// omat, err := convertMaterial(mat, dir)
+		// if err != nil {
+		// 	return nil, err
+		// }
+
+		log.Println("  Faces:")
+		for _, f := range m.Faces {
+			vcount := 0
+			for _, r := range f.References {
+				v := model.GetVertexFromReference(r)
+				// negate Z because OBJ uses right-handed coordinates, and we use left-handed coordinates
+				vertices = append(vertices, NewPoint(v.X, v.Y, -v.Z))
+
+				n := model.GetNormalFromReference(r)
+				normals = append(normals, NewVector(n.X, n.Y, -n.Z))
+
+				t := model.GetTexCoordFromReference(r)
+				textures = append(textures, NewPoint(t.U, 1-t.V, t.W))
+				vertexIndex = append(vertexIndex, vcount)
+
+				vcount++
+			}
+			faceIndex = append(faceIndex, vcount)
+		}
+		numFaces := len(m.Faces)
+		tri = NewMesh(numFaces, faceIndex, vertexIndex, vertices, normals, textures)
+	}
+
+	return tri, nil
+}
+
+// convertToMesh converts the parsed model to a group of TriangleMesh objects
+func convertDataToMesh(model *obj.Model, lib *mtl.Library, dir string) (*Group, error) {
+	g := NewGroup()
+
+	for _, o := range model.Objects {
+		log.Printf("Object:%v", o.Name)
+		m, err := toMesh(model, o, lib, dir)
+		if err != nil {
+			panic(err)
+		}
+		g.AddMember(m)
+	}
+	return g, nil
+}
+
 // ParseOBJ parses an OBJ file and returns the result as a group
 func ParseOBJ(f string) (*Group, error) {
 	file, err := os.Open(f)
@@ -288,7 +351,8 @@ func ParseOBJ(f string) (*Group, error) {
 		return nil, err
 	}
 
-	g, err := convertData(model, lib, filepath.Dir(f))
+	// g, err := convertData(model, lib, filepath.Dir(f))
+	g, err := convertDataToMesh(model, lib, filepath.Dir(f))
 	if err != nil {
 		return nil, err
 	}

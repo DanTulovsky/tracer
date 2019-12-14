@@ -145,29 +145,6 @@ func (g *Group) NormalAt(p Point, xs *Intersection) Vector {
 	panic("called NormalAt on a group")
 }
 
-// boundingBoxFromPoints returns the bounding box given a list of points
-func (g *Group) boundingBoxFromPoints(points ...Point) Bound {
-
-	var x []float64
-	var y []float64
-	var z []float64
-
-	for _, p := range points {
-		x = append(x, p.X())
-		y = append(y, p.Y())
-		z = append(z, p.Z())
-	}
-
-	sort.Float64s(x)
-	sort.Float64s(y)
-	sort.Float64s(z)
-
-	return Bound{
-		Min: NewPoint(x[0], y[0], z[0]),
-		Max: NewPoint(x[len(x)-1], y[len(y)-1], z[len(z)-1]),
-	}
-}
-
 func (g *Group) boundBoxFromBoundingBoxes(boxes []Bound) Bound {
 
 	if len(boxes) <= 0 {
@@ -227,7 +204,7 @@ func (g *Group) calculateBounds() {
 		p8 := NewPoint(mb.Max.X(), mb.Max.Y(), mb.Max.Z()).TimesMatrix(m.Transform())
 
 		// now find the min and max of all the point sto get the new bounding box
-		all = append(all, g.boundingBoxFromPoints(p1, p2, p3, p4, p5, p6, p7, p8))
+		all = append(all, boundingBoxFromPoints(p1, p2, p3, p4, p5, p6, p7, p8))
 	}
 
 	// not combine all bounding boxes into one

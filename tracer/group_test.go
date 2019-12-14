@@ -502,7 +502,7 @@ func TestGroup_boundingBoxFromPoints(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, tt.g.boundingBoxFromPoints(tt.args.points...))
+			assert.Equal(t, tt.want, boundingBoxFromPoints(tt.args.points...))
 		})
 	}
 }

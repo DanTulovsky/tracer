@@ -17,9 +17,9 @@ func newTestTriangle() *SmoothTriangle {
 		NewVector(0, 1, 0),
 		NewVector(-1, 0, 0),
 		NewVector(1, 0, 0),
-		NewVector(0, 1, 0),
-		NewVector(-1, 0, 0),
-		NewVector(1, 0, 0),
+		NewPoint(0, 1, 0),
+		NewPoint(-1, 0, 0),
+		NewPoint(1, 0, 0),
 	)
 }
 func TestNewSmoothTriangle(t *testing.T) {
@@ -30,9 +30,9 @@ func TestNewSmoothTriangle(t *testing.T) {
 		n1  Vector
 		n2  Vector
 		n3  Vector
-		vt1 Vector
-		vt2 Vector
-		vt3 Vector
+		vt1 Point
+		vt2 Point
+		vt3 Point
 	}
 	tests := []struct {
 		name string
@@ -47,17 +47,17 @@ func TestNewSmoothTriangle(t *testing.T) {
 				n1:  NewVector(0, 1, 0),
 				n2:  NewVector(-1, 0, 0),
 				n3:  NewVector(1, 0, 0),
-				vt1: NewVector(0, 1, 0),
-				vt2: NewVector(-1, 0, 0),
-				vt3: NewVector(1, 0, 0),
+				vt1: NewPoint(0, 1, 0),
+				vt2: NewPoint(-1, 0, 0),
+				vt3: NewPoint(1, 0, 0),
 			},
 			want: &SmoothTriangle{
 				N1:  NewVector(0, 1, 0),
 				N2:  NewVector(-1, 0, 0),
 				N3:  NewVector(1, 0, 0),
-				VT1: NewVector(0, 1, 0),
-				VT2: NewVector(-1, 0, 0),
-				VT3: NewVector(1, 0, 0),
+				VT1: NewPoint(0, 1, 0),
+				VT2: NewPoint(-1, 0, 0),
+				VT3: NewPoint(1, 0, 0),
 				Triangle: Triangle{
 					P1: NewPoint(0, 1, 0),
 					P2: NewPoint(-1, 0, 0),
@@ -109,8 +109,10 @@ func TestSmoothTriangle_IntersectWith(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.tri.IntersectWith(tt.args.r, NewIntersections())
-			assert.InDelta(t, tt.wantu, got[0].u, constants.Epsilon, "should equal")
-			assert.InDelta(t, tt.wantv, got[0].v, constants.Epsilon, "should equal")
+			if assert.NotEqual(t, 0, len(got), "expected intersections") {
+				assert.InDelta(t, tt.wantu, got[0].u, constants.Epsilon, "should equal")
+				assert.InDelta(t, tt.wantv, got[0].v, constants.Epsilon, "should equal")
+			}
 		})
 	}
 }

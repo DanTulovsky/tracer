@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"math"
 	"os"
@@ -20,6 +21,7 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/tracer/tracer"
+	"github.com/DanTulovsky/tracer/utils"
 )
 
 var (
@@ -31,113 +33,6 @@ func init() {
 	// This is needed to arrange that main() runs on main thread.
 	// See documentation for functions that are only allowed to be called from the main thread.
 	runtime.LockOSThread()
-}
-
-func sceneold() {
-
-	// width, height := 300.0, 300.0
-	width, height := 1200.0, 1000.0
-
-	// setup world, default light and camera
-	w := tracer.NewDefaultWorld(width, height)
-
-	// override light here
-	w.SetLights([]tracer.Light{
-		tracer.NewPointLight(tracer.NewPoint(-10, 10, -10), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(10, 10, -10), tracer.NewColor(1, 1, 1)),
-	})
-
-	// where the camera is and where it's pointing; also which way is "up"
-	from := tracer.NewPoint(0, 1.5, -7)
-	to := tracer.NewPoint(0, 1, 0)
-	up := tracer.NewVector(0, 1, 0)
-	cameraTransform := tracer.ViewTransform(from, to, up)
-	w.Camera().SetTransform(cameraTransform)
-
-	var material *tracer.Material
-
-	// floor
-	floor := tracer.NewPlane()
-	material = floor.Material()
-	material.Color = tracer.NewColor(1, 1, 1)
-	material.Specular = 0
-	material.Reflective = 0.5
-	// p := tracer.NewRingPattern(tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue))
-	// p := tracer.NewPerturbedPattern(
-	// 	tracer.NewRingPattern(
-	// 		tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
-	// 	0.9)
-	bp1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
-	bp2 := tracer.NewStripedPattern(tracer.ColorName(colornames.Green), tracer.ColorName(colornames.White))
-	// rotate bp2 by 90 degrees
-	bp2.SetTransform(tracer.IM().RotateY(math.Pi / 2))
-
-	p := tracer.NewBlendedPattern(bp1, bp2)
-	floor.Material().SetPattern(p)
-	w.AddObject(floor)
-
-	wallMaterial := tracer.NewDefaultMaterial()
-	wallMaterial.Color = tracer.ColorName(colornames.Whitesmoke)
-
-	// left wall
-	leftWall := tracer.NewPlane()
-	leftWall.SetTransform(
-		tracer.IM().RotateZ(math.Pi/2).Translate(-15, 0, 0))
-	leftWall.SetMaterial(wallMaterial)
-	w.AddObject(leftWall)
-
-	// right wall
-	rightWall := tracer.NewPlane()
-	rightWall.SetTransform(
-		tracer.IM().RotateZ(math.Pi/2).Translate(15, 0, 0))
-	pRightWall := tracer.NewPerturbedPattern(
-		tracer.NewCheckerPattern(
-			tracer.ColorName(colornames.Fuchsia), tracer.ColorName(colornames.Blue)),
-		0.5)
-	rightWall.Material().SetPattern(pRightWall)
-	// rightWall.Material().Color = tracer.ColorName(colornames.Lightseagreen)
-	w.AddObject(rightWall)
-
-	// sphere
-	middle := tracer.NewUnitSphere()
-	middle.SetTransform(tracer.IM().Translate(-0.5, 1, 0.5))
-	material = middle.Material()
-	material.Color = tracer.ColorName(colornames.Greenyellow)
-	material.Diffuse = 0.7
-	material.Specular = 0.3
-	p1 := tracer.NewStripedPattern(tracer.ColorName(colornames.Red), tracer.Black())
-	p1.SetTransform(tracer.IM().Scale(0.3, 0.1, 0.3).RotateX(math.Pi / 1.5).RotateY(math.Pi / 5))
-	material.SetPattern(p1)
-	w.AddObject(middle)
-
-	// another sphere
-	right := tracer.NewUnitSphere()
-	right.SetTransform(tracer.IM().Scale(1, 1, 1).Translate(1, 2, -0.5))
-	material = right.Material()
-	material.Color = tracer.ColorName(colornames.Lime) // ignored when pattern
-	material.Diffuse = 0.7
-	material.Specular = 0.3
-	p2 := tracer.NewStripedPattern(
-		tracer.ColorName(colornames.Red), tracer.ColorName(colornames.Green))
-	p2.SetTransform(tracer.IM().Scale(0.1, 0.1, 0.1).RotateX(math.Pi / 4))
-	p3 := tracer.NewPerturbedPattern(p2, 0.6)
-	material.SetPattern(p3)
-	w.AddObject(right)
-
-	// cube
-	left := tracer.NewUnitCube()
-	left.SetTransform(
-		tracer.IM().Scale(0.33, 0.33, 0.33).RotateX(math.Pi/4).RotateY(math.Pi/4).RotateZ(math.Pi/4).Translate(-1.5, 2, -0.5))
-	material = left.Material()
-	material.Color = tracer.ColorName(colornames.Lightblue)
-	material.Diffuse = 0.2
-	material.Specular = 0.8
-	// p4 := tracer.NewGradientPattern(tracer.ColorName(colornames.Black), tracer.ColorName(colornames.White))
-	// p4.SetTransform(tracer.IM().Scale(2, 1, 1))
-	// material.SetPattern(p4)
-	w.AddObject(left)
-
-	tracer.Render(w)
 }
 
 func colors() {
@@ -946,20 +841,13 @@ func triangle() {
 }
 
 func objParse(f string) {
-
-	// width, height := 100.0, 100.0
-	width, height := 640.0, 480.0
-	// width, height := 1200.0, 1000.0
-
-	// setup world, default light and camera
-	w := tracer.NewDefaultWorld(width, height)
+	w := envxy(640, 480)
 	// w.Config.Parallelism = 1
 	w.Config.SoftShadows = false
 
 	// override light here
 	w.SetLights([]tracer.Light{
 		tracer.NewPointLight(tracer.NewPoint(10, 50, -30), tracer.NewColor(1, 1, 1)),
-		// tracer.NewPointLight(tracer.NewPoint(-10, -3, -5), tracer.NewColor(1, 1, 1)),
 	})
 
 	// where the camera is and where it's pointing; also which way is "up"
@@ -976,7 +864,7 @@ func objParse(f string) {
 	}
 
 	// g.SetTransform(tracer.IM().RotateY(math.Pi/5).RotateX(math.Pi/3).Translate(0, 2, 0))
-	// g.SetTransform(tracer.IM().Scale(2.5, 2.5, 2.5).RotateY(math.Pi/7).Translate(0, 2, 0))
+	g.SetTransform(tracer.IM().Scale(6.5, 6.5, 6.5).RotateY(math.Pi/7).Translate(0, 4, 0))
 
 	w.AddObject(g)
 	tracer.Render(w)
@@ -2135,7 +2023,7 @@ func main() {
 	// glass()
 
 	// window()
-	pond()
+	// pond()
 	// spherewarp()
 	// cylinder()
 	// cone()
@@ -2144,12 +2032,12 @@ func main() {
 	// triangle()
 	// csg()
 
-	// dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
+	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// f := path.Join(dir, "cubes2.obj")
-	// f := path.Join(dir, "monkey-smooth2.obj")
+	f := path.Join(dir, "monkey-smooth.obj")
 	// f := path.Join(dir, "texture2.obj")
 	// f := path.Join(dir, "simple-human-shape1.obj")
-	// objParse(f)
+	objParse(f)
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

@@ -141,7 +141,9 @@ func TestTriangle_IntersectWith(t *testing.T) {
 
 			assert.Equal(t, len(want), len(got), "should equal")
 			if tt.wantXS > 0 {
-				assert.InDelta(t, tt.wantT1, got[0].T(), constants.Epsilon, "within epsilon")
+				if assert.NotEqual(t, 0, len(got), "expected intersections") {
+					assert.InDelta(t, tt.wantT1, got[0].T(), constants.Epsilon, "within epsilon")
+				}
 			}
 		})
 	}

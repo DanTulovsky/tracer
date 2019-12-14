@@ -2,7 +2,6 @@ package tracer
 
 import (
 	"math"
-	"sync"
 
 	"github.com/DanTulovsky/tracer/constants"
 )
@@ -14,21 +13,17 @@ type Triangle struct {
 	// edge1, edge2 and the normal
 	E1, E2, Normal Vector
 
-	// Cache of Ray transform
-	RayTransformCache sync.Map
-
 	Shape
 }
 
 // NewTriangle returns a new triangle
 func NewTriangle(p1, p2, p3 Point) *Triangle {
 	t := &Triangle{
-		P1:                p1,
-		P2:                p2,
-		P3:                p3,
-		E1:                p2.SubPoint(p1),
-		E2:                p3.SubPoint(p1),
-		RayTransformCache: sync.Map{},
+		P1: p1,
+		P2: p2,
+		P3: p3,
+		E1: p2.SubPoint(p1),
+		E2: p3.SubPoint(p1),
 		Shape: Shape{
 			transform:        IM(),
 			transformInverse: IM().Inverse(),
@@ -59,6 +54,12 @@ func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, bool) 
 
 	dirCrossE2 := r.Dir.Cross(t.E2)
 	d := t.E1.Dot(dirCrossE2)
+
+	// if back culling is enabled, ignore back faces
+	// if d < 0 {
+	// 	return 0, 0, 0, false
+	// }
+
 	if math.Abs(d) < constants.Epsilon {
 		// ray parallel to surface of triangle
 		return 0, 0, 0, false
@@ -85,8 +86,6 @@ func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, bool) 
 // IntersectWith returns the 't' value of Ray r intersecting with the triangle in sorted order
 func (t *Triangle) IntersectWith(r Ray, xs Intersections) Intersections {
 	r = r.Transform(t.transformInverse)
-	// rval, _ := t.RayTransformCache.LoadOrStore(r, r.Transform(t.transformInverse))
-	// r = rval.(Ray)
 
 	// u, v not used here
 	tval, _, _, found := t.sharedIntersectWith(r)
@@ -94,7 +93,6 @@ func (t *Triangle) IntersectWith(r Ray, xs Intersections) Intersections {
 		return xs
 	}
 	xs = append(xs, NewIntersection(t, tval))
-	// sort.Sort(byT(xs))
 	return xs
 }
 
