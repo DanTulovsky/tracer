@@ -150,6 +150,7 @@ func NewMesh(numFaces int, faceIndex, vertexIndex, normalIndex, textureIndex, ma
 func (m *TriangleMesh) Equal(m2 *TriangleMesh) bool {
 	return m.Shape.Equal(&m2.Shape) &&
 		cmp.Equal(m.V, m2.V)
+	// TODO: restore next line by fixing tests
 	// cmp.Equal(m.Triangles, &m2.Triangles)
 	// cmp.Equal(m.Vn, m2.Vn) &&
 	// cmp.Equal(m.Vt, m2.Vt) &&
