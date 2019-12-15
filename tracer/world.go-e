@@ -351,7 +351,6 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 		}()
 	}
 
-	// keep track of progress
 	total := (camera.Vsize - 1) * (camera.Hsize - 1)
 	done := 0.0
 	last := 0.0
@@ -387,12 +386,6 @@ func (w *World) ShowInfo() {
 		}
 	}
 
-	var numShapes int
-
-	for _, s := range w.Objects {
-		numShapes = numShapes + s.NumShapes()
-	}
-
 	log.Printf("Camera HSize: %v", w.Camera().Hsize)
 	log.Printf("Camera WSize: %v", w.Camera().Vsize)
 	log.Printf("Camera Pixel Size: %.4f", w.Camera().PixelSize)
@@ -401,7 +394,7 @@ func (w *World) ShowInfo() {
 	log.Printf("Antialiasing: %v", w.Config.Antialias)
 	log.Printf("Parallelism: %v", w.Config.Parallelism)
 	log.Printf("Max Recursion: %v", w.Config.MaxRecusions)
-	log.Printf("BackfaceCulling enabled? -> %v", w.Config.BackfaceCulling)
+	log.Printf("BackCulling enabled? -> %v", w.Config.BackCulling)
 	log.Printf("Have Area Lights? -> %v", haveAreaLight)
 	if haveAreaLight {
 		log.Printf("  Area Light Rays: %v", w.Config.AreaLightRays)
@@ -410,7 +403,6 @@ func (w *World) ShowInfo() {
 	if w.Config.SoftShadows {
 		log.Printf("  Soft shadow rays: %v", w.Config.SoftShadowRays)
 	}
-	log.Printf("Total Shapes (if obj import, all are triangles): %v", numShapes)
 }
 
 // Render renders the world using the world camera

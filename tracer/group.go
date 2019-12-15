@@ -73,6 +73,14 @@ func (g *Group) Includes(s Shaper) bool {
 	return false
 }
 
+// SetWorldConfig attachs the world config to this object
+func (g *Group) SetWorldConfig(wc *WorldConfig) {
+	for _, m := range g.members {
+		m.SetWorldConfig(wc)
+	}
+	g.wc = wc
+}
+
 // checkAxis is a helper function for check for intersection of the group's bounding box and ray
 func (g *Group) checkAxis(o, d, min, max float64) (float64, float64) {
 
@@ -209,4 +217,14 @@ func (g *Group) calculateBounds() {
 
 	// not combine all bounding boxes into one
 	g.bound = g.boundBoxFromBoundingBoxes(all)
+}
+
+// NumShapes returns the number of shapes contained in this object
+func (g *Group) NumShapes() int {
+	var num int
+	for _, m := range g.members {
+		num = num + m.NumShapes()
+	}
+
+	return num
 }

@@ -113,9 +113,12 @@ func NewMesh(numFaces int, faceIndex, vertexIndex, normalIndex, textureIndex, ma
 	var j int
 	for i := 0; i < numTris; i++ {
 		tri := NewSmoothTriangle(
-			v[trisIndex[j]], v[trisIndex[j+1]], v[trisIndex[j+2]],
-			vn[ni[j]], vn[ni[j+1]], vn[ni[j+2]],
-			vt[ti[j]], vt[ti[j+1]], vt[ti[j+2]],
+			// v[trisIndex[j]], v[trisIndex[j+1]], v[trisIndex[j+2]],
+			// vn[ni[j]], vn[ni[j+1]], vn[ni[j+2]],
+			// vt[ti[j]], vt[ti[j+1]], vt[ti[j+2]],
+			v[trisIndex[j]], v[trisIndex[j+2]], v[trisIndex[j+1]],
+			vn[ni[j]], vn[ni[j+2]], vn[ni[j+1]],
+			vt[ti[j]], vt[ti[j+2]], vt[ti[j+1]],
 		)
 		// index := int(math.Floor(float64(i) / 3.0))
 		mat := materials[mi[i]]
@@ -241,4 +244,17 @@ func (m *TriangleMesh) IntersectWith(r Ray, t Intersections) Intersections {
 	}
 
 	return t
+}
+
+// SetWorldConfig attachs the world config to this object
+func (m *TriangleMesh) SetWorldConfig(wc *WorldConfig) {
+	for _, t := range m.Triangles {
+		t.SetWorldConfig(wc)
+	}
+	m.wc = wc
+}
+
+// NumShapes returns the number of shapes contained in this object
+func (m *TriangleMesh) NumShapes() int {
+	return len(m.Triangles)
 }

@@ -28,8 +28,13 @@ type Shaper interface {
 	Material() *Material
 	SetMaterial(*Material)
 
+	WorldConfig() *WorldConfig
+	SetWorldConfig(*WorldConfig)
+
 	Name() string
 	SetName(string)
+
+	NumShapes() int
 
 	// RandomPosition returns a andom point on the surface of the geometry
 	RandomPosition(*rand.Rand) Point
@@ -48,11 +53,27 @@ type Shape struct {
 	transformInverse Matrix
 	material         *Material
 	bound            Bound // cache the group bounding box
+	wc               *WorldConfig
 
 	parent Shaper
 
 	// localNormalAt
 	lna func(Point, *Intersection) Vector
+}
+
+// NumShapes returns the number of shapes contained in this object
+func (s *Shape) NumShapes() int {
+	return 1
+}
+
+// SetWorldConfig attachs the world config to this object
+func (s *Shape) SetWorldConfig(wc *WorldConfig) {
+	s.wc = wc
+}
+
+// WorldConfig returns the world config attached to this object
+func (s *Shape) WorldConfig() *WorldConfig {
+	return s.wc
 }
 
 // Equal returns true if the shapes are equal

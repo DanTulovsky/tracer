@@ -5,16 +5,15 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"os"
 	"path"
 	"runtime"
-	"runtime/pprof"
 
 	"image/color"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 
+	"net/http"
 	_ "net/http/pprof"
 
 	"github.com/lucasb-eyer/go-colorful"
@@ -22,11 +21,6 @@ import (
 
 	"github.com/DanTulovsky/tracer/tracer"
 	"github.com/DanTulovsky/tracer/utils"
-)
-
-var (
-	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
-	memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 )
 
 func init() {
@@ -844,7 +838,8 @@ func objParse(f string) {
 	w := envxy(640, 480)
 	// w.Config.Parallelism = 1
 	w.Config.SoftShadows = false
-	w.Config.Antialias = 3
+	// w.Config.Antialias = 3
+	w.Config.BackfaceCulling = true
 
 	// override light here
 	w.SetLights([]tracer.Light{
@@ -1984,17 +1979,10 @@ func main() {
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal("could not create CPU profile: ", err)
-		}
-		defer f.Close()
-		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal("could not start CPU profile: ", err)
-		}
-		defer pprof.StopCPUProfile()
-	}
+	go func() {
+		// https://golang.org/pkg/net/http/pprof/
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 
 	// areaspotlight()
 	// spotlight()
@@ -2036,22 +2024,10 @@ func main() {
 
 	dir := fmt.Sprintf(path.Join(utils.Homedir(), "go/src/github.com/DanTulovsky/tracer/obj"))
 	// f := path.Join(dir, "cubes2.obj")
-	f := path.Join(dir, "monkey-smooth.obj")
+	// f := path.Join(dir, "monkey-smooth.obj")
 	// f := path.Join(dir, "cube-plane.obj")
 	// f := path.Join(dir, "texture2.obj")
 	// f := path.Join(dir, "simple-human-shape1.obj")
+	f := path.Join(dir, "human1.obj")
 	objParse(f)
-
-	if *memprofile != "" {
-		f, err := os.Create(*memprofile)
-		if err != nil {
-			log.Fatal("could not create memory profile: ", err)
-		}
-		defer f.Close()
-		runtime.GC() // get up-to-date statistics
-		if err := pprof.WriteHeapProfile(f); err != nil {
-			log.Fatal("could not write memory profile: ", err)
-		}
-	}
-
 }
