@@ -7,6 +7,7 @@ import (
 
 	"github.com/DanTulovsky/tracer/constants"
 	"github.com/google/go-cmp/cmp"
+	"github.com/rcrowley/go-metrics"
 )
 
 // Intersection encapsulates an intersection t value an an object
@@ -19,6 +20,7 @@ type Intersection struct {
 
 // NewIntersection returns an intersection object
 func NewIntersection(o Shaper, t float64) *Intersection {
+	metrics.GetOrRegisterCounter("num_intersection", nil).Inc(1)
 	return &Intersection{o: o, t: t}
 }
 
@@ -34,6 +36,7 @@ func (i *Intersection) Object() Shaper {
 
 // NewIntersectionUV returns an intersection object with UV filled in
 func NewIntersectionUV(o Shaper, t, u, v float64) *Intersection {
+	metrics.GetOrRegisterCounter("num_uv_intersection", nil).Inc(1)
 	return &Intersection{o: o, t: t, u: u, v: v}
 }
 
@@ -50,6 +53,8 @@ type Intersections []*Intersection
 
 // NewIntersections aggregates the given intersections into a sorted list
 func NewIntersections(i ...*Intersection) Intersections {
+	metrics.GetOrRegisterCounter("num_intersections", nil).Inc(1)
+
 	is := make(Intersections, 0, 4)
 
 	for _, int := range i {

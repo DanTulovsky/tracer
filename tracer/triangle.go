@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/DanTulovsky/tracer/constants"
+	"github.com/rcrowley/go-metrics"
 )
 
 // Triangle is a triangle defined by 3 points in 3d space
@@ -57,6 +58,7 @@ func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, bool) 
 
 	// if back culling is enabled, ignore back faces
 	if t.WorldConfig().BackfaceCulling && d < 0 {
+		metrics.GetOrRegisterCounter("num_backfaces_culled", nil).Inc(1)
 		return 0, 0, 0, false
 	}
 

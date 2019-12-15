@@ -1,5 +1,7 @@
 package tracer
 
+import "github.com/rcrowley/go-metrics"
+
 // Ray describes a light ray
 type Ray struct {
 	Origin Point
@@ -8,6 +10,8 @@ type Ray struct {
 
 // NewRay returns a new ray
 func NewRay(o Point, d Vector) Ray {
+	m := metrics.GetOrRegisterCounter("num_rays", nil)
+	m.Inc(1)
 	return Ray{Origin: o, Dir: d}
 }
 

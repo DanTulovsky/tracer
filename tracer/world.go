@@ -4,9 +4,12 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"os"
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/rcrowley/go-metrics"
 
 	"golang.org/x/image/colornames"
 )
@@ -118,6 +121,7 @@ func (w *World) ColorAt(r Ray, remaining int, xs Intersections, rng *rand.Rand) 
 	if err != nil {
 		return Black()
 	}
+	metrics.GetOrRegisterCounter("num_hits", nil).Inc(1)
 
 	// Second solve the shading problem
 	state := PrepareComputations(hit, r, xs)
@@ -376,6 +380,20 @@ func (w *World) doRender(camera *Camera, canvas *Canvas) *Canvas {
 	return canvas
 }
 
+// RegisterMetrics initializes metrics
+func (w *World) RegisterMetrics() {
+	// counters
+	metrics.Register("num_backfaces_culled", metrics.NewCounter())
+	metrics.Register("num_hits", metrics.NewCounter())
+	metrics.Register("num_intersection", metrics.NewCounter())
+	metrics.Register("num_intersections", metrics.NewCounter())
+	metrics.Register("num_rays", metrics.NewCounter())
+	metrics.Register("num_uv_intersection", metrics.NewCounter())
+
+	// guages
+	metrics.Register("total_progress_pcnt", metrics.NewGaugeFloat64())
+}
+
 // ShowInfo dumps info about the world
 func (w *World) ShowInfo() {
 	haveAreaLight := false
@@ -417,6 +435,8 @@ func (w *World) ShowInfo() {
 func (w *World) Render(camera *Camera, canvas *Canvas) {
 	w.LintWorld()
 	w.PrecomputeValues()
+	w.RegisterMetrics()
+	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 
 	w.ShowInfo()
 
