@@ -144,7 +144,6 @@ func (g *Group) IntersectWith(r Ray, t Intersections) Intersections {
 		xs = xs[:0]
 	}
 
-	// sort.Sort(byT(t))
 	return t
 }
 

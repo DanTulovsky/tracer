@@ -56,7 +56,7 @@ func (t *Triangle) sharedIntersectWith(r Ray) (float64, float64, float64, bool) 
 	dirCrossE2 := r.Dir.Cross(t.E2)
 	d := t.E1.Dot(dirCrossE2)
 
-	// if back culling is enabled, ignore back faces
+	// if backface culling is enabled, ignore back faces
 	if t.WorldConfig().BackfaceCulling && d < 0 {
 		metrics.GetOrRegisterCounter("num_backfaces_culled", nil).Inc(1)
 		return 0, 0, 0, false

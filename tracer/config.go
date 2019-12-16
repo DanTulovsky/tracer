@@ -32,13 +32,13 @@ type WorldConfig struct {
 // NewWorldConfig returns a new world config with default settings
 func NewWorldConfig() *WorldConfig {
 	return &WorldConfig{
-		Antialias:      0,
-		AreaLightRays:  10,
-		MaxRecusions:   4,
-		Parallelism:    runtime.NumCPU(),
-		SoftShadows:    true,
-		SoftShadowRays: 6,
-		RenderPasses:   8,
-		BackfaceCulling:    true,
+		Antialias:       0,
+		AreaLightRays:   10,
+		MaxRecusions:    4,
+		Parallelism:     runtime.NumCPU(),
+		SoftShadows:     true,
+		SoftShadowRays:  6,
+		RenderPasses:    8,
+		BackfaceCulling: false, // off by default, as transpaencies require it
 	}
 }
