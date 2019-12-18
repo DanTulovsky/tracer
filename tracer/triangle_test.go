@@ -133,6 +133,7 @@ func TestTriangle_IntersectWith(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			want := NewIntersections()
+			tt.tri.SetWorldConfig(NewWorldConfig())
 
 			if tt.wantXS > 0 {
 				want = append(want, NewIntersection(tt.tri, tt.wantT1))

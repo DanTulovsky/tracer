@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestTriangle() *SmoothTriangle {
-	return NewSmoothTriangle(
+func newTestTriangle(config *WorldConfig) *SmoothTriangle {
+	t := NewSmoothTriangle(
 		NewPoint(0, 1, 0),
 		NewPoint(-1, 0, 0),
 		NewPoint(1, 0, 0),
@@ -21,6 +21,8 @@ func newTestTriangle() *SmoothTriangle {
 		NewPoint(-1, 0, 0),
 		NewPoint(1, 0, 0),
 	)
+	t.SetWorldConfig(config)
+	return t
 }
 func TestNewSmoothTriangle(t *testing.T) {
 	type args struct {
@@ -98,7 +100,7 @@ func TestSmoothTriangle_IntersectWith(t *testing.T) {
 		wantu, wantv float64
 	}{
 		{
-			tri: newTestTriangle(),
+			tri: newTestTriangle(NewWorldConfig()),
 			args: args{
 				r: NewRay(NewPoint(-0.2, 0.3, -2), NewVector(0, 0, 1)),
 			},
@@ -129,10 +131,10 @@ func TestSmoothTriangle_NormalAt(t *testing.T) {
 		want Vector
 	}{
 		{
-			tri: newTestTriangle(),
+			tri: newTestTriangle(NewWorldConfig()),
 			args: args{
 				p:  NewPoint(0, 0, 0), // not used
-				xs: NewIntersectionUV(newTestTriangle(), 1, 0.45, 0.25),
+				xs: NewIntersectionUV(newTestTriangle(NewWorldConfig()), 1, 0.45, 0.25),
 			},
 			want: NewVector(-0.55470, 0.832050, 0),
 		},

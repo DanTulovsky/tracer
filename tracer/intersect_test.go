@@ -404,13 +404,13 @@ func TestNewIntersectionUV(t *testing.T) {
 		{
 			name: "test1",
 			args: args{
-				o: newTestTriangle(),
+				o: newTestTriangle(NewWorldConfig()),
 				t: 3.5,
 				u: 0.2,
 				v: 0.4,
 			},
 			want: &Intersection{
-				o: newTestTriangle(),
+				o: newTestTriangle(NewWorldConfig()),
 				t: 3.5,
 				u: 0.2,
 				v: 0.4,
