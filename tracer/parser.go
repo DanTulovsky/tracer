@@ -17,6 +17,7 @@ import (
 
 	"github.com/mokiat/go-data-front/decoder/mtl"
 	"github.com/mokiat/go-data-front/decoder/obj"
+	"github.com/qmuntal/gltf"
 )
 
 const (
@@ -366,6 +367,24 @@ func ParseOBJ(f string) (*Group, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return g, nil
+}
+
+// ParseGLTF paes a .gltf file and returns the result as a group
+func ParseGLTF(f string) (*Group, error) {
+	log.Printf("Parsing %v...", f)
+	doc, err := gltf.Open(f)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(doc.Asset)
+	fmt.Printf("%#v\n", doc.Cameras)
+	fmt.Printf("%#v\n", doc.Meshes)
+	fmt.Printf("%#v\n", doc.Scenes)
+
+	g := NewGroup()
 
 	return g, nil
 }
